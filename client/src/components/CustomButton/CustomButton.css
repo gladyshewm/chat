@@ -1,0 +1,18 @@
+.custom-button {
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: none;
+    background-image: linear-gradient(160deg, var(--col1) 0%, var(--col2) 100%);
+    transition: --col1 0.7s ease, --col2 0.7s ease;
+    color: #fff;
+    width: 200px;
+    height: 40px;
+    font-size: 16px;
+    margin-bottom: 20px;
+
+    &:hover {
+        cursor: pointer;
+        --col1: #378f7b;
+        --col2: #8ceabb;
+    }
+}
