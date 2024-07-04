@@ -24,12 +24,31 @@ export class User {
 export class UserInfo {
     id: string;
     name: string;
+    email: string;
+}
+
+export class AuthPayload {
+    user: UserInfo;
+    token: string;
+}
+
+export abstract class IMutation {
+    abstract createUser(input: UserInput): AuthPayload | Promise<AuthPayload>;
+
+    abstract logInUser(email: string, password: string): AuthPayload | Promise<AuthPayload>;
+
+    abstract logOutUser(): boolean | Promise<boolean>;
+}
+
+export class Info {
+    id: string;
+    name: string;
 }
 
 export abstract class IQuery {
     abstract user(): Nullable<User> | Promise<Nullable<User>>;
 
-    abstract users(): UserInfo[] | Promise<UserInfo[]>;
+    abstract users(): Info[] | Promise<Info[]>;
 }
 
 type Nullable<T> = T | null;

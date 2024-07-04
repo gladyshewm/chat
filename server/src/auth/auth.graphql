@@ -1,0 +1,29 @@
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+}
+
+type UserInfo {
+  id: ID!
+  name: String!
+  email: String!
+}
+
+input UserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+type AuthPayload {
+  user: UserInfo!
+  token: String!
+}
+
+type Mutation {
+  createUser(input: UserInput!): AuthPayload!
+  logInUser(email: String!, password: String!): AuthPayload!
+  logOutUser: Boolean!
+}

@@ -1,18 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
-import { UserInfo } from 'src/graphql';
+import { Info } from 'src/graphql';
 
 @Injectable()
 export class UsersService {
   constructor(private supabaseService: SupabaseService) {}
 
-  public async findAll(): Promise<UserInfo[]> {
+  async findAll(): Promise<Info[]> {
     const { data: users, error } = await this.supabaseService
       .getClient()
       .from('profiles')
       .select('id, name');
     if (error) {
-      throw error;
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return users;
   }
