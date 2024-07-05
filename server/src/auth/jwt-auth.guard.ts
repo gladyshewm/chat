@@ -11,7 +11,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 export class JWTAuthGuard implements CanActivate {
   constructor(private jwtService: JwtService) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const req = ctx.getContext().req;
     try {
@@ -22,7 +22,9 @@ export class JWTAuthGuard implements CanActivate {
       if (bearer !== 'Bearer' || !token) {
         throw new UnauthorizedException({ message: 'User not authorized' });
       }
-      const user = this.jwtService.verify(token);
+      const user = await this.jwtService.verifyAsync(token).catch((err) => {
+        throw new UnauthorizedException({ message: err.message });
+      });
       req.user = user;
     } catch (error) {
       throw new UnauthorizedException({ message: 'User not authorized' });
