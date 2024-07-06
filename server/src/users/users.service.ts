@@ -1,10 +1,30 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
-import { Info } from 'src/graphql';
+import { Info, UserInfo } from 'src/graphql';
 
 @Injectable()
 export class UsersService {
   constructor(private supabaseService: SupabaseService) {}
+
+  async getUser(): Promise<UserInfo> | null {
+    try {
+      const {
+        data: { session },
+      } = await this.supabaseService.getClient().auth.getSession();
+      if (session) {
+        const { user } = session;
+        return {
+          id: user.id,
+          name: user.user_metadata.name,
+          email: user.email,
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Ошибка получения пользователя:', error.message);
+      throw error;
+    }
+  }
 
   async findAll(): Promise<Info[]> {
     const { data: users, error } = await this.supabaseService

@@ -13,6 +13,11 @@ export class UsersResolver {
     return this.usersService.findAll();
   } */
 
+  @Query('user')
+  async getUser(): Promise<UserInfo> | null {
+    return this.usersService.getUser();
+  }
+
   @UseGuards(JWTAuthGuard)
   @Query('users')
   async getAllUsers(): Promise<Info[]> {
