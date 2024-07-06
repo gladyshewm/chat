@@ -1,8 +1,13 @@
-import React from 'react';
-import { useField } from 'formik';
+import React, { FC } from 'react';
+import { FieldAttributes, useField } from 'formik';
 import './CustomInput.css';
 
-const CustomInput = ({ label, ...props }: any) => {
+interface inputProps extends FieldAttributes<any> {
+  label?: string;
+  name: string;
+}
+
+const CustomInput: FC<inputProps> = ({ label, ...props }) => {
   const [field, meta] = useField(props);
   const fieldClassName = meta.touched && meta.error ? 'error' : '';
   return (
