@@ -1,47 +1,43 @@
 @property --col1 {
-    syntax: '<color>';
-    initial-value: #48dd93;
-    /* #8ceabb; */
-    inherits: false;
+  syntax: '<color>';
+  initial-value: #48dd93;
+  /* #8ceabb; */
+  inherits: false;
 }
 
 @property --col2 {
-    syntax: '<color>';
-    initial-value: #258770;
-    /* #378f7b; */
-    inherits: false;
-}
-
-:root {
-    --base-color: #212121;
+  syntax: '<color>';
+  initial-value: #258770;
+  /* #378f7b; */
+  inherits: false;
 }
 
 .auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: var(--base-color);
+
+  & form {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background-color: var(--base-color);
+    margin-top: 5vh;
+  }
 
-    & form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 5vh;
+  & .login-form {
+    position: relative;
+
+    & .error-message {
+      position: absolute;
+      bottom: -20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(252, 125, 108, 1);
+      width: 300px;
+      padding-left: 30px;
     }
-
-    & .login-form {
-        position: relative;
-
-        & .error-message {
-            position: absolute;
-            bottom: -20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: rgba(252, 125, 108, 1);
-            width: 300px;
-            padding-left: 30px;
-        }
-    }
+  }
 }

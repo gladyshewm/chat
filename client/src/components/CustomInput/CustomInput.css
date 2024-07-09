@@ -7,7 +7,7 @@
     position: relative;
 }
 
-input {
+.custom-input {
     margin-bottom: 30px;
     outline: none;
     background: transparent;

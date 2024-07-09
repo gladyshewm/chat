@@ -4,7 +4,7 @@ export const CREATE_USER = gql`
   mutation createUser($input: UserInput!) {
     createUser(input: $input) {
       user {
-        id
+        uuid
         name
         email
       }
@@ -17,7 +17,7 @@ export const LOGIN_USER = gql`
   mutation logInUser($email: String!, $password: String!) {
     logInUser(email: $email, password: $password) {
       user {
-        id
+        uuid
         email
         name
       }
@@ -29,5 +29,11 @@ export const LOGIN_USER = gql`
 export const SIGN_OUT_USER = gql`
   mutation logOutUser {
     logOutUser
+  }
+`;
+
+export const UPLOAD_AVATAR = gql`
+  mutation uploadAvatar($image: Upload!, $userUuid: String!) {
+    uploadAvatar(image: $image, userUuid: $userUuid)
   }
 `;

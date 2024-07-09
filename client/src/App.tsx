@@ -4,7 +4,7 @@ import './App.css';
 import AppRoutes from './AppRoutes';
 import { AuthProvider } from './hoc/AuthProvider';
 
-const App: FC = () => {
+const App = () => {
   return (
     <AuthProvider>
       <BrowserRouter>

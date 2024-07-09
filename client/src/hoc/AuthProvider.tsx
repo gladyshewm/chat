@@ -3,9 +3,10 @@ import { useQuery, useMutation, useApolloClient } from '@apollo/client';
 import { GET_USER } from '../graphql/query/user';
 import { SIGN_OUT_USER } from '../graphql/mutations/user';
 import { LOGIN_USER } from '../graphql/mutations/user';
+import CustomLoader from '../components/CustomLoader/CustomLoader';
 
-interface User {
-  id: string;
+export interface User {
+  uuid: string;
   name: string;
   email: string;
 }
@@ -49,7 +50,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           const { data } = await refetch();
           if (data && data.user) {
             setUser({
-              id: data.user.id,
+              uuid: data.user.uuid,
               name: data.user.name,
               email: data.user.email,
             });
@@ -106,7 +107,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   };
 
   if (isLoading) {
-    return <h1>Loading...</h1>;
+    return <CustomLoader />;
   }
 
   return (

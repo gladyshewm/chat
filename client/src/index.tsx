@@ -6,20 +6,25 @@ import {
   ApolloClient,
   InMemoryCache,
   split,
-  HttpLink,
   ApolloLink,
 } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
 import { setContext } from '@apollo/client/link/context';
+import createUploadLink from 'apollo-upload-client/createUploadLink.mjs';
 
-let httpLink: HttpLink = new HttpLink({
+/* let httpLink = new HttpLink({
   uri: 'http://localhost:5000/graphql',
   credentials: 'include',
+}); */
+
+let uploadLink = createUploadLink({
+  uri: 'http://localhost:5000/graphql',
+    credentials: 'include',
 });
 
-let wsLink: GraphQLWsLink = new GraphQLWsLink(
+let wsLink = new GraphQLWsLink(
   createClient({
     url: 'ws://localhost:5000/graphql',
   }),
@@ -31,12 +36,14 @@ const authLink: ApolloLink = setContext((_, { headers }) => {
     headers: {
       ...headers,
       authorization: token ? `Bearer ${token}` : '',
+      'apollo-require-preflight': 'true',
     },
   };
 });
 
-httpLink = authLink.concat(httpLink) as HttpLink;
+/* httpLink = authLink.concat(httpLink) as HttpLink; */
 wsLink = authLink.concat(wsLink) as GraphQLWsLink;
+uploadLink = authLink.concat(uploadLink);
 
 const splitLink: ApolloLink = split(
   ({ query }) => {
@@ -47,7 +54,7 @@ const splitLink: ApolloLink = split(
     );
   },
   wsLink,
-  httpLink,
+  uploadLink,
 );
 
 const client: ApolloClient<any> = new ApolloClient({

@@ -1,11 +1,12 @@
-import React, { FC } from 'react';
+import React, { Suspense } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import CustomButton from '../CustomButton/CustomButton';
 import Sidebar from '../Sidebar/Sidebar';
 import './Layout.css';
+import CustomLoader from '../CustomLoader/CustomLoader';
 
-const Layout: FC = () => {
+const Layout = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -21,11 +22,9 @@ const Layout: FC = () => {
   return (
     <div className="layout">
       <Sidebar />
-      <CustomButton onClick={handleLogout} type="submit">
-        Выйти
-      </CustomButton>
-      HUIHUIHUIHUIHUIHUIHUIHUIHUIHUIHUIHUIHUI
-      <Outlet />
+      <Suspense fallback={<CustomLoader />}>
+        <Outlet />
+      </Suspense>
     </div>
   );
 };

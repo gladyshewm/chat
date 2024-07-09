@@ -1,17 +1,19 @@
-import React, { FC } from 'react';
+import React, { FC, lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import Auth from './pages/Authentication/Auth';
 import PrivateRoute from './hoc/PrivateRoute';
 import useAuth from './hooks/useAuth';
 import Layout from './components/Layout/Layout';
-import Main from './pages/Main/Main';
-import Chat from './components/Chat/Chat';
+import CustomLoader from './components/CustomLoader/CustomLoader';
+import Settings from './pages/Settings/Settings';
+const Main = lazy(() => import('./pages/Main/Main'));
+const Chat = lazy(() => import('./components/Chat/Chat'));
 
-const AppRoutes: FC = () => {
+const AppRoutes = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <h1>Loading...</h1>;
+    return <CustomLoader />;
   }
 
   return (
@@ -24,6 +26,7 @@ const AppRoutes: FC = () => {
         <Route path="/" element={<Layout />}>
           <Route index element={<Main />} />
           <Route path="chat" element={<Chat />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Route>
       <Route

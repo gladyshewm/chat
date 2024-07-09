@@ -1,3 +1,9 @@
+:root {
+  --base-color: #212121;
+  --col1: #48dd93;
+  --col2: #258770;
+}
+
 * {
   margin: 0;
   padding: 0;

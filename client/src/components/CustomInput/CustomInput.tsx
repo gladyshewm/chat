@@ -9,7 +9,7 @@ interface inputProps extends FieldAttributes<any> {
 
 const CustomInput: FC<inputProps> = ({ label, ...props }) => {
   const [field, meta] = useField(props);
-  const fieldClassName = meta.touched && meta.error ? 'error' : '';
+  const fieldClassName = meta.touched && meta.error ? 'custom-input error' : 'custom-input';
   return (
     <div className="input-block">
       <input {...field} {...props} className={fieldClassName} />

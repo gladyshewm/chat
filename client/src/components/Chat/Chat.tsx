@@ -5,6 +5,7 @@ import { POST_MESSAGE } from '../../graphql/mutations/messages';
 import { MESSAGES_SUBSCRIPTION } from '../../graphql/subscriptions/messages';
 import './Chat.css';
 import SendIcon from '../icons/SendIcon';
+import CustomLoader from '../CustomLoader/CustomLoader';
 
 interface MessagesProps {
   user: string;
@@ -34,7 +35,7 @@ const Messages: FC<MessagesProps> = ({ user }) => {
   }, [messagesContent]);
 
   if (loadingMessages) {
-    return <h1>Loading...</h1>;
+    return <CustomLoader />;
   }
 
   return (
