@@ -43,7 +43,7 @@ export class AuthService {
     }
 
     const user: UserInfo = {
-      id: profile_id,
+      uuid: profile_id,
       name: userInput.name,
       email: userInput.email,
     };
@@ -64,7 +64,7 @@ export class AuthService {
     }
 
     const user = {
-      id: data.user.id,
+      uuid: data.user.id,
       name: data.user.user_metadata.name,
       email: data.user.email,
     };

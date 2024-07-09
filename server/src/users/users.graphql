@@ -1,3 +1,5 @@
+scalar Upload
+
 type Info {
   id: ID!
   name: String!
@@ -6,4 +8,9 @@ type Info {
 type Query {
   user: User
   users: [Info!]!
+  userAvatar(userUuid: ID!): String!
+}
+
+type Mutation {
+  uploadAvatar(image: Upload!, userUuid: String!): String!
 }

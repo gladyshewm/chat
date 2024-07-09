@@ -6,4 +6,8 @@ definitionsFactory.generate({
   typePaths: ['./**/*.graphql'],
   path: join(process.cwd(), 'src/graphql.ts'),
   outputAs: 'class',
+  customScalarTypeMapping: {
+    Upload: 'FileUpload',
+  },
+  additionalHeader: 'import { FileUpload } from "graphql-upload-ts";',
 });

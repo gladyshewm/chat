@@ -9,6 +9,7 @@ import { ProductsModule } from '../products/products.module';
 import { UsersModule } from '../users/users.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { AuthModule } from '../auth/auth.module';
+import { UploadScalar } from 'src/users/scalars/upload.scalar';
 
 @Module({
   imports: [
@@ -18,12 +19,17 @@ import { AuthModule } from '../auth/auth.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    UploadScalar,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
         outputAs: 'class',
+        customScalarTypeMapping: {
+          Upload: 'FileUpload',
+        },
+        additionalHeader: 'import { FileUpload } from "graphql-upload-ts";',
       },
     }),
     AuthModule,

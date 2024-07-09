@@ -1,17 +1,13 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { Info, User, UserInfo } from 'src/graphql';
+import { Info, UserInfo } from 'src/graphql';
 import { UseGuards } from '@nestjs/common';
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 @Resolver('User')
 export class UsersResolver {
   constructor(private usersService: UsersService) {}
-
-  /* @Query('user')
-  public async getUser() {
-    return this.usersService.findAll();
-  } */
 
   @Query('user')
   async getUser(): Promise<UserInfo> | null {
@@ -24,8 +20,17 @@ export class UsersResolver {
     return this.usersService.findAll();
   }
 
-  /* @Query()
-  async getUser(@Args('id') id: number) {
-    return this.usersService.findOneById(id);
-  } */
+  @UseGuards(JWTAuthGuard)
+  @Mutation('uploadAvatar')
+  async uploadAvatar(
+    @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
+    @Args('userUuid') userUuid: string,
+  ) {
+    return this.usersService.uploadAvatar(image, userUuid);
+  }
+
+  @Query('userAvatar')
+  async getUserAvatar(@Args('userUuid') userUuid: string) {
+    return this.usersService.getUserAvatar(userUuid);
+  }
 }

@@ -1,12 +1,12 @@
 type User {
-  id: ID!
+  uuid: ID!
   name: String!
   email: String!
   password: String!
 }
 
 type UserInfo {
-  id: ID!
+  uuid: ID!
   name: String!
   email: String!
 }
