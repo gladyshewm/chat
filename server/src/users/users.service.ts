@@ -1,7 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FileUpload } from 'graphql-upload-ts';
-import { createWriteStream } from 'fs';
 import { Info, UserInfo } from 'src/graphql';
 
 @Injectable()
@@ -112,19 +111,3 @@ export class UsersService {
     return profile.avatar_url;
   }
 }
-
-/*const stream = createReadStream();
- 
-const uploadPath = './src/uploads/' + filename;
-
-    return new Promise((resolve, reject) => {
-      const writeStream = createWriteStream(uploadPath);
-      writeStream.on('finish', () => resolve(filename));
-      writeStream.on('error', (error) =>
-        reject(
-          new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR),
-        ),
-      );
-
-      stream.pipe(writeStream);
-    }); */
