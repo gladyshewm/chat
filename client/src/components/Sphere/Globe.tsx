@@ -1,8 +1,12 @@
-import React, { useRef, useState, FC } from 'react';
+import React, { useRef, useState, FC, memo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import {
   Cloud,
+  Detailed,
   MeshDistortMaterial,
+  MeshReflectorMaterial,
+  MeshRefractionMaterial,
+  MeshWobbleMaterial,
   OrbitControls,
   Stars,
   useDetectGPU,
@@ -16,13 +20,15 @@ import {
 import * as THREE from 'three';
 import LogoSphere from './LogoSphere';
 import CustomButton from '../CustomButton/CustomButton';
-import PowerIcon from '../icons/PowerIcon';
+import PowerIcon from '../../icons/PowerIcon';
+import { motion } from 'framer-motion-3d';
+import { MotionCanvas, LayoutCamera } from 'framer-motion-3d';
 
 interface GlobeProps {
   position: [number, number, number];
 }
 
-const Globe: FC<GlobeProps> = ({ position }) => {
+const Globe: FC<GlobeProps> = memo(({ position }) => {
   const [hovered, hover] = useState(false);
   const meshDistortRef = useRef<THREE.MeshStandardMaterial>(null);
   const meshRef = useRef<THREE.Mesh>(null);
@@ -44,14 +50,40 @@ const Globe: FC<GlobeProps> = ({ position }) => {
     }
   });
 
-  return (
-    <mesh
-      ref={meshRef}
-      onPointerOver={() => hover(true)}
-      onPointerOut={() => hover(false)}
-      position={position}
-    >
-      <sphereGeometry args={[3, 26, 22]} />
+  /* const variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 0.4 },
+  }; */
+
+  const HighDetailGlobe = () => (
+    <mesh>
+      <sphereGeometry args={[3, 64, 64]} />
+      <MeshReflectorMaterial
+        ref={meshDistortRef as any}
+        mirror={0.5}
+        color="#48dd93"
+        wireframe
+      />
+      {/* <MeshWobbleMaterial
+        ref={meshDistortRef as any}
+        color="#48dd93"
+        wireframe
+        factor={0.5}
+        speed={0.5}
+      /> */}
+      {/* <MeshDistortMaterial
+        ref={meshDistortRef as any}
+        speed={0.5}
+        color="#48dd93"
+        wireframe
+        distort={0}
+      /> */}
+    </mesh>
+  );
+
+  const MediumDetailGlobe = () => (
+    <mesh>
+      <sphereGeometry args={[3, 32, 32]} />
       <MeshDistortMaterial
         ref={meshDistortRef as any}
         speed={0.5}
@@ -60,13 +92,40 @@ const Globe: FC<GlobeProps> = ({ position }) => {
       />
     </mesh>
   );
-};
+
+  const LowDetailGlobe = () => (
+    <mesh>
+      <sphereGeometry args={[3, 16, 16]} />
+      <MeshDistortMaterial
+        ref={meshDistortRef as any}
+        speed={0.5}
+        color="#48dd93"
+        wireframe
+      />
+    </mesh>
+  );
+
+  return (
+    <group
+      ref={meshRef as any}
+      onPointerOver={() => hover(true)}
+      onPointerOut={() => hover(false)}
+      position={position}
+    >
+      <Detailed distances={[0, 10, 20]}>
+        <HighDetailGlobe />
+        <MediumDetailGlobe />
+        <LowDetailGlobe />
+      </Detailed>
+    </group>
+  );
+});
 
 const Scene = () => {
   const GPUTier = useDetectGPU();
   const [effects, setEffects] = useState(false);
 
-  const killPerfomance = () => {
+  const killPerformance = () => {
     if (effects) {
       setEffects(false);
     } else {
@@ -76,7 +135,7 @@ const Scene = () => {
 
   return (
     <>
-      <CustomButton onClick={() => killPerfomance()}>
+      <CustomButton onClick={() => killPerformance()}>
         <PowerIcon />
       </CustomButton>
       <Canvas gl={{ antialias: true, powerPreference: 'high-performance' }}>

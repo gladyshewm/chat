@@ -1,6 +1,7 @@
 import React, { FC, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import { motion } from 'framer-motion-3d';
 
 interface LogoProps {
   url: string;
@@ -9,10 +10,19 @@ interface LogoProps {
 
 const Logo: FC<LogoProps> = ({ url, position }) => {
   const texture = new THREE.TextureLoader().load(url);
+
+  const handleLogoTap = () => {
+    window.open(url, '_blank');
+  };
+
   return (
-    <sprite position={position}>
+    <motion.sprite
+      position={position}
+      whileHover={{ scale: 1.2 }}
+      onTap={() => handleLogoTap()}
+    >
       <spriteMaterial attach="material" map={texture} />
-    </sprite>
+    </motion.sprite>
   );
 };
 

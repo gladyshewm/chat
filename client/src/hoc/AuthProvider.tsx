@@ -50,9 +50,9 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
           const { data } = await refetch();
           if (data && data.user) {
             setUser({
-              uuid: data.user.uuid,
-              name: data.user.name,
-              email: data.user.email,
+              uuid: data.user.user.uuid,
+              name: data.user.user.name,
+              email: data.user.user.email,
             });
             setIsAuthenticated(true);
           } else {
@@ -87,6 +87,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       client.resetStore();
     } catch (error) {
       console.error('Ошибка при входе в систему:', error.message);
+      throw new Error(error.message);
     }
   };
 
@@ -103,6 +104,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('Ошибка при выходе из системы:', error.message);
+      throw new Error(error.message);
     }
   };
 

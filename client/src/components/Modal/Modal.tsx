@@ -1,7 +1,7 @@
 import React, { useState, useEffect, SetStateAction, FC } from 'react';
 import './Modal.css';
-import XmarkIcon from '../icons/XmarkIcon';
-import ChevronLeftIcon from '../icons/ChevronLeftIcon';
+import XmarkIcon from '../../icons/XmarkIcon';
+import ChevronLeftIcon from '../../icons/ChevronLeftIcon';
 
 interface ModalProps {
   active: boolean;

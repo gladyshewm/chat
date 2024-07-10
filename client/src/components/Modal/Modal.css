@@ -1,5 +1,5 @@
 :root {
-  --modal-color: #191919;
+  --modal-color: #191919; /* rgba(25, 25, 25, 1); */
 }
 
 @keyframes appear {

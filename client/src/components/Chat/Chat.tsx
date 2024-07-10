@@ -1,10 +1,11 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
+import { motion } from 'framer-motion';
 import { GET_MESSAGES } from '../../graphql/query/messages';
 import { POST_MESSAGE } from '../../graphql/mutations/messages';
 import { MESSAGES_SUBSCRIPTION } from '../../graphql/subscriptions/messages';
 import './Chat.css';
-import SendIcon from '../icons/SendIcon';
+import SendIcon from '../../icons/SendIcon';
 import CustomLoader from '../CustomLoader/CustomLoader';
 
 interface MessagesProps {
@@ -83,7 +84,12 @@ const Chat = () => {
   };
 
   return (
-    <div className="chat">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="chat"
+    >
       <Messages user={user} />
       <form className="message-form" id="message-form">
         <input
@@ -105,7 +111,7 @@ const Chat = () => {
           <SendIcon />
         </button>
       </form>
-    </div>
+    </motion.div>
   );
 };
 

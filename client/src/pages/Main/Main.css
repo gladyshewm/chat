@@ -1,27 +1,29 @@
 .main-page {
-    background-color: var(--base-color);
-    width: 100%;
-    height: 100%;
+  /* background-color: var(--base-color); */
+  /* width: 100%;
+  height: 100%;  // для сферы
+  position: absolute; */
+  background-image: linear-gradient(160deg, var(--col1) 0%, var(--col2) 100%);
+  width: 100%;
+
+  & button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    width: 40px;
+    z-index: 1;
     position: absolute;
+    right: 0;
+    top: 10%;
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
 
-    & button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0;
-        padding: 0;
-        width: 40px;
-        z-index: 1;
-        position: absolute;
-        right: 0;
-        top: 10%;
-        transform: translate(-50%, -50%);
-        opacity: 0.5;
-        transition: opacity .3s ease;
-
-        &:hover {
-            opacity: 1;
-            transition: opacity .3s ease;
-        }
+    &:hover {
+      opacity: 1;
+      transition: opacity 0.3s ease;
     }
+  }
 }

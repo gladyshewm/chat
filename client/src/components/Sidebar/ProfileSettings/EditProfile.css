@@ -1,0 +1,180 @@
+.edit-profile {
+  height: 100%;
+  width: 100%;
+
+  & .edit-profile__header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    border-bottom: 1px solid rgba(140, 234, 187, 0.2);
+
+    & .back {
+      margin-left: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      background-color: transparent;
+      transition: background-color 0.3s ease;
+
+      & svg {
+        stroke: var(--col2);
+        transition: stroke 0.3s ease;
+      }
+
+      &:hover {
+        cursor: pointer;
+        background-color: rgba(140, 234, 187, 0.2);
+        transition: background-color 0.3s ease;
+
+        & svg {
+          stroke: var(--col1);
+          transition: stroke 0.3s ease;
+        }
+      }
+    }
+
+    & .edit-profile__title {
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      padding-left: 10px;
+
+      & p {
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--col1);
+      }
+    }
+  }
+}
+
+.edit-profile__main {
+  margin-top: 10px;
+
+  & .avatar {
+    display: flex;
+    justify-content: center;
+    height: 200px;
+
+    & .empty-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(140, 234, 187, 0.2);
+      border-radius: 50%;
+      height: 100%;
+      width: 200px;
+
+      & svg {
+        stroke: var(--col1);
+        height: 40%;
+        width: 40%;
+        transition:
+          height 0.1s ease,
+          width 0.1s ease;
+      }
+
+      &:hover {
+        cursor: pointer;
+        background-color: rgba(0, 0, 0, 0.1);
+
+        & svg {
+          height: 45%;
+          width: 45%;
+          transition:
+            height 0.1s ease,
+            width 0.1s ease;
+        }
+      }
+    }
+
+    & .update-avatar {
+      height: 100%;
+      width: 200px;
+      position: relative;
+
+      & img {
+        height: 100%;
+        width: 200px;
+        border-radius: 50%;
+        opacity: 0.7;
+      }
+
+      & svg {
+        z-index: 1;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        stroke: var(--col1);
+        height: 40%;
+        width: 40%;
+        transition:
+          height 0.1s ease,
+          width 0.1s ease;
+      }
+
+      &:hover {
+        cursor: pointer;
+
+        & svg {
+          height: 45%;
+          width: 45%;
+          transition:
+            height 0.1s ease,
+            width 0.1s ease;
+        }
+      }
+    }
+
+    & .preview-avatar {
+      height: 100%;
+      width: 200px;
+
+      & img {
+        height: 100%;
+        width: 200px;
+        border-radius: 50%;
+      }
+
+      & .avatar-buttons {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 40px;
+
+        & button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: none;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          background-color: transparent;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            cursor: pointer;
+            background-color: rgba(140, 234, 187, 0.2);
+            transition: background-color 0.3s ease;
+          }
+        }
+
+        & .cancel svg {
+          stroke: rgba(252, 125, 108, 1);
+        }
+
+        & .save svg {
+          stroke: rgba(72, 221, 147, 1);
+        }
+      }
+    }
+  }
+}

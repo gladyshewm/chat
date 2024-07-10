@@ -1,4 +1,5 @@
 import React, { FC, useState } from 'react';
+import { motion } from 'framer-motion';
 import './Auth.css';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import Modal from '../../components/Modal/Modal';
@@ -21,7 +22,7 @@ const Auth: FC = () => {
   };
 
   return (
-    <div className="auth">
+    <motion.div className="auth">
       <CustomButton onClick={() => setModalActive(true)} type="button">
         Войти
       </CustomButton>
@@ -37,7 +38,7 @@ const Auth: FC = () => {
           <CreateAccForm />
         )}
       </Modal>
-    </div>
+    </motion.div>
   );
 };
 
