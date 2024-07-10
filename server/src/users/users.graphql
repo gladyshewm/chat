@@ -5,10 +5,16 @@ type Info {
   name: String!
 }
 
+type UserWithToken {
+  user: UserInfo!
+  token: String!
+}
+
 type Query {
-  user: User
+  user: UserWithToken
   users: [Info!]!
-  userAvatar(userUuid: ID!): String!
+  userAvatar(userUuid: ID!): String
+  userAllAvatars(userUuid: ID!): [String]!
 }
 
 type Mutation {

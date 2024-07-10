@@ -1,23 +1,26 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FileUpload } from 'graphql-upload-ts';
-import { Info, UserInfo } from 'src/graphql';
+import { Info, UserWithToken } from 'src/graphql';
 
 @Injectable()
 export class UsersService {
   constructor(private supabaseService: SupabaseService) {}
 
-  async getUser(): Promise<UserInfo> | null {
+  async getUser(): Promise<UserWithToken> | null {
     try {
       const {
         data: { session },
       } = await this.supabaseService.getClient().auth.getSession();
       if (session) {
-        const { user } = session;
+        const { user: userSession } = session;
         return {
-          uuid: user.id,
-          name: user.user_metadata.name,
-          email: user.email,
+          user: {
+            uuid: userSession.id,
+            name: userSession.user_metadata.name,
+            email: userSession.email,
+          },
+          token: session.access_token,
         };
       }
       return null;
@@ -56,7 +59,7 @@ export class UsersService {
     const { data, error } = await this.supabaseService
       .getClient()
       .storage.from('avatars')
-      .upload(`${userUuid}/${avatarName}`, buffer, {
+      .upload(`${userUuid}/${uniqueFilename}`, buffer, {
         contentType: mimetype,
         upsert: true,
       });
@@ -68,15 +71,15 @@ export class UsersService {
       const { data: dataPublicURL } = await this.supabaseService
         .getClient()
         .storage.from('avatars')
-        .getPublicUrl(`${userUuid}/${avatarName}`);
+        .getPublicUrl(`${userUuid}/${uniqueFilename}`);
 
       const publicURL = dataPublicURL.publicUrl;
       await this.updateProfileAvatar(userUuid, publicURL);
+
+      return publicURL;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    return data.path;
   }
 
   private async updateProfileAvatar(userId: string, publicURL: string) {
@@ -109,5 +112,40 @@ export class UsersService {
       return null;
     }
     return profile.avatar_url;
+  }
+
+  async getUserAllAvatars(userUuid: string): Promise<string[]> {
+    try {
+      const { data, error } = await this.supabaseService
+        .getClient()
+        .storage.from('avatars')
+        .list(userUuid, {
+          limit: 100,
+          offset: 0,
+          sortBy: { column: 'name', order: 'asc' },
+        });
+
+      if (error) {
+        throw new HttpException(
+          error.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      const avatarUrls = await Promise.all(
+        data.map(async (file) => {
+          const { data } = await this.supabaseService
+            .getClient()
+            .storage.from('avatars')
+            .getPublicUrl(`${userUuid}/${file.name}`);
+
+          return data.publicUrl;
+        }),
+      );
+
+      return avatarUrls;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

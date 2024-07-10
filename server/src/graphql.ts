@@ -49,12 +49,19 @@ export class Info {
     name: string;
 }
 
+export class UserWithToken {
+    user: UserInfo;
+    token: string;
+}
+
 export abstract class IQuery {
-    abstract user(): Nullable<User> | Promise<Nullable<User>>;
+    abstract user(): Nullable<UserWithToken> | Promise<Nullable<UserWithToken>>;
 
     abstract users(): Info[] | Promise<Info[]>;
 
-    abstract userAvatar(userUuid: string): string | Promise<string>;
+    abstract userAvatar(userUuid: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract userAllAvatars(userUuid: string): Nullable<string>[] | Promise<Nullable<string>[]>;
 }
 
 export type Upload = FileUpload;
