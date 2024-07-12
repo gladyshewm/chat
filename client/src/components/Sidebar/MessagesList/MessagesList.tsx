@@ -2,6 +2,8 @@ import React, { FC } from 'react';
 import UserIcon from '../../../icons/UserIcon';
 import { ApolloError } from '@apollo/client';
 import './MessagesList.css';
+import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
+import SearchIcon from '../../../icons/SearchIcon';
 
 interface MessagesListProps {
   avatarUrl: string | null;
@@ -21,14 +23,21 @@ const MessagesList: FC<MessagesListProps> = ({
   return (
     <>
       <div className="message-list__header">
-        <div onClick={handleAvatarClick} className="avatar">
-          {errorQueryAvatar || !avatarUrl ? (
-            <UserIcon />
-          ) : (
-            <img src={avatarUrl} alt="avatar" />
-          )}
-        </div>
-        <input type="text" />
+        <DrawOutlineRect className="avatar-wrapper" rx="50%">
+          <div onClick={handleAvatarClick} className="avatar">
+            {errorQueryAvatar || !avatarUrl ? (
+              <UserIcon />
+            ) : (
+              <img src={avatarUrl} alt="avatar" />
+            )}
+          </div>
+        </DrawOutlineRect>
+        <DrawOutlineRect className="search-input-wrapper" rx={20}>
+          <div className="search-input-container">
+            <input className="search-input" type="text" placeholder=" " />
+            <SearchIcon />
+          </div>
+        </DrawOutlineRect>
       </div>
       <div className="message-list">
         <h2>Messages</h2>

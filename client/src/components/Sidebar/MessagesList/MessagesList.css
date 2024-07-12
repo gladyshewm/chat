@@ -4,27 +4,16 @@
   justify-content: center;
   height: 80px;
 
-  & input {
-    width: 300px;
-    height: 40px;
-    border: none;
-    border-radius: 20px;
-    outline: none;
-    padding: 0 10px;
-    font-size: 16px;
-  }
-
   & .avatar {
+    box-sizing: border-box;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 40px;
-    width: 40px;
-    border: 2px solid var(--col2);
+    height: 50px;
+    width: 50px;
+    /* border: 2px solid var(--outline-main-color); */
     border-radius: 50%;
-    margin-right: 5px;
     font-size: 18px;
-    transition: border 0.3s ease;
 
     & img {
       height: 100%;
@@ -33,19 +22,81 @@
     }
 
     & svg {
-      stroke: var(--col2);
+      stroke: var(--outline-main-color);
+      transition: stroke 0.3s ease;
+    }
+
+    & ~ .draw-outline-rect-svg > .draw-outline-rect-rect {
       transition: stroke 0.3s ease;
     }
 
     &:hover {
       cursor: pointer;
-      border: 2px solid var(--col1);
-      transition: border 0.3s ease;
+
+      & ~ .draw-outline-rect-svg > .draw-outline-rect-rect {
+        stroke: #fff;
+        transition: stroke 0.3s ease;
+      }
 
       & svg {
-        stroke: var(--col1);
+        stroke: #fff;
         transition: stroke 0.3s ease;
       }
     }
   }
+}
+
+.search-input-wrapper {
+  & .draw-outline-rect-rect {
+    transition: stroke 0.3s ease;
+  }
+
+  & .search-input-container {
+    position: relative;
+
+    & .search-input {
+      box-sizing: border-box;
+      width: 320px;
+      height: 45px;
+      border: none;
+      background-color: transparent;
+      color: #fff;
+      border-radius: 20px;
+      outline: none;
+      padding: 0 15px 0 45px;
+      font-size: 14px;
+    }
+
+    & svg {
+      position: absolute;
+      top: 50%;
+      left: 15px;
+      transform: translateY(-50%);
+      pointer-events: none;
+      stroke: var(--outline-main-color);
+      transition: stroke 0.3s ease;
+    }
+  }
+
+  &:hover {
+    .draw-outline-rect-rect,
+    .search-input-container svg {
+      stroke: #fff;
+      transition: stroke 0.3s ease;
+    }
+  }
+}
+
+.search-input-wrapper:focus-within .draw-outline-rect-rect,
+.search-input-wrapper:focus-within .search-input-container svg,
+.search-input-wrapper
+  .search-input:not(:placeholder-shown)
+  ~ .draw-outline-rect-svg
+  .draw-outline-rect-rect,
+.search-input-wrapper .search-input:not(:placeholder-shown) ~ svg {
+  stroke: #fff;
+}
+
+.avatar-wrapper {
+  margin-right: 10px;
 }

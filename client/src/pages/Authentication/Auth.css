@@ -19,6 +19,10 @@
   height: 100vh;
   background-color: var(--base-color);
 
+  & button {
+    margin: 0;
+  }
+
   & form {
     display: flex;
     flex-direction: column;
@@ -31,13 +35,14 @@
 
     & .error-message {
       position: absolute;
-      bottom: -20px;
+      bottom: -30px;
       display: flex;
       align-items: center;
       justify-content: center;
       color: rgba(252, 125, 108, 1);
       width: 300px;
-      padding-left: 30px;
+      font-size: 14px;
+      text-align: center;
     }
   }
 }

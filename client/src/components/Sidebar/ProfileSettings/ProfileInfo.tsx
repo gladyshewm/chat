@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useState } from 'react';
 import ExclamationCircleIcon from '../../../icons/ExclamationCircleIcon';
 import ArrowLeftIcon from '../../../icons/ArrowLeftIcon';
 import PencilIcon from '../../../icons/PencilIcon';
@@ -6,13 +6,15 @@ import EllipsisVerticalIcon from '../../../icons/EllipsisVerticalIcon';
 import UserIcon from '../../../icons/UserIcon';
 import IdentificationIcon from '../../../icons/IdentificationIcon';
 import AtSymbolIcon from '../../../icons/AtSymbolIcon';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, stagger } from 'framer-motion';
 import ExitIcon from '../../../icons/ExitIcon';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../../../hoc/AuthProvider';
 import { ApolloError, useQuery } from '@apollo/client';
 import './ProfileInfo.css';
 import { GET_USER_ALL_AVATARS } from '../../../graphql/query/user';
+import Slider from '../../Slider/Slider';
+import DrawOutline from '../../DrawOutline/DrawOutline/DrawOutline';
 
 interface ProfileInfoProps {
   user: User | null;
@@ -33,32 +35,25 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
 }) => {
   const [copyMessage, setCopyMessage] = useState('');
   const [isExitClicked, setIsExitClicked] = useState(false);
+  const [allAvatars, setAllAvatars] = useState([]);
   const navigate = useNavigate();
-  const { data, error, loading, refetch } = useQuery(GET_USER_ALL_AVATARS, {
+
+  useQuery(GET_USER_ALL_AVATARS, {
     variables: {
       userUuid: user?.uuid,
     },
+    skip: !user,
+    onCompleted: (data) => {
+      if (user) {
+        setAllAvatars(data.userAllAvatars);
+      }
+    },
+    onError: (error) => {
+      if (error.message.includes('User not authorized')) {
+        setAllAvatars([]);
+      }
+    },
   });
-
-  useEffect(() => {
-    if (!loading && !error && data) {
-      console.log(data);
-    }
-  }, [data, loading, error]);
-
-  const SlideShow = ({ image }: { image: { src: string } }) => {
-    return (
-      <AnimatePresence>
-        <motion.img
-          key={image.src}
-          src={image.src}
-          initial={{ x: 300, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          exit={{ x: -300, opacity: 0 }}
-        />
-      </AnimatePresence>
-    );
-  };
 
   const handlePencilClick = () => {
     setIsProfileInfo(false);
@@ -91,42 +86,72 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
       .catch((err) => console.error('Ошибка копирования текста:', err));
   };
 
+  const logoutButtonTransition = {
+    type: 'spring',
+    duration: 0.2,
+    ease: 'linear',
+  };
+
+  const logoutButtonVariants = {
+    initial: {
+      opacity: 0,
+      y: -10,
+      transition: logoutButtonTransition,
+    },
+    animate: {
+      opacity: 1,
+      y: 0,
+      transition: logoutButtonTransition,
+    },
+    exit: {
+      opacity: 0,
+      y: -10,
+      transition: logoutButtonTransition,
+    },
+  };
+
   return (
     <>
       {copyMessage && (
         <div className="copy-message">
           <ExclamationCircleIcon />
-          {copyMessage}
+          <p>{copyMessage}</p>
         </div>
       )}
       <div className="profile-settings">
-        <div className="profile-settings__header">
-          <button className="back" onClick={handleBackClick}>
-            <ArrowLeftIcon />
-          </button>
-          <div className="settings-title">
-            <p>Настройки</p>
-            <div className="settings-title_buttons">
-              <button
-                className="edit-button"
-                onClick={() => handlePencilClick()}
-              >
-                <PencilIcon />
-              </button>
-              <button className="exit-button" onClick={() => handleExitClick()}>
-                <EllipsisVerticalIcon />
-              </button>
+        <DrawOutline orientation="horizontal" position="bottom">
+          <div className="profile-settings__header">
+            <button className="back" onClick={handleBackClick}>
+              <ArrowLeftIcon />
+            </button>
+            <div className="settings-title">
+              <p>Профиль</p>
+              <div className="settings-title_buttons">
+                <button
+                  className="edit-button"
+                  onClick={() => handlePencilClick()}
+                >
+                  <PencilIcon />
+                </button>
+                <button
+                  className="exit-button"
+                  onClick={() => handleExitClick()}
+                >
+                  <EllipsisVerticalIcon />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </DrawOutline>
         <AnimatePresence>
           {isExitClicked && (
             <motion.div
               className="logout-button"
               key="logoutButton"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              variants={logoutButtonVariants}
             >
               <div className="logout-button__text" onClick={handleLogout}>
                 <ExitIcon />
@@ -136,13 +161,21 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
           )}
         </AnimatePresence>
         <div className="profile-settings__main">
-          <div className="avatar">
-            {errorQueryAvatar || !avatarUrl ? (
-              <UserIcon />
-            ) : (
-              <img src={avatarUrl} alt="avatar" />
-            )}
-          </div>
+          <DrawOutline
+            className="all-avatars-wrapper"
+            orientation="horizontal"
+            position="bottom"
+          >
+            <div className="avatar">
+              {errorQueryAvatar || !avatarUrl ? (
+                <UserIcon />
+              ) : allAvatars.length > 1 ? (
+                <Slider images={allAvatars} />
+              ) : (
+                <img src={avatarUrl} alt="avatar" />
+              )}
+            </div>
+          </DrawOutline>
           <div className="credentials">
             <motion.div
               whileTap={{ scale: 1.05 }}

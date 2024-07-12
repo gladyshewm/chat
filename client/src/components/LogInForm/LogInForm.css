@@ -1,0 +1,28 @@
+.login-form {
+  & .input {
+    & .input__label {
+      background-color: var(--modal-color);
+    }
+  }
+
+  & .custom-button:hover {
+    background-color: var(--base-color);
+  }
+}
+
+.input-wrapper {
+  margin-bottom: 35px;
+
+  & .draw-outline-rect-rect {
+    transition: stroke 0.3s ease;
+  }
+
+  &:hover .draw-outline-rect-rect {
+    stroke: var(--input-placeholder-color);
+    transition: stroke 0.3s ease;
+  }
+}
+
+.button-wrapper {
+  margin-bottom: 10px;
+}

@@ -26,10 +26,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
   const [isProfileInfo, setIsProfileInfo] = useState(true);
   const navigate = useNavigate();
 
-  const handleAvatarClick = () => {
-    setIsProfileSettings(true);
-  };
-
   const handleBackClick = () => {
     setIsProfileSettings(false);
   };

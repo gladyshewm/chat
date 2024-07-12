@@ -1,0 +1,9 @@
+.draw-outline-wrapper {
+  position: relative;
+}
+
+.draw-outline-svg {
+  overflow: visible;
+  position: absolute;
+  pointer-events: none;
+}

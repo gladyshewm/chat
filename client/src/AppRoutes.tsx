@@ -1,4 +1,4 @@
-import React, { FC, lazy } from 'react';
+import React, { lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Auth from './pages/Authentication/Auth';

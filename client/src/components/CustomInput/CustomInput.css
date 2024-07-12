@@ -1,38 +1,86 @@
 :root {
-    --input-color: #999999;
-    --input-placeholder-color: #707070;
+  --input-color: #999999;
+  --input-placeholder-color: #707070;
 }
 
-.input-block {
-    position: relative;
-}
+.input {
+  position: relative;
 
-.custom-input {
-    margin-bottom: 30px;
-    outline: none;
-    background: transparent;
-    border: 1px solid rgba(140, 234, 187, .3);
-    border-radius: 20px;
-    padding: 10px;
-    min-width: 300px;
-    min-height: 20px;
+  /* &:hover {
+    & .input__field {
+      border: 1px solid rgba(140, 234, 187, 0.6);
+      transition: border 0.2s ease;
+
+      &.error {
+        border: 1px solid rgba(252, 125, 108, 0.5);
+      }
+    }
+  } */
+
+  & .input__label {
+    z-index: 1;
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 0 15px;
+    margin: 15px 5px;
+    white-space: nowrap;
+    transform: translate(0, 0);
+    transform-origin: 0 0;
+    background-color: var(--base-color);
+    transition: transform 120ms ease-in;
+    line-height: 1.2;
     color: var(--input-color);
     font-size: 14px;
 
+    &:hover {
+      cursor: text;
+    }
+  }
+
+  & .input__field {
+    box-sizing: border-box;
+    display: block;
+    outline: none;
+    background: transparent;
+    /* border: 1px solid rgba(140, 234, 187, 0.3); */
+    border: none;
+    transition: border 0.2s ease;
+    border-radius: 15px;
+    padding: 15px;
+    min-width: 300px;
+    min-height: 20px;
+    height: 45px;
+    width: 100%;
+    color: var(--input-color);
+    font-size: 14px;
+
+    &:focus,
+    &:not(:placeholder-shown) {
+      & + .input__label {
+        transform: translate(0, -120%) scale(0.8);
+        color: var(--col1);
+      }
+    }
+
     &.error {
-        border: 1px solid rgba(252, 125, 108, 1);
-    }
+      /* border: 1px solid rgba(252, 125, 108, 1); */
 
-    &::placeholder {
-        color: var(--input-placeholder-color);
+      &:focus,
+      &:not(:placeholder-shown) {
+        & + .input__label {
+          color: rgba(252, 125, 108, 1);
+        }
+      }
     }
-}
+  }
 
-span {
+  & .input__error {
     display: block;
     position: absolute;
-    top: 45px;
+    top: 50px;
     padding-left: 10px;
     color: rgba(252, 125, 108, 1);
-    font-size: 14px;
+    font-size: 12px;
+  }
 }

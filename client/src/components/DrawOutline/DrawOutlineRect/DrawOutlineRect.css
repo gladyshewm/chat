@@ -1,0 +1,17 @@
+.draw-outline-rect-wrapper {
+  display: block;
+  position: relative;
+}
+
+.draw-outline-rect-svg {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.draw-outline-rect-rect {
+  fill: none;
+}

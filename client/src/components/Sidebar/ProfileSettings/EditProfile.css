@@ -7,7 +7,6 @@
     align-items: center;
     justify-content: center;
     height: 80px;
-    border-bottom: 1px solid rgba(140, 234, 187, 0.2);
 
     & .back {
       margin-left: 15px;
@@ -22,19 +21,14 @@
       transition: background-color 0.3s ease;
 
       & svg {
-        stroke: var(--col2);
+        stroke: #fff;
         transition: stroke 0.3s ease;
       }
 
       &:hover {
         cursor: pointer;
-        background-color: rgba(140, 234, 187, 0.2);
+        background-color: rgba(153, 153, 153, 0.3);
         transition: background-color 0.3s ease;
-
-        & svg {
-          stroke: var(--col1);
-          transition: stroke 0.3s ease;
-        }
       }
     }
 
@@ -46,9 +40,9 @@
       padding-left: 10px;
 
       & p {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 800;
-        color: var(--col1);
+        color: #fff;
       }
     }
   }
@@ -66,13 +60,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(140, 234, 187, 0.2);
+      /* border: 1px solid rgba(140, 234, 187, 0.2); */
+      border: 1px solid var(--outline-hover-color);
       border-radius: 50%;
       height: 100%;
       width: 200px;
 
       & svg {
-        stroke: var(--col1);
+        stroke: var(--outline-hover-color);
         height: 40%;
         width: 40%;
         transition:
@@ -82,9 +77,9 @@
 
       &:hover {
         cursor: pointer;
-        background-color: rgba(0, 0, 0, 0.1);
 
         & svg {
+          stroke: var(--outline-main-color);
           height: 45%;
           width: 45%;
           transition:
@@ -112,7 +107,7 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        stroke: var(--col1);
+        stroke: #fff;
         height: 40%;
         width: 40%;
         transition:
@@ -150,6 +145,7 @@
         height: 40px;
 
         & button {
+          z-index: 1;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -162,7 +158,7 @@
 
           &:hover {
             cursor: pointer;
-            background-color: rgba(140, 234, 187, 0.2);
+            background-color: rgba(153, 153, 153, 0.3);
             transition: background-color 0.3s ease;
           }
         }
@@ -174,6 +170,63 @@
         & .save svg {
           stroke: rgba(72, 221, 147, 1);
         }
+      }
+    }
+  }
+}
+
+.credentials {
+  margin: 50px 10px;
+  display: flex;
+  flex-direction: column;
+
+  & .input {
+    position: relative;
+
+    & .input__label {
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding: 0 15px;
+      margin: 15px 5px;
+      white-space: nowrap;
+      transform: translate(0, 0);
+      transform-origin: 0 0;
+      background-color: var(--base-color);
+      transition: transform 120ms ease-in;
+      line-height: 1.2;
+      color: var(--input-color);
+      font-size: 14px;
+    }
+
+    & .input__field {
+      box-sizing: border-box;
+      display: block;
+      outline: none;
+      background: transparent;
+      /* border: 1px solid rgba(140, 234, 187, 0.3); */
+      border: 1px solid var(--outline-hover-color);
+      transition: border 0.2s ease;
+      border-radius: 15px;
+      padding: 15px;
+      min-width: 300px;
+      min-height: 20px;
+      height: 50px;
+      width: 100%;
+      color: var(--input-color);
+      font-size: 14px;
+
+      &:focus,
+      &:not(:placeholder-shown) {
+        & + .input__label {
+          transform: translate(0, -120%) scale(0.8);
+          color: #fff;
+        }
+      }
+
+      &:hover {
+        border: 1px solid var(--outline-main-color);
+        transition: border 0.2s ease;
       }
     }
   }

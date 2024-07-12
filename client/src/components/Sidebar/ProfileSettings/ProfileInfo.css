@@ -7,7 +7,6 @@
     align-items: center;
     justify-content: center;
     height: 80px;
-    border-bottom: 1px solid rgba(140, 234, 187, 0.2);
 
     & .back {
       margin-left: 15px;
@@ -22,19 +21,14 @@
       transition: background-color 0.3s ease;
 
       & svg {
-        stroke: var(--col2);
+        stroke: #fff;
         transition: stroke 0.3s ease;
       }
 
       &:hover {
         cursor: pointer;
-        background-color: rgba(140, 234, 187, 0.2);
+        background-color: rgba(153, 153, 153, 0.3);
         transition: background-color 0.3s ease;
-
-        & svg {
-          stroke: var(--col1);
-          transition: stroke 0.3s ease;
-        }
       }
     }
 
@@ -47,9 +41,9 @@
       padding-left: 10px;
 
       & p {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 800;
-        color: var(--col1);
+        color: #fff;
       }
 
       & .settings-title_buttons {
@@ -71,19 +65,14 @@
           transition: background-color 0.3s ease;
 
           & svg {
-            stroke: var(--col2);
+            stroke: #fff;
             transition: stroke 0.3s ease;
           }
 
           &:hover {
             cursor: pointer;
-            background-color: rgba(140, 234, 187, 0.2);
+            background-color: rgba(153, 153, 153, 0.3);
             transition: background-color 0.3s ease;
-
-            & svg {
-              stroke: var(--col1);
-              transition: stroke 0.3s ease;
-            }
           }
         }
       }
@@ -95,18 +84,19 @@
   margin-top: 10px;
 
   & .avatar {
+    position: relative;
     display: flex;
     justify-content: center;
     height: 300px;
     margin: 0 10px;
-    
+
     & img {
       height: 100%;
       max-width: 100%;
     }
 
     & svg {
-      stroke: var(--col1);
+      stroke: var(--outline-hover-color);
       height: 100%;
       width: 100%;
     }
@@ -130,13 +120,14 @@
         justify-content: center;
 
         & p {
-          font-size: 18px;
-          color: var(--col1);
+          font-size: 14px;
+          color: #fff;
+          margin: 2px 0;
         }
 
         & .subtitle {
-          font-size: 16px;
-          color: var(--col2);
+          font-size: 12px;
+          color: var(--outline-main-color);
         }
       }
 
@@ -144,13 +135,13 @@
         display: flex;
         align-self: center;
         justify-content: center;
-        stroke: var(--col1);
+        stroke: #fff;
         margin: 0 10px;
       }
 
       &:hover {
         cursor: pointer;
-        background-color: rgba(140, 234, 187, 0.2);
+        background-color: rgba(153, 153, 153, 0.3);
       }
     }
   }
@@ -158,23 +149,26 @@
 
 .copy-message {
   position: fixed;
-  top: 20px;
+  bottom: 5%;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   align-items: center;
-  background-color: rgba(140, 234, 187, 0.4);
-  color: var(--col1);
+  justify-content: center;
+  background-color: rgba(153, 153, 153, 0.3);
+  color: #fff;
   padding: 10px;
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
 
   & svg {
-    margin-right: 5px;
+    margin-right: 10px;
   }
 }
 
 .logout-button {
+  z-index: 3;
   position: fixed;
   right: 0;
   display: flex;
@@ -199,13 +193,13 @@
     padding: 0 10px;
 
     & p {
-      font-size: 16px;
-      color: rgba(72, 221, 147, 1);
+      font-size: 14px;
+      color: #fff;
       transition: color 0.3s ease;
     }
 
     & svg {
-      stroke: rgba(72, 221, 147, 1);
+      stroke: #fff;
       transition: stroke 0.3s ease;
       margin-right: 15px;
     }
@@ -216,4 +210,8 @@
     background-color: rgba(25, 25, 25, 1);
     transition: background-color 0.3s ease;
   }
+}
+
+.all-avatars-wrapper {
+  padding: 0 0 13px 0;
 }

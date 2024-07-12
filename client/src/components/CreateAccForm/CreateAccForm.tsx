@@ -7,6 +7,7 @@ import CustomInput from '../CustomInput/CustomInput';
 import CustomButton from '../CustomButton/CustomButton';
 import useAuth from '../../hooks/useAuth';
 import { CreateAccSchema } from '../../utils/validationSchemas';
+import DrawOutlineRect from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 
 const CreateAccForm: FC = () => {
   const [createUser] = useMutation(CREATE_USER);
@@ -49,15 +50,31 @@ const CreateAccForm: FC = () => {
         onSubmit={(values) => createAccount(values)}
       >
         <Form>
-          <CustomInput name="email" placeholder="E-mail" />
-          <CustomInput name="username" placeholder="Имя" />
-          <CustomInput type="password" name="password" placeholder="Пароль" />
-          <CustomInput
-            type="password"
-            name="confirmPassword"
-            placeholder="Подтверждение пароля"
-          />
-          <CustomButton type="submit">Создать аккаунт</CustomButton>
+          <DrawOutlineRect className="input-wrapper" rx="15px">
+            <CustomInput name="email" placeholder=" " label="E-mail" />
+          </DrawOutlineRect>
+          <DrawOutlineRect className="input-wrapper" rx="15px">
+            <CustomInput name="username" placeholder=" " label="Имя" />
+          </DrawOutlineRect>
+          <DrawOutlineRect className="input-wrapper" rx="15px">
+            <CustomInput
+              type="password"
+              name="password"
+              placeholder=" "
+              label="Пароль"
+            />
+          </DrawOutlineRect>
+          <DrawOutlineRect className="input-wrapper" rx="15px">
+            <CustomInput
+              type="password"
+              name="confirmPassword"
+              placeholder=" "
+              label="Подтвердите пароль"
+            />
+          </DrawOutlineRect>
+          <DrawOutlineRect className="button-wrapper" rx="15px">
+            <CustomButton type="submit">Создать аккаунт</CustomButton>
+          </DrawOutlineRect>
         </Form>
       </Formik>
       {errorMessage && <div className="error-message">{errorMessage}</div>}

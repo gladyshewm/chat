@@ -1,7 +1,6 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import './Main.css';
-import CustomLoader from '../../components/CustomLoader/CustomLoader';
 const Scene = lazy(() => import('../../components/Sphere/Globe'));
 
 const Main = () => {

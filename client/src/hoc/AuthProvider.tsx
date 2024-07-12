@@ -98,7 +98,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
         localStorage.removeItem('authToken');
-        client.resetStore();
+        client.clearStore();
       } else {
         console.error('Не удалось выйти из системы', data.message);
       }

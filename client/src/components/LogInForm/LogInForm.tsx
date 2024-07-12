@@ -5,6 +5,8 @@ import CustomInput from '../CustomInput/CustomInput';
 import CustomButton from '../CustomButton/CustomButton';
 import useAuth from '../../hooks/useAuth';
 import { LoginSchema } from '../../utils/validationSchemas';
+import './LogInForm.css';
+import DrawOutlineRect from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 
 interface LogInFormProps {
   handleCreateAccountClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -35,21 +37,30 @@ const LogInForm: FC<LogInFormProps> = ({ handleCreateAccountClick }) => {
         onSubmit={(values) => signIn(values)}
       >
         <Form>
-          <CustomInput name="email" placeholder="E-mail" />
-          <CustomInput
-            type="password"
-            name="password"
-            placeholder="••••••••••••"
-          />
-          <CustomButton type="submit">Войти</CustomButton>
-          <CustomButton
-            type="button"
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-              handleCreateAccountClick(e)
-            }
-          >
-            Создать аккаунт
-          </CustomButton>
+          <DrawOutlineRect className="input-wrapper" rx="15px">
+            <CustomInput name="email" placeholder=" " label="E-mail" />
+          </DrawOutlineRect>
+          <DrawOutlineRect className="input-wrapper" rx="15px">
+            <CustomInput
+              type="password"
+              name="password"
+              placeholder=" "
+              label="Пароль"
+            />
+          </DrawOutlineRect>
+          <DrawOutlineRect className="button-wrapper" rx="15px">
+            <CustomButton type="submit">Войти</CustomButton>
+          </DrawOutlineRect>
+          <DrawOutlineRect className="button-wrapper" rx="15px">
+            <CustomButton
+              type="button"
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                handleCreateAccountClick(e)
+              }
+            >
+              Создать аккаунт
+            </CustomButton>
+          </DrawOutlineRect>
         </Form>
       </Formik>
       {errorMessage && <div className="error-message">{errorMessage}</div>}

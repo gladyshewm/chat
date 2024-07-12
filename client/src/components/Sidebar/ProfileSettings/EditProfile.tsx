@@ -7,6 +7,7 @@ import XmarkIcon from '../../../icons/XmarkIcon';
 import CheckIcon from '../../../icons/CheckIcon';
 import { User } from '../../../hoc/AuthProvider';
 import { UPLOAD_AVATAR } from '../../../graphql/mutations/user';
+import DrawOutline from '../../DrawOutline/DrawOutline/DrawOutline';
 
 interface EditProfileProps {
   user: User | null;
@@ -70,14 +71,16 @@ const EditProfile: FC<EditProfileProps> = ({
 
   return (
     <div className="edit-profile">
-      <div className="edit-profile__header">
-        <button className="back" onClick={handleBackClick}>
-          <ArrowLeftIcon />
-        </button>
-        <div className="edit-profile__title">
-          <p>Редактирование профиля</p>
+      <DrawOutline orientation='horizontal' position='bottom'>
+        <div className="edit-profile__header">
+          <button className="back" onClick={handleBackClick}>
+            <ArrowLeftIcon />
+          </button>
+          <div className="edit-profile__title">
+            <p>Редактирование профиля</p>
+          </div>
         </div>
-      </div>
+      </DrawOutline>
       <div className="edit-profile__main">
         <div className="avatar">
           <input
@@ -114,7 +117,19 @@ const EditProfile: FC<EditProfileProps> = ({
             </div>
           )}
         </div>
-        <div className="credentials">asdsa</div>
+        <div className="credentials">
+          <label className="input">
+            <input
+              className="input__field"
+              id="name"
+              name="name"
+              type="text"
+              placeholder=" "
+              defaultValue={user?.name}
+            />
+            <span className="input__label">Имя (обязательно)</span>
+          </label>
+        </div>
       </div>
     </div>
   );

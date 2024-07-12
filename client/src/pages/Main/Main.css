@@ -3,7 +3,8 @@
   /* width: 100%;
   height: 100%;  // для сферы
   position: absolute; */
-  background-image: linear-gradient(160deg, var(--col1) 0%, var(--col2) 100%);
+  /* background-image: linear-gradient(160deg, var(--col1) 0%, var(--col2) 100%); */
+  background-color: var(--base-color);
   width: 100%;
 
   & button {
