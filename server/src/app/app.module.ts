@@ -5,21 +5,22 @@ import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ProductsModule } from '../products/products.module';
 import { UsersModule } from '../users/users.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { AuthModule } from '../auth/auth.module';
-import { UploadScalar } from 'src/users/scalars/upload.scalar';
+import { UploadScalar } from 'src/common/scalars/upload.scalar';
+import { ChatsModule } from 'src/chats/chats.module';
+import { DateScalar } from 'src/common/scalars/date.scalar';
 
 @Module({
   imports: [
+    AuthModule,
     SupabaseModule,
-    ProductsModule,
     UsersModule,
+    ChatsModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    UploadScalar,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       typePaths: ['./**/*.graphql'],
@@ -31,10 +32,13 @@ import { UploadScalar } from 'src/users/scalars/upload.scalar';
         },
         additionalHeader: 'import { FileUpload } from "graphql-upload-ts";',
       },
+      subscriptions: {
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+      },
     }),
-    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, DateScalar, UploadScalar],
 })
 export class AppModule {}

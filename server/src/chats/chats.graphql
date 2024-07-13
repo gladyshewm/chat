@@ -1,0 +1,36 @@
+scalar Date
+
+type Chat {
+  id: ID!
+  name: String
+  participants: [UserWithAvatar!]!
+  messages: [Message!]!
+}
+
+type ChatWithoutMessages {
+  id: ID!
+  name: String
+  participants: [UserWithAvatar!]!
+}
+
+type UserWithAvatar {
+  id: ID!
+  name: String!
+  avatarUrl: String
+}
+
+type Message {
+  id: ID!
+  chatId: ID!
+  userId: ID!
+  userName: String!
+  avatarUrl: String
+  content: String!
+  createdAt: Date!
+  isRead: Boolean!
+}
+
+type Query {
+  userChats: [ChatWithoutMessages!]!
+  chatMessages(chatId: ID!, limit: Int, offset: Int): [Message!]
+}

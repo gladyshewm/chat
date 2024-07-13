@@ -13,7 +13,9 @@ export class JWTAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
-    const req = ctx.getContext().req;
+    const gqlContext = ctx.getContext();
+    const req = gqlContext.req;
+
     try {
       const authHeader = req.headers.authorization;
       const bearer = authHeader.split(' ')[0];
@@ -26,6 +28,7 @@ export class JWTAuthGuard implements CanActivate {
         throw new UnauthorizedException({ message: err.message });
       });
       req.user = user;
+      gqlContext['user_uuid'] = user.sub;
     } catch (error) {
       throw new UnauthorizedException({ message: 'User not authorized' });
     }
