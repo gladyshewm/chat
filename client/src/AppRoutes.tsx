@@ -6,9 +6,8 @@ import PrivateRoute from './hoc/PrivateRoute';
 import useAuth from './hooks/useAuth';
 import Layout from './components/Layout/Layout';
 import CustomLoader from './components/CustomLoader/CustomLoader';
-import Settings from './pages/Settings/Settings';
 const Main = lazy(() => import('./pages/Main/Main'));
-const Chat = lazy(() => import('./components/Chat/Chat'));
+const Chat = lazy(() => import('./pages/Chat/Chat'));
 
 const AppRoutes = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -27,8 +26,7 @@ const AppRoutes = () => {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Layout />}>
             <Route index element={<Main />} />
-            <Route path="chat" element={<Chat />} />
-            <Route path="settings" element={<Settings />} />
+            <Route path="chat/:id" element={<Chat />} />
           </Route>
         </Route>
         <Route

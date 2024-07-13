@@ -1,9 +1,23 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import UserIcon from '../../../icons/UserIcon';
-import { ApolloError } from '@apollo/client';
+import { ApolloError, useQuery } from '@apollo/client';
 import './MessagesList.css';
 import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import SearchIcon from '../../../icons/SearchIcon';
+import { GET_USER_CHATS } from '../../../graphql/query/chats';
+import { Link } from 'react-router-dom';
+
+type ChatWithoutMessages = {
+  id: string;
+  name?: string;
+  participants: UserWithAvatar[];
+};
+
+type UserWithAvatar = {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+};
 
 interface MessagesListProps {
   avatarUrl: string | null;
@@ -16,6 +30,19 @@ const MessagesList: FC<MessagesListProps> = ({
   errorQueryAvatar,
   setIsProfileSettings,
 }) => {
+  const [chats, setChats] = useState<ChatWithoutMessages[]>([]);
+
+  useQuery(GET_USER_CHATS, {
+    onCompleted: (data) => {
+      if (data) {
+        setChats(data.userChats);
+      }
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
   const handleAvatarClick = () => {
     setIsProfileSettings(true);
   };
@@ -40,8 +67,19 @@ const MessagesList: FC<MessagesListProps> = ({
         </DrawOutlineRect>
       </div>
       <div className="message-list">
-        <h2>Messages</h2>
-        <p>Your messages will appear here.</p>
+        {chats.length === 0 ? (
+          <p>No messages</p>
+        ) : (
+          chats.map((chat) => (
+            <Link
+              to={`/chat/${chat.id}`}
+              key={chat.id}
+              className="message-list-block"
+            >
+              <p>{chat.name}</p>
+            </Link>
+          ))
+        )}
       </div>
     </>
   );

@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: center;
   height: 80px;
+  width: 100%;
 
   & .avatar {
     box-sizing: border-box;
@@ -11,7 +12,6 @@
     align-items: center;
     height: 50px;
     width: 50px;
-    /* border: 2px solid var(--outline-main-color); */
     border-radius: 50%;
     font-size: 18px;
 
@@ -95,6 +95,25 @@
   .draw-outline-rect-rect,
 .search-input-wrapper .search-input:not(:placeholder-shown) ~ svg {
   stroke: #fff;
+}
+
+.message-list {
+  margin-top: 10px;
+  padding: 0 10px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  & .message-list-block {
+    border: 1px solid #ff6060;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    height: 60px;
+    width: 100%;
+  }
 }
 
 .avatar-wrapper {

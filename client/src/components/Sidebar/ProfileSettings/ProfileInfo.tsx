@@ -6,7 +6,7 @@ import EllipsisVerticalIcon from '../../../icons/EllipsisVerticalIcon';
 import UserIcon from '../../../icons/UserIcon';
 import IdentificationIcon from '../../../icons/IdentificationIcon';
 import AtSymbolIcon from '../../../icons/AtSymbolIcon';
-import { AnimatePresence, motion, stagger } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import ExitIcon from '../../../icons/ExitIcon';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../../../hoc/AuthProvider';
