@@ -12,7 +12,8 @@ type UserWithToken {
 
 type Query {
   user: UserWithToken
-  users: [Info!]!
+  users: [UserWithAvatar!]!
+  findUsers(input: String!): [UserWithAvatar!]
   userAvatar(userUuid: ID!): String
   userAllAvatars(userUuid: ID!): [String]!
 }

@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { Info, UserWithToken } from 'src/graphql';
+import { UserWithToken, UserWithAvatar } from 'src/graphql';
 import { UseGuards } from '@nestjs/common';
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
@@ -16,8 +16,14 @@ export class UsersResolver {
 
   @UseGuards(JWTAuthGuard)
   @Query('users')
-  async getAllUsers(): Promise<Info[]> {
-    return this.usersService.findAll();
+  async getAllUsers(): Promise<UserWithAvatar[]> {
+    return this.usersService.getAll();
+  }
+
+  @UseGuards(JWTAuthGuard)
+  @Query('findUsers')
+  async findUsers(@Args('input') input: string): Promise<UserWithAvatar[]> {
+    return this.usersService.findUsers(input);
   }
 
   @UseGuards(JWTAuthGuard)

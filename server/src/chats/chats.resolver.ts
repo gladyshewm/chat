@@ -1,4 +1,4 @@
-import { Args, Context, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ChatsService } from './chats.service';
 import { UseGuards } from '@nestjs/common';
 import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
@@ -23,5 +23,14 @@ export class ChatsResolver {
     @Args('offset') offset: number,
   ): Promise<Message[]> {
     return this.chatsService.getChatMessages(chatId, limit, offset);
+  }
+
+  @Mutation('sendMessage')
+  async sendMessage(
+    @Args('chatId') chatId: string,
+    @Args('content') content: string,
+    @Context('user_uuid') userUuid: string,
+  ): Promise<Message> {
+    return this.chatsService.sendMessage(chatId, content, userUuid);
   }
 }

@@ -41,6 +41,8 @@ export abstract class IMutation {
 
     abstract logOutUser(): boolean | Promise<boolean>;
 
+    abstract sendMessage(chatId: string, content: string): Message | Promise<Message>;
+
     abstract uploadAvatar(image: Upload, userUuid: string): string | Promise<string>;
 }
 
@@ -81,7 +83,9 @@ export abstract class IQuery {
 
     abstract user(): Nullable<UserWithToken> | Promise<Nullable<UserWithToken>>;
 
-    abstract users(): Info[] | Promise<Info[]>;
+    abstract users(): UserWithAvatar[] | Promise<UserWithAvatar[]>;
+
+    abstract findUsers(input: string): Nullable<UserWithAvatar[]> | Promise<Nullable<UserWithAvatar[]>>;
 
     abstract userAvatar(userUuid: string): Nullable<string> | Promise<Nullable<string>>;
 

@@ -117,4 +117,61 @@ export class ChatsService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async sendMessage(
+    chatId: string,
+    content: string,
+    userUuid: string,
+  ): Promise<Message> {
+    try {
+      const { data, error } = (await this.supabaseService
+        .getClient()
+        .from('messages')
+        .insert({
+          message_id: Date.now().toString(),
+          content: content,
+          created_at: new Date(),
+          chat_id: chatId,
+          user_uuid: userUuid,
+          is_read: false,
+        })
+        .select(
+          `
+          message_id,
+          chat_id, 
+          user_uuid,
+          content, 
+          created_at, 
+          is_read,
+          profiles:user_uuid (
+            name,
+            avatar_url
+          )
+          `,
+        )) as { data: MessageData; error: any };
+
+      if (error) {
+        throw new HttpException(
+          error.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      let message = data[0];
+      message = {
+        id: message.message_id,
+        chatId: message.chat_id,
+        userId: message.user_uuid,
+        content: message.content,
+        createdAt: new Date(message.created_at),
+        isRead: message.is_read,
+        userName: message.profiles.name,
+        avatarUrl: message.profiles.avatar_url,
+      };
+
+      return message;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

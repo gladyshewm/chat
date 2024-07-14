@@ -24,3 +24,13 @@ export const GET_USER_ALL_AVATARS = gql`
     userAllAvatars(userUuid: $userUuid)
   }
 `;
+
+export const FIND_USERS = gql`
+  query findUsers($input: String!) {
+    findUsers(input: $input) {
+      id
+      name
+      avatarUrl
+    }
+  }
+`;

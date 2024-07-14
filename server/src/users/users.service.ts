@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FileUpload } from 'graphql-upload-ts';
-import { Info, UserWithToken } from 'src/graphql';
+import { UserWithToken, UserWithAvatar } from 'src/graphql';
+import { User } from './types/users.types';
 
 @Injectable()
 export class UsersService {
@@ -30,19 +31,45 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<Info[]> {
-    const { data: users, error } = await this.supabaseService
-      .getClient()
-      .from('profiles')
-      .select('id, name');
+  async getAll(): Promise<UserWithAvatar[]> {
+    const { data: users, error }: { data: User[]; error: any } =
+      await this.supabaseService
+        .getClient()
+        .from('profiles')
+        .select('uuid, name, avatar_url');
+
     if (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-    return users;
+
+    const allUsers = users.map((user) => {
+      return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
+    });
+
+    return allUsers;
+  }
+
+  async findUsers(input: string): Promise<UserWithAvatar[]> {
+    const { data, error }: { data: User[]; error: any } =
+      await this.supabaseService
+        .getClient()
+        .from('profiles')
+        .select('uuid, name, avatar_url')
+        .ilike('name', `%${input}%`);
+
+    if (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    const allUsers = data.map((user) => {
+      return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
+    });
+
+    return allUsers;
   }
 
   async uploadAvatar(file: FileUpload, userUuid: string): Promise<string> {
-    const { createReadStream, filename, mimetype, encoding } = file;
+    const { createReadStream, filename, mimetype } = file;
     const stream = createReadStream();
 
     const chunks = [];
@@ -54,9 +81,8 @@ export class UsersService {
 
     const fileExtension = filename.split('.').pop();
     const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
-    const avatarName = `${userUuid}-avatar.${fileExtension}`;
 
-    const { data, error } = await this.supabaseService
+    const { error } = await this.supabaseService
       .getClient()
       .storage.from('avatars')
       .upload(`${userUuid}/${uniqueFilename}`, buffer, {

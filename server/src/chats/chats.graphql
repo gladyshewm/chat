@@ -34,3 +34,7 @@ type Query {
   userChats: [ChatWithoutMessages!]!
   chatMessages(chatId: ID!, limit: Int, offset: Int): [Message!]
 }
+
+type Mutation {
+  sendMessage(chatId: ID!, content: String!): Message!
+}

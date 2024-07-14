@@ -1,11 +1,19 @@
-import React, { FC, useState } from 'react';
-import UserIcon from '../../../icons/UserIcon';
-import { ApolloError, useQuery } from '@apollo/client';
+import React, { FC, useEffect, useState } from 'react';
+import { ApolloError, useLazyQuery, useQuery } from '@apollo/client';
+import { Link } from 'react-router-dom';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  fromEvent,
+  map,
+} from 'rxjs';
 import './MessagesList.css';
+import UserIcon from '../../../icons/UserIcon';
 import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import SearchIcon from '../../../icons/SearchIcon';
 import { GET_USER_CHATS } from '../../../graphql/query/chats';
-import { Link } from 'react-router-dom';
+import { FIND_USERS } from '../../../graphql/query/user';
 
 type ChatWithoutMessages = {
   id: string;
@@ -31,8 +39,18 @@ const MessagesList: FC<MessagesListProps> = ({
   setIsProfileSettings,
 }) => {
   const [chats, setChats] = useState<ChatWithoutMessages[]>([]);
+  const [searchValue, setSearchValue] = useState('');
 
-  useQuery(GET_USER_CHATS, {
+  const [
+    findUsers,
+    { loading: searchLoading, error: searchError, data: searchData },
+  ] = useLazyQuery(FIND_USERS);
+
+  const {
+    data: chatsData,
+    error: chatsError,
+    loading: chatsLoading,
+  } = useQuery(GET_USER_CHATS, {
     onCompleted: (data) => {
       if (data) {
         setChats(data.userChats);
@@ -43,8 +61,83 @@ const MessagesList: FC<MessagesListProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (chatsData) {
+      setChats(chatsData.userChats);
+    }
+  }, [chatsData]);
+
   const handleAvatarClick = () => {
     setIsProfileSettings(true);
+  };
+
+  useEffect(() => {
+    const handleSearch = (value: string) => {
+      setSearchValue(value);
+      if (value.trim()) {
+        findUsers({
+          variables: {
+            input: value.trim(),
+          },
+        });
+      }
+    };
+
+    const input = document.querySelector('.search-input') as HTMLInputElement;
+    const search$ = fromEvent(input, 'input').pipe(
+      map((event: Event) => (event.target as HTMLInputElement).value),
+      debounceTime(500),
+      distinctUntilChanged(),
+      filter((value) => value.trim().length > 0 || value === ''),
+    );
+
+    const subscription = search$.subscribe(handleSearch);
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [findUsers, setSearchValue]);
+
+  const renderSearchResults = () => {
+    if (searchLoading) return <p>Searching...</p>;
+    if (searchError) return <p>Error: {searchError.message}</p>;
+    if (!searchData || !searchData.findUsers.length)
+      return <p>No users found</p>;
+
+    return (
+      <div className="search-results">
+        {searchData.findUsers.map((user: UserWithAvatar) => (
+          <div key={user.id} className="user-result">
+            {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.name}
+                className="user-avatar"
+              />
+            ) : (
+              <UserIcon />
+            )}
+            <span>{user.name}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderChats = () => {
+    if (chatsLoading) return <p>Loading...</p>;
+    if (chatsError) return <p>Error</p>;
+    if (!chats.length) return <p>No messages</p>;
+
+    return chats.map((chat) => (
+      <Link
+        to={`/chat/${chat.id}`}
+        key={chat.id}
+        className="message-list-block"
+      >
+        {chat.name}
+      </Link>
+    ));
   };
 
   return (
@@ -66,21 +159,11 @@ const MessagesList: FC<MessagesListProps> = ({
           </div>
         </DrawOutlineRect>
       </div>
-      <div className="message-list">
-        {chats.length === 0 ? (
-          <p>No messages</p>
-        ) : (
-          chats.map((chat) => (
-            <Link
-              to={`/chat/${chat.id}`}
-              key={chat.id}
-              className="message-list-block"
-            >
-              <p>{chat.name}</p>
-            </Link>
-          ))
-        )}
-      </div>
+      {searchValue ? (
+        renderSearchResults()
+      ) : (
+        <div className="message-list">{renderChats()}</div>
+      )}
     </>
   );
 };
