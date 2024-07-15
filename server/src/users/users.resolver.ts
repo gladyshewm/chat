@@ -2,8 +2,8 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { UserWithToken, UserWithAvatar } from 'src/graphql';
 import { UseGuards } from '@nestjs/common';
-import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
+import { JwtHttpAuthGuard } from 'src/auth/guards/jwt-http-auth.guard';
 
 @Resolver('User')
 export class UsersResolver {
@@ -14,19 +14,19 @@ export class UsersResolver {
     return this.usersService.getUser();
   }
 
-  @UseGuards(JWTAuthGuard)
+  @UseGuards(JwtHttpAuthGuard)
   @Query('users')
   async getAllUsers(): Promise<UserWithAvatar[]> {
     return this.usersService.getAll();
   }
 
-  @UseGuards(JWTAuthGuard)
+  @UseGuards(JwtHttpAuthGuard)
   @Query('findUsers')
   async findUsers(@Args('input') input: string): Promise<UserWithAvatar[]> {
     return this.usersService.findUsers(input);
   }
 
-  @UseGuards(JWTAuthGuard)
+  @UseGuards(JwtHttpAuthGuard)
   @Mutation('uploadAvatar')
   async uploadAvatar(
     @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
@@ -40,7 +40,7 @@ export class UsersResolver {
     return this.usersService.getUserAvatar(userUuid);
   }
 
-  @UseGuards(JWTAuthGuard)
+  @UseGuards(JwtHttpAuthGuard)
   @Query('userAllAvatars')
   async getUserAllAvatars(@Args('userUuid') userUuid: string) {
     return this.usersService.getUserAllAvatars(userUuid);

@@ -38,3 +38,7 @@ type Query {
 type Mutation {
   sendMessage(chatId: ID!, content: String!): Message!
 }
+
+type Subscription {
+  messageSent(chatId: ID!): Message!
+}

@@ -33,8 +33,16 @@ import { DateScalar } from 'src/common/scalars/date.scalar';
         additionalHeader: 'import { FileUpload } from "graphql-upload-ts";',
       },
       subscriptions: {
-        'graphql-ws': true,
-        'subscriptions-transport-ws': true,
+        'graphql-ws': {
+          onConnect: (connectionParams) => {
+            return { connectionParams };
+          },
+        },
+        'subscriptions-transport-ws': {
+          onConnect: (connectionParams) => {
+            return { connectionParams };
+          },
+        },
       },
     }),
   ],

@@ -1,14 +1,27 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
 import { ChatsService } from './chats.service';
-import { UseGuards } from '@nestjs/common';
-import { JWTAuthGuard } from 'src/auth/jwt-auth.guard';
+import { Inject, UseGuards } from '@nestjs/common';
 import { ChatWithoutMessages, Message } from 'src/graphql';
+import { PUB_SUB } from 'src/common/pubsub/pubsub.provider';
+import { PubSub } from 'graphql-subscriptions';
+import { JwtHttpAuthGuard } from 'src/auth/guards/jwt-http-auth.guard';
+import { JwtWsAuthGuard } from 'src/auth/guards/jwt-ws-auth.guard';
 
-@UseGuards(JWTAuthGuard)
 @Resolver('Chats')
 export class ChatsResolver {
-  constructor(private chatsService: ChatsService) {}
+  constructor(
+    private chatsService: ChatsService,
+    @Inject(PUB_SUB) private pubSub: PubSub,
+  ) {}
 
+  @UseGuards(JwtHttpAuthGuard)
   @Query('userChats')
   async getUserChats(
     @Context('user_uuid') userUuid: string,
@@ -16,6 +29,7 @@ export class ChatsResolver {
     return this.chatsService.getUserChats(userUuid);
   }
 
+  @UseGuards(JwtHttpAuthGuard)
   @Query('chatMessages')
   async getChatMessages(
     @Args('chatId') chatId: string,
@@ -25,12 +39,24 @@ export class ChatsResolver {
     return this.chatsService.getChatMessages(chatId, limit, offset);
   }
 
+  @UseGuards(JwtHttpAuthGuard)
   @Mutation('sendMessage')
   async sendMessage(
     @Args('chatId') chatId: string,
     @Args('content') content: string,
     @Context('user_uuid') userUuid: string,
   ): Promise<Message> {
-    return this.chatsService.sendMessage(chatId, content, userUuid);
+    /* return this.chatsService.sendMessage(chatId, content, userUuid); */
+    return this.chatsService.sendMessageSub(chatId, userUuid, content);
+  }
+
+  @UseGuards(JwtWsAuthGuard)
+  @Subscription('messageSent', {
+    filter: (payload, variables) => {
+      return payload.messageSent.chatId == variables.chatId;
+    },
+  })
+  messageSent() {
+    return this.pubSub.asyncIterator('messageSent');
   }
 }

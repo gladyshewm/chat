@@ -92,6 +92,10 @@ export abstract class IQuery {
     abstract userAllAvatars(userUuid: string): Nullable<string>[] | Promise<Nullable<string>[]>;
 }
 
+export abstract class ISubscription {
+    abstract messageSent(chatId: string): Message | Promise<Message>;
+}
+
 export class Info {
     id: string;
     name: string;
