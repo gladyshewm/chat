@@ -21,12 +21,18 @@ import createUploadLink from 'apollo-upload-client/createUploadLink.mjs';
 
 let uploadLink = createUploadLink({
   uri: 'http://localhost:5000/graphql',
-    credentials: 'include',
+  credentials: 'include',
 });
 
 let wsLink = new GraphQLWsLink(
   createClient({
     url: 'ws://localhost:5000/graphql',
+    connectionParams: () => {
+      const token = localStorage.getItem('authToken');
+      return {
+        authorization: token ? `Bearer ${token}` : '',
+      };
+    },
   }),
 );
 
@@ -42,7 +48,6 @@ const authLink: ApolloLink = setContext((_, { headers }) => {
 });
 
 /* httpLink = authLink.concat(httpLink) as HttpLink; */
-wsLink = authLink.concat(wsLink) as GraphQLWsLink;
 uploadLink = authLink.concat(uploadLink);
 
 const splitLink: ApolloLink = split(

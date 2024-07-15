@@ -1,11 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useMutation, useQuery, useSubscription } from '@apollo/client';
 import { motion } from 'framer-motion';
-import { GET_MESSAGES } from '../../graphql/query/messages';
 import { MESSAGES_SUBSCRIPTION } from '../../graphql/subscriptions/messages';
 import './Chat.css';
 import SendIcon from '../../icons/SendIcon';
-import CustomLoader from '../../components/CustomLoader/CustomLoader';
 import { useParams } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
 import { GET_CHAT_MESSAGES } from '../../graphql/query/chats';
@@ -22,12 +20,6 @@ interface MessagesProps {
   chat_id: string;
 }
 
-interface MessagesContent {
-  id: string;
-  user: string;
-  content: string;
-}
-
 interface Message {
   id: string;
   userId: string;
@@ -39,26 +31,17 @@ interface Message {
 }
 
 const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
-  /* const { data, loading, error, refetch } = useQuery(GET_ALL_USERS, { pollInterval: 1000 }); */
-  /* const { data: messagesContent, loading: loadingMessages } = useQuery(GET_MESSAGES); */
-
-  /* const { data: messagesContent, loading: loadingMessages } = useSubscription(
+  const { data: messagesContent, loading: loadingMessages } = useSubscription(
     MESSAGES_SUBSCRIPTION,
+    {
+      variables: {
+        chatId: chat_id,
+      },
+      onError: (error) => {
+        console.error(error);
+      },
+    },
   );
-  const [messages, setMessages] = useState<MessagesContent[]>([]);
-
-  useEffect(() => {
-    if (messagesContent) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        messagesContent.messageAdded,
-      ]);
-    }
-  }, [messagesContent]);
-
-  if (loadingMessages) {
-    return <CustomLoader />;
-  } */
 
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -75,6 +58,18 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
       console.error(error);
     },
   });
+
+  useEffect(() => {
+    if (messagesContent) {
+      setMessages((prevMessages) => {
+        const newMessage = messagesContent.messageSent;
+        if (!prevMessages.some((msg) => msg.id === newMessage.id)) {
+          return [newMessage, ...prevMessages];
+        }
+        return prevMessages;
+      });
+    }
+  }, [messagesContent]);
 
   return (
     <div className="message-container">

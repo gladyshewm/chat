@@ -1,9 +1,15 @@
 import { gql } from '@apollo/client';
 
 export const MESSAGES_SUBSCRIPTION = gql`
-    subscription {
-        messageAdded {
-            id, user, content
-        }
+  subscription messageSent($chatId: ID!) {
+    messageSent(chatId: $chatId) {
+      id
+      userId
+      content
+      createdAt
+      isRead
+      userName
+      avatarUrl
     }
+  }
 `;
