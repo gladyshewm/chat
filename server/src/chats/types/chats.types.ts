@@ -7,6 +7,8 @@ export type Profile = {
 export type Chat = {
   chat_id: string;
   name: string;
+  is_group_chat: boolean;
+  created_at: Date;
 };
 
 export type PartyItem = {
@@ -26,4 +28,10 @@ export type MessageData = {
     name: string;
     avatar_url: string;
   };
+};
+
+export type UserWithAvatarData = {
+  uuid: string;
+  name: string;
+  avatar_url: string;
 };

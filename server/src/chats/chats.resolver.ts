@@ -8,6 +8,7 @@ import {
 } from '@nestjs/graphql';
 import { ChatsService } from './chats.service';
 import { Inject, UseGuards } from '@nestjs/common';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { ChatWithoutMessages, Message } from 'src/graphql';
 import { PUB_SUB } from 'src/common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
@@ -20,6 +21,16 @@ export class ChatsResolver {
     private chatsService: ChatsService,
     @Inject(PUB_SUB) private pubSub: PubSub,
   ) {}
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('createChat')
+  async createChat(
+    @Args('participantsIds') participantsIds: string[],
+    @Args('name') name: string,
+    @Context('user_uuid') userUuid: string,
+  ): Promise<ChatWithoutMessages> {
+    return this.chatsService.createChat(userUuid, participantsIds, name);
+  }
 
   @UseGuards(JwtHttpAuthGuard)
   @Query('userChats')
@@ -58,5 +69,31 @@ export class ChatsResolver {
   })
   messageSent() {
     return this.pubSub.asyncIterator('messageSent');
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('uploadChatAvatar')
+  async uploadChatAvatar(
+    @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
+    @Args('chatId') chatId: string,
+  ): Promise<string> {
+    return this.chatsService.uploadChatAvatar(image, chatId);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('updateChatAvatar')
+  async updateChatAvatar(
+    @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
+    @Args('chatId') chatId: string,
+  ): Promise<string> {
+    return this.chatsService.updateChatAvatar(image, chatId);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('deleteChatAvatar')
+  async deleteChatAvatar(
+    @Args('chatId') chatId: string,
+  ): Promise<string> | null {
+    return this.chatsService.deleteChatAvatar(chatId);
   }
 }

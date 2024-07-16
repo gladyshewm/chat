@@ -45,4 +45,12 @@ export class UsersResolver {
   async getUserAllAvatars(@Args('userUuid') userUuid: string) {
     return this.usersService.getUserAllAvatars(userUuid);
   }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('deleteAvatar')
+  async deleteChatAvatar(
+    @Args('userUuid') userUuid: string,
+  ): Promise<string> | null {
+    return this.usersService.deleteAvatar(userUuid);
+  }
 }

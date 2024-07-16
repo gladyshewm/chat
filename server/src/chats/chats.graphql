@@ -1,4 +1,5 @@
 scalar Date
+scalar Upload
 
 type Chat {
   id: ID!
@@ -10,7 +11,10 @@ type Chat {
 type ChatWithoutMessages {
   id: ID!
   name: String
+  isGroupChat: Boolean!
+  groupAvatarUrl: String
   participants: [UserWithAvatar!]!
+  createdAt: Date!
 }
 
 type UserWithAvatar {
@@ -36,7 +40,11 @@ type Query {
 }
 
 type Mutation {
+  createChat(participantsIds: [ID!]!, name: String): ChatWithoutMessages!
   sendMessage(chatId: ID!, content: String!): Message!
+  uploadChatAvatar(image: Upload!, chatId: ID!): String!
+  updateChatAvatar(image: Upload!, chatId: ID!): String!
+  deleteChatAvatar(chatId: ID!): String
 }
 
 type Subscription {

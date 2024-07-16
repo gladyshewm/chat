@@ -41,9 +41,19 @@ export abstract class IMutation {
 
     abstract logOutUser(): boolean | Promise<boolean>;
 
+    abstract createChat(participantsIds: string[], name?: Nullable<string>): ChatWithoutMessages | Promise<ChatWithoutMessages>;
+
     abstract sendMessage(chatId: string, content: string): Message | Promise<Message>;
 
+    abstract uploadChatAvatar(image: Upload, chatId: string): string | Promise<string>;
+
+    abstract updateChatAvatar(image: Upload, chatId: string): string | Promise<string>;
+
+    abstract deleteChatAvatar(chatId: string): Nullable<string> | Promise<Nullable<string>>;
+
     abstract uploadAvatar(image: Upload, userUuid: string): string | Promise<string>;
+
+    abstract deleteAvatar(userUuid: string): Nullable<string> | Promise<Nullable<string>>;
 }
 
 export class Chat {
@@ -56,7 +66,10 @@ export class Chat {
 export class ChatWithoutMessages {
     id: string;
     name?: Nullable<string>;
+    isGroupChat: boolean;
+    groupAvatarUrl?: Nullable<string>;
     participants: UserWithAvatar[];
+    createdAt: Date;
 }
 
 export class UserWithAvatar {

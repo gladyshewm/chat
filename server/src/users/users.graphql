@@ -20,4 +20,5 @@ type Query {
 
 type Mutation {
   uploadAvatar(image: Upload!, userUuid: String!): String!
+  deleteAvatar(userUuid: String!): String
 }
