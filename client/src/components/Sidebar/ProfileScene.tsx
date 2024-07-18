@@ -7,7 +7,7 @@ import UserIcon from '../../icons/UserIcon';
 import IdentificationIcon from '../../icons/IdentificationIcon';
 import AtSymbolIcon from '../../icons/AtSymbolIcon';
 import { ApolloError } from '@apollo/client';
-import { User } from '../../hoc/AuthProvider';
+import { User } from '../../hoc/Auth/AuthProvider';
 import ExclamationCircleIcon from '../../icons/ExclamationCircleIcon';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';

@@ -1,0 +1,18 @@
+.download-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--outline-main-color);
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  margin-right: 20px;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    cursor: pointer;
+    background-color: var(--base-color);
+    transition: background-color 0.3s ease;
+  }
+}

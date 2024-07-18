@@ -1,6 +1,6 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { UserWithToken, UserWithAvatar } from 'src/graphql';
+import { UserWithToken, UserWithAvatar, AvatarInfo } from 'src/graphql';
 import { UseGuards } from '@nestjs/common';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { JwtHttpAuthGuard } from 'src/auth/guards/jwt-http-auth.guard';
@@ -31,12 +31,14 @@ export class UsersResolver {
   async uploadAvatar(
     @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
     @Args('userUuid') userUuid: string,
-  ): Promise<string> {
+  ): Promise<AvatarInfo> {
     return this.usersService.uploadAvatar(image, userUuid);
   }
 
   @Query('userAvatar')
-  async getUserAvatar(@Args('userUuid') userUuid: string) {
+  async getUserAvatar(
+    @Args('userUuid') userUuid: string,
+  ): Promise<AvatarInfo | null> {
     return this.usersService.getUserAvatar(userUuid);
   }
 
@@ -50,7 +52,8 @@ export class UsersResolver {
   @Mutation('deleteAvatar')
   async deleteChatAvatar(
     @Args('userUuid') userUuid: string,
+    @Args('avatarUrl') avatarUrl: string,
   ): Promise<string> | null {
-    return this.usersService.deleteAvatar(userUuid);
+    return this.usersService.deleteAvatar(userUuid, avatarUrl);
   }
 }

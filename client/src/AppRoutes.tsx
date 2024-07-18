@@ -2,7 +2,7 @@ import React, { lazy } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import Auth from './pages/Authentication/Auth';
-import PrivateRoute from './hoc/PrivateRoute';
+import PrivateRoute from './hoc/PrivateRoute/PrivateRoute';
 import useAuth from './hooks/useAuth';
 import Layout from './components/Layout/Layout';
 import CustomLoader from './components/CustomLoader/CustomLoader';

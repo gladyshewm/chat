@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import ProfileScene from './ProfileScene';
 import MessagesList from './MessagesList/MessagesList';
-import { User } from '../../hoc/AuthProvider';
+import { User } from '../../hoc/Auth/AuthProvider';
 import { ApolloError } from '@apollo/client';
 
 interface SceneContentProps {

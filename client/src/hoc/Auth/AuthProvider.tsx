@@ -1,9 +1,10 @@
-import React, { createContext, useState, useEffect, FC } from 'react';
+import React, { useState, useEffect, FC } from 'react';
 import { useQuery, useMutation, useApolloClient } from '@apollo/client';
-import { GET_USER } from '../graphql/query/user';
-import { SIGN_OUT_USER } from '../graphql/mutations/user';
-import { LOGIN_USER } from '../graphql/mutations/user';
-import CustomLoader from '../components/CustomLoader/CustomLoader';
+import { GET_USER } from '../../graphql/query/user';
+import { SIGN_OUT_USER } from '../../graphql/mutations/user';
+import { LOGIN_USER } from '../../graphql/mutations/user';
+import CustomLoader from '../../components/CustomLoader/CustomLoader';
+import { AuthContext } from './AuthContext';
 
 export interface User {
   uuid: string;
@@ -11,23 +12,9 @@ export interface User {
   email: string;
 }
 
-interface AuthContextType {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  isAuthenticated: boolean;
-  setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  isLoading: boolean;
-}
-
 interface AuthProviderProps {
   children: React.ReactNode;
 }
-
-export const AuthContext = createContext<AuthContextType>(
-  {} as AuthContextType,
-);
 
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);

@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { ApolloError, useLazyQuery, useQuery } from '@apollo/client';
+import { useLazyQuery, useQuery } from '@apollo/client';
 import { Link } from 'react-router-dom';
 import {
   debounceTime,
@@ -14,11 +14,16 @@ import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import SearchIcon from '../../../icons/SearchIcon';
 import { GET_USER_CHATS } from '../../../graphql/query/chats';
 import { FIND_USERS } from '../../../graphql/query/user';
+import { useProfile } from '../../../hooks/useProfile';
+import useAuth from '../../../hooks/useAuth';
 
 type ChatWithoutMessages = {
   id: string;
   name?: string;
+  isGroupChat: boolean;
+  groupAvatarUrl?: string;
   participants: UserWithAvatar[];
+  createdAt: Date;
 };
 
 type UserWithAvatar = {
@@ -28,18 +33,14 @@ type UserWithAvatar = {
 };
 
 interface MessagesListProps {
-  avatarUrl: string | null;
-  errorQueryAvatar: ApolloError | undefined;
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MessagesList: FC<MessagesListProps> = ({
-  avatarUrl,
-  errorQueryAvatar,
-  setIsProfileSettings,
-}) => {
+const MessagesList: FC<MessagesListProps> = ({ setIsProfileSettings }) => {
   const [chats, setChats] = useState<ChatWithoutMessages[]>([]);
   const [searchValue, setSearchValue] = useState('');
+  const { avatarUrl, errorQueryAvatar } = useProfile();
+  const { user } = useAuth();
 
   const [
     findUsers,
@@ -135,7 +136,29 @@ const MessagesList: FC<MessagesListProps> = ({
         key={chat.id}
         className="message-list-block"
       >
-        {chat.name}
+        {chat.isGroupChat ? (
+          <>{chat.name}</>
+        ) : (
+          <>
+            <div>
+              {/* <img
+                src={
+                  chat.participants.filter(
+                    (participant) => participant.id !== user?.uuid,
+                  )[0].avatarUrl
+                }
+                alt=""
+              /> */}
+            </div>
+            <p>
+              {
+                chat.participants.filter(
+                  (participant) => participant.id !== user?.uuid,
+                )[0].name
+              }
+            </p>
+          </>
+        )}
       </Link>
     ));
   };

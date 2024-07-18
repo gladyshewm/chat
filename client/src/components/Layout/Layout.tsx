@@ -1,13 +1,21 @@
 import React, { Suspense } from 'react';
+import './Layout.css';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import CustomLoader from '../CustomLoader/CustomLoader';
-import './Layout.css';
+import FullScreenSlider from '../Sidebar/ProfileSettings/ProfileInfo/FullScreenSlider/FullScreenSlider';
+import { FullScreenProvider } from '../../hoc/FullScreen/FullScreenProvider';
+import { ProfileProvider } from '../../hoc/Profile/ProfileProvider';
 
 const Layout = () => {
   return (
     <div className="layout">
-      <Sidebar />
+      <ProfileProvider>
+        <FullScreenProvider>
+          <Sidebar />
+          <FullScreenSlider />
+        </FullScreenProvider>
+      </ProfileProvider>
       <Suspense fallback={<CustomLoader />}>
         <Outlet />
       </Suspense>

@@ -6,9 +6,10 @@ import ChevronLeft from '../../icons/ChevronLeftIcon';
 
 interface SliderProps {
   images: string[];
+  onImageClick: (index: number) => void;
 }
 
-const Slider: FC<SliderProps> = ({ images }) => {
+const Slider: FC<SliderProps> = ({ images, onImageClick }) => {
   const [[page, direction], setPage] = useState([0, 0]);
   const imageIndex = wrap(0, images.length, page);
 
@@ -46,7 +47,7 @@ const Slider: FC<SliderProps> = ({ images }) => {
     <div className="slider">
       <AnimatePresence initial={false} custom={direction}>
         <motion.img
-          className="slider-img"
+          className="slider__img"
           key={page}
           src={images[imageIndex]}
           custom={direction}
@@ -70,6 +71,7 @@ const Slider: FC<SliderProps> = ({ images }) => {
               paginate(-1);
             }
           }}
+          onClick={() => onImageClick(imageIndex)}
         />
       </AnimatePresence>
       <motion.button className="prev" onClick={() => paginate(-1)}>

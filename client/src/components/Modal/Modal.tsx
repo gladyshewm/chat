@@ -8,8 +8,8 @@ import DrawOutline from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 interface ModalProps {
   active: boolean;
   setActive: React.Dispatch<SetStateAction<boolean>>;
-  showBackButton: boolean;
-  handleBackClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  showBackButton?: boolean;
+  handleBackClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   children: React.ReactNode;
 }
 

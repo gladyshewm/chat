@@ -5,6 +5,9 @@ export const GET_USER_CHATS = gql`
     userChats {
       id
       name
+      isGroupChat
+      groupAvatarUrl
+      createdAt
       participants {
         id
         name

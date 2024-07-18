@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
-import CustomLoader from '../components/CustomLoader/CustomLoader';
+import useAuth from '../../hooks/useAuth';
+import CustomLoader from '../../components/CustomLoader/CustomLoader';
 
-const PrivateRoute: FC = () => {
+const PrivateRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {

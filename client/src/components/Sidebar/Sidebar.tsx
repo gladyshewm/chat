@@ -1,35 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useQuery } from '@apollo/client';
 import './Sidebar.css';
-import useAuth from '../../hooks/useAuth';
-import { GET_USER_AVATAR } from '../../graphql/query/user';
 import ProfileSettings from './ProfileSettings/ProfileSettings';
 import MessagesList from './MessagesList/MessagesList';
 import DrawOutline from '../DrawOutline/DrawOutline/DrawOutline';
 
 const Sidebar = () => {
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isProfileSettings, setIsProfileSettings] = useState(false);
-  const { user, logout } = useAuth();
-  const {
-    data,
-    loading,
-    error: errorQueryAvatar,
-    refetch,
-  } = useQuery(GET_USER_AVATAR, {
-    variables: {
-      userUuid: user?.uuid,
-    },
-  });
-
-  useEffect(() => {
-    if (!loading && !errorQueryAvatar && data) {
-      setAvatarUrl(data.userAvatar);
-    }
-  }, [data, loading, errorQueryAvatar]);
-
-  /*if (loading) return <p>Загрузка...</p>; */
 
   const messagesListVariants = {
     hidden: { scale: 0.95, opacity: 0.8 },
@@ -49,10 +26,7 @@ const Sidebar = () => {
 
   return (
     <DrawOutline orientation="vertical" position="right" strokeWidth={2}>
-      <div
-        className="sidebar"
-        style={{ overflow: 'hidden', /* position: 'relative' */ }}
-      >
+      <div className="sidebar" style={{ overflow: 'hidden' }}>
         <AnimatePresence initial={false} mode="wait">
           {isProfileSettings ? (
             <motion.div
@@ -70,14 +44,7 @@ const Sidebar = () => {
                 left: 0,
               }}
             >
-              <ProfileSettings
-                user={user}
-                logout={logout}
-                avatarUrl={avatarUrl}
-                setAvatarUrl={setAvatarUrl}
-                errorQueryAvatar={errorQueryAvatar}
-                setIsProfileSettings={setIsProfileSettings}
-              />
+              <ProfileSettings setIsProfileSettings={setIsProfileSettings} />
             </motion.div>
           ) : (
             <motion.div
@@ -95,11 +62,7 @@ const Sidebar = () => {
                 left: 0,
               }}
             >
-              <MessagesList
-                avatarUrl={avatarUrl}
-                errorQueryAvatar={errorQueryAvatar}
-                setIsProfileSettings={setIsProfileSettings}
-              />
+              <MessagesList setIsProfileSettings={setIsProfileSettings} />
             </motion.div>
           )}
         </AnimatePresence>

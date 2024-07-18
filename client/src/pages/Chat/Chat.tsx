@@ -93,7 +93,7 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
             className={message.userId === user.uuid ? 'message_me' : 'message'}
           >
             <p>{message.content}</p>
-            <p>{new Date(message.createdAt).toISOString()}</p>
+            <p>{message.createdAt.toString()}</p>
           </div>
         </div>
       ))}

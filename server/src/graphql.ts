@@ -51,9 +51,9 @@ export abstract class IMutation {
 
     abstract deleteChatAvatar(chatId: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract uploadAvatar(image: Upload, userUuid: string): string | Promise<string>;
+    abstract uploadAvatar(image: Upload, userUuid: string): AvatarInfo | Promise<AvatarInfo>;
 
-    abstract deleteAvatar(userUuid: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract deleteAvatar(userUuid: string, avatarUrl: string): Nullable<string> | Promise<Nullable<string>>;
 }
 
 export class Chat {
@@ -100,9 +100,9 @@ export abstract class IQuery {
 
     abstract findUsers(input: string): Nullable<UserWithAvatar[]> | Promise<Nullable<UserWithAvatar[]>>;
 
-    abstract userAvatar(userUuid: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract userAvatar(userUuid: string): Nullable<AvatarInfo> | Promise<Nullable<AvatarInfo>>;
 
-    abstract userAllAvatars(userUuid: string): Nullable<string>[] | Promise<Nullable<string>[]>;
+    abstract userAllAvatars(userUuid: string): Nullable<AvatarInfo>[] | Promise<Nullable<AvatarInfo>[]>;
 }
 
 export abstract class ISubscription {
@@ -117,6 +117,12 @@ export class Info {
 export class UserWithToken {
     user: UserInfo;
     token: string;
+}
+
+export class AvatarInfo {
+    url: string;
+    name: string;
+    createdAt: Date;
 }
 
 export type Upload = FileUpload;

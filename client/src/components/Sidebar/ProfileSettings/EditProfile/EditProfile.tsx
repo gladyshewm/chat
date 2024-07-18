@@ -1,31 +1,21 @@
 import React, { FC, useState } from 'react';
 import './EditProfile.css';
-import ArrowLeftIcon from '../../../icons/ArrowLeftIcon';
-import { ApolloError, useMutation } from '@apollo/client';
-import CameraIcon from '../../../icons/CameraIcon';
-import XmarkIcon from '../../../icons/XmarkIcon';
-import CheckIcon from '../../../icons/CheckIcon';
-import { User } from '../../../hoc/AuthProvider';
-import { UPLOAD_AVATAR } from '../../../graphql/mutations/user';
-import DrawOutline from '../../DrawOutline/DrawOutline/DrawOutline';
+import ArrowLeftIcon from '../../../../icons/ArrowLeftIcon';
+import CameraIcon from '../../../../icons/CameraIcon';
+import XmarkIcon from '../../../../icons/XmarkIcon';
+import CheckIcon from '../../../../icons/CheckIcon';
+import DrawOutline from '../../../DrawOutline/DrawOutline/DrawOutline';
+import { useProfile } from '../../../../hooks/useProfile';
+import useAuth from '../../../../hooks/useAuth';
 
 interface EditProfileProps {
-  user: User | null;
-  avatarUrl: string | null;
-  setAvatarUrl: React.Dispatch<React.SetStateAction<string | null>>;
-  errorQueryAvatar: ApolloError | undefined;
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const EditProfile: FC<EditProfileProps> = ({
-  user,
-  avatarUrl,
-  setAvatarUrl,
-  errorQueryAvatar,
-  setIsProfileInfo,
-}) => {
+const EditProfile: FC<EditProfileProps> = ({ setIsProfileInfo }) => {
   const [avatar, setAvatar] = useState<File | null>(null);
-  const [uploadAvatar] = useMutation(UPLOAD_AVATAR);
+  const { avatarUrl, errorQueryAvatar, handleUploadAvatar } = useProfile();
+  const { user } = useAuth();
 
   const handleBackClick = () => {
     setIsProfileInfo(true);
@@ -43,21 +33,8 @@ const EditProfile: FC<EditProfileProps> = ({
 
   const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (user && avatar) {
-      try {
-        const { data } = await uploadAvatar({
-          variables: {
-            image: avatar,
-            userUuid: user.uuid,
-          },
-        });
-        const newAvatarUrl = data.uploadAvatar;
-        setAvatarUrl(newAvatarUrl);
-        setAvatar(null);
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    await handleUploadAvatar(avatar as File);
+    setAvatar(null);
   };
 
   const handleDivClick = () => {
@@ -71,7 +48,7 @@ const EditProfile: FC<EditProfileProps> = ({
 
   return (
     <div className="edit-profile">
-      <DrawOutline orientation='horizontal' position='bottom'>
+      <DrawOutline orientation="horizontal" position="bottom">
         <div className="edit-profile__header">
           <button className="back" onClick={handleBackClick}>
             <ArrowLeftIcon />

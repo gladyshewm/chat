@@ -1,42 +1,19 @@
 import React, { FC, useState } from 'react';
-import { ApolloError } from '@apollo/client';
-import { User } from '../../../hoc/AuthProvider';
-import { useNavigate } from 'react-router-dom';
-import EditProfile from './EditProfile';
-import ProfileInfo from './ProfileInfo';
+import EditProfile from './EditProfile/EditProfile';
+import ProfileInfo from './ProfileInfo/ProfileInfo';
 import { AnimatePresence, motion } from 'framer-motion';
 
 interface ProfileSettingsProps {
-  user: User | null;
-  logout: () => Promise<void>;
-  avatarUrl: string | null;
-  setAvatarUrl: React.Dispatch<React.SetStateAction<string | null>>;
-  errorQueryAvatar: ApolloError | undefined;
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ProfileSettings: FC<ProfileSettingsProps> = ({
-  user,
-  logout,
-  avatarUrl,
-  setAvatarUrl,
-  errorQueryAvatar,
   setIsProfileSettings,
 }) => {
   const [isProfileInfo, setIsProfileInfo] = useState(true);
-  const navigate = useNavigate();
 
   const handleBackClick = () => {
     setIsProfileSettings(false);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/auth');
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   const profileInfoVariants = {
@@ -75,12 +52,8 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
             }}
           >
             <ProfileInfo
-              user={user}
-              avatarUrl={avatarUrl}
-              errorQueryAvatar={errorQueryAvatar}
               handleBackClick={handleBackClick}
               setIsProfileInfo={setIsProfileInfo}
-              logout={handleLogout}
             />
           </motion.div>
         ) : (
@@ -99,13 +72,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
               left: 0,
             }}
           >
-            <EditProfile
-              user={user}
-              avatarUrl={avatarUrl}
-              setAvatarUrl={setAvatarUrl}
-              errorQueryAvatar={errorQueryAvatar}
-              setIsProfileInfo={setIsProfileInfo}
-            />
+            <EditProfile setIsProfileInfo={setIsProfileInfo} />
           </motion.div>
         )}
       </AnimatePresence>

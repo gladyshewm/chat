@@ -34,6 +34,16 @@ export const SIGN_OUT_USER = gql`
 
 export const UPLOAD_AVATAR = gql`
   mutation uploadAvatar($image: Upload!, $userUuid: String!) {
-    uploadAvatar(image: $image, userUuid: $userUuid)
+    uploadAvatar(image: $image, userUuid: $userUuid) {
+      url
+      name
+      createdAt
+    }
+  }
+`;
+
+export const DELETE_AVATAR = gql`
+  mutation deleteAvatar($userUuid: String!, $avatarUrl: String!) {
+    deleteAvatar(userUuid: $userUuid, avatarUrl: $avatarUrl)
   }
 `;

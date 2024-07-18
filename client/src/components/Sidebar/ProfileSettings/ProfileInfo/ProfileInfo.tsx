@@ -1,59 +1,64 @@
 import React, { FC, useState } from 'react';
-import ExclamationCircleIcon from '../../../icons/ExclamationCircleIcon';
-import ArrowLeftIcon from '../../../icons/ArrowLeftIcon';
-import PencilIcon from '../../../icons/PencilIcon';
-import EllipsisVerticalIcon from '../../../icons/EllipsisVerticalIcon';
-import UserIcon from '../../../icons/UserIcon';
-import IdentificationIcon from '../../../icons/IdentificationIcon';
-import AtSymbolIcon from '../../../icons/AtSymbolIcon';
-import { AnimatePresence, motion } from 'framer-motion';
-import ExitIcon from '../../../icons/ExitIcon';
 import { useNavigate } from 'react-router-dom';
-import { User } from '../../../hoc/AuthProvider';
-import { ApolloError, useQuery } from '@apollo/client';
+import { AnimatePresence, motion } from 'framer-motion';
 import './ProfileInfo.css';
-import { GET_USER_ALL_AVATARS } from '../../../graphql/query/user';
-import Slider from '../../Slider/Slider';
-import DrawOutline from '../../DrawOutline/DrawOutline/DrawOutline';
+import { useFullScreen } from '../../../../hooks/useFullScreen';
+import { useProfile } from '../../../../hooks/useProfile';
+import useAuth from '../../../../hooks/useAuth';
+import ExclamationCircleIcon from '../../../../icons/ExclamationCircleIcon';
+import ArrowLeftIcon from '../../../../icons/ArrowLeftIcon';
+import PencilIcon from '../../../../icons/PencilIcon';
+import EllipsisVerticalIcon from '../../../../icons/EllipsisVerticalIcon';
+import UserIcon from '../../../../icons/UserIcon';
+import IdentificationIcon from '../../../../icons/IdentificationIcon';
+import AtSymbolIcon from '../../../../icons/AtSymbolIcon';
+import ExitIcon from '../../../../icons/ExitIcon';
+import Slider from '../../../Slider/Slider';
+import DrawOutline from '../../../DrawOutline/DrawOutline/DrawOutline';
 
 interface ProfileInfoProps {
-  user: User | null;
-  avatarUrl: string | null;
-  errorQueryAvatar: ApolloError | undefined;
   handleBackClick: () => void;
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
-  logout: () => void;
 }
 
 const ProfileInfo: FC<ProfileInfoProps> = ({
-  user,
-  avatarUrl,
-  errorQueryAvatar,
   handleBackClick,
   setIsProfileInfo,
-  logout,
 }) => {
   const [copyMessage, setCopyMessage] = useState('');
   const [isExitClicked, setIsExitClicked] = useState(false);
-  const [allAvatars, setAllAvatars] = useState([]);
   const navigate = useNavigate();
+  const { openFullScreen } = useFullScreen();
+  const {
+    avatarUrl,
+    errorQueryAvatar,
+    allAvatars,
+    avatarUrls,
+    handleDeleteAvatar
+  } = useProfile();
+  const { user, logout } = useAuth();
 
-  useQuery(GET_USER_ALL_AVATARS, {
-    variables: {
-      userUuid: user?.uuid,
-    },
-    skip: !user,
-    onCompleted: (data) => {
-      if (user) {
-        setAllAvatars(data.userAllAvatars);
-      }
-    },
-    onError: (error) => {
-      if (error.message.includes('User not authorized')) {
-        setAllAvatars([]);
-      }
-    },
-  });
+  const handleImageClick = (index: number) => {
+    const headerContent = (
+      <div className="profile-info__header">
+        <div className="header__info">
+          <div className="header__avatar">
+            {avatarUrl ? <img src={avatarUrl} alt="avatar" /> : <UserIcon />}
+          </div>
+          <div className="header__name">
+            <span>{user?.name}</span>
+          </div>
+        </div>
+      </div>
+    );
+    openFullScreen(
+      allAvatars,
+      allAvatars[index],
+      headerContent,
+      true,
+      handleDeleteAvatar,
+    );
+  };
 
   const handlePencilClick = () => {
     setIsProfileInfo(false);
@@ -170,11 +175,14 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
               {errorQueryAvatar || !avatarUrl ? (
                 <UserIcon />
               ) : allAvatars.length > 1 ? (
-                <Slider images={allAvatars} />
+                <>
+                  <Slider images={avatarUrls} onImageClick={handleImageClick} />
+                </>
               ) : (
-                <img src={avatarUrl} alt="avatar" />
+                <img src={avatarUrl} alt="avatar" onClick={() => handleImageClick(0)} />
               )}
             </div>
+            <AnimatePresence></AnimatePresence>
           </DrawOutline>
           <div className="credentials">
             <motion.div

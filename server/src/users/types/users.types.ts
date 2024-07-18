@@ -3,3 +3,9 @@ export type User = {
   name: string;
   avatar_url?: string;
 };
+
+export type AvatarInfoData = {
+  url: string;
+  name: string;
+  created_at: Date;
+};

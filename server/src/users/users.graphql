@@ -1,4 +1,5 @@
 scalar Upload
+scalar Date
 
 type Info {
   id: ID!
@@ -10,15 +11,21 @@ type UserWithToken {
   token: String!
 }
 
+type AvatarInfo {
+  url: String!
+  name: String!
+  createdAt: Date!
+}
+
 type Query {
   user: UserWithToken
   users: [UserWithAvatar!]!
   findUsers(input: String!): [UserWithAvatar!]
-  userAvatar(userUuid: ID!): String
-  userAllAvatars(userUuid: ID!): [String]!
+  userAvatar(userUuid: ID!): AvatarInfo
+  userAllAvatars(userUuid: ID!): [AvatarInfo]!
 }
 
 type Mutation {
-  uploadAvatar(image: Upload!, userUuid: String!): String!
-  deleteAvatar(userUuid: String!): String
+  uploadAvatar(image: Upload!, userUuid: String!): AvatarInfo!
+  deleteAvatar(userUuid: String!, avatarUrl: String!): String
 }
