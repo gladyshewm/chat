@@ -3,7 +3,7 @@ import './Layout.css';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import CustomLoader from '../CustomLoader/CustomLoader';
-import FullScreenSlider from '../Sidebar/ProfileSettings/ProfileInfo/FullScreenSlider/FullScreenSlider';
+import FullScreenSlider from '../Slider/FullScreenSlider/FullScreenSlider';
 import { FullScreenProvider } from '../../hoc/FullScreen/FullScreenProvider';
 import { ProfileProvider } from '../../hoc/Profile/ProfileProvider';
 

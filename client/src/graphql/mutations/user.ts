@@ -47,3 +47,13 @@ export const DELETE_AVATAR = gql`
     deleteAvatar(userUuid: $userUuid, avatarUrl: $avatarUrl)
   }
 `;
+
+export const CHANGE_CREDENTIALS = gql`
+  mutation changeCredentials($credentials: ChangeCredentialsInput!) {
+    changeCredentials(credentials: $credentials) {
+      uuid
+      name
+      email
+    }
+  }
+`;

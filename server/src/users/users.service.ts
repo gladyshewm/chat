@@ -1,8 +1,14 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FileUpload } from 'graphql-upload-ts';
-import { UserWithToken, UserWithAvatar, AvatarInfo } from 'src/graphql';
-import { AvatarInfoData, User } from './types/users.types';
+import {
+  UserWithToken,
+  UserWithAvatar,
+  AvatarInfo,
+  ChangeCredentialsInput,
+  UserInfo,
+} from 'src/graphql';
+import { AvatarInfoData, UserData } from './types/users.types';
 
 @Injectable()
 export class UsersService {
@@ -12,21 +18,30 @@ export class UsersService {
 
   async getUser(): Promise<UserWithToken> | null {
     try {
-      const {
-        data: { session },
-      } = await this.supabaseService.getClient().auth.getSession();
-      if (session) {
-        const { user: userSession } = session;
-        return {
-          user: {
-            uuid: userSession.id,
-            name: userSession.user_metadata.name,
-            email: userSession.email,
-          },
-          token: session.access_token,
-        };
+      const [{ data: userData }, { data: sessionData }] = await Promise.all([
+        this.supabaseService.getClient().auth.getUser(),
+        this.supabaseService.getClient().auth.getSession(),
+      ]);
+
+      if (!userData || !sessionData || userData.user === null) {
+        return null;
       }
-      return null;
+
+      if (sessionData.session === null) {
+        throw new HttpException(
+          'Сессия пользователя не найдена',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      return {
+        user: {
+          uuid: userData.user.id,
+          name: userData.user.user_metadata.name,
+          email: userData.user.email,
+        },
+        token: sessionData.session.access_token,
+      };
     } catch (error) {
       this.logger.error('Ошибка получения пользователя:', error.message);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -34,7 +49,7 @@ export class UsersService {
   }
 
   async getAll(): Promise<UserWithAvatar[]> {
-    const { data: users, error }: { data: User[]; error: any } =
+    const { data: users, error }: { data: UserData[]; error: any } =
       await this.supabaseService
         .getClient()
         .from('profiles')
@@ -53,7 +68,7 @@ export class UsersService {
   }
 
   async findUsers(input: string): Promise<UserWithAvatar[]> {
-    const { data, error }: { data: User[]; error: any } =
+    const { data, error }: { data: UserData[]; error: any } =
       await this.supabaseService
         .getClient()
         .from('profiles')
@@ -326,6 +341,46 @@ export class UsersService {
       return currentAvatar.avatar_url;
     } catch (error) {
       this.logger.error('Ошибка удаления аватара:', error.message);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async changeCredentials(
+    userUuid: string,
+    credentials: ChangeCredentialsInput,
+  ): Promise<UserInfo> {
+    try {
+      const { data, error } = await this.supabaseService
+        .getClient()
+        .rpc('change_user_credentials', {
+          p_user_uuid: userUuid,
+          p_name: credentials.name,
+          p_email: credentials.email,
+          p_password: credentials.password,
+        });
+
+      if (error) {
+        this.logger.error('Ошибка обновления учетных данных:', error.message);
+        throw new HttpException(
+          error.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      if (!data) {
+        throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+      }
+
+      return {
+        uuid: data.uuid,
+        name: data.name,
+        email: data.email,
+      };
+    } catch (error) {
+      this.logger.error(
+        'Ошибка вызова функции обновления учетных данных:',
+        error.message,
+      );
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

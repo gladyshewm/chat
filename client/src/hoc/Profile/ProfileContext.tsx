@@ -1,6 +1,7 @@
 import { ApolloError } from '@apollo/client';
 import { createContext } from 'react';
 import { Avatar } from '../FullScreen/FullScreenContext';
+import { ChangeCredentialsSchema } from '../../utils/validationSchemas';
 
 interface ProfileContextType {
   avatarUrl: string | null;
@@ -12,6 +13,7 @@ interface ProfileContextType {
   avatarUrls: string[] | [];
   handleDeleteAvatar: (url: string) => void;
   handleUploadAvatar: (avatar: File) => void;
+  handleChangeCredentials: (values: ChangeCredentialsSchema) => Promise<string[] | null>;
 }
 
 export const ProfileContext = createContext<ProfileContextType>(

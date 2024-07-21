@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import './Auth.css';
+import { signInVariants, signUpVariants, TWEEN_TRANSITION } from '../../motion';
 import CustomButton from '../../components/CustomButton/CustomButton';
 import Modal from '../../components/Modal/Modal';
 import LogInForm from '../../components/LogInForm/LogInForm';
@@ -22,22 +23,6 @@ const Auth = () => {
     setTimeout(() => setIsLoginForm(true), 50);
   };
 
-  const SignUpVariants = {
-    hidden: { scale: 0.95, opacity: 0.8 },
-    visible: { scale: 1, opacity: 1 },
-  };
-
-  const SignInVariants = {
-    hidden: { x: '10%' },
-    visible: { x: 0 },
-  };
-
-  const transition = {
-    type: 'tween',
-    duration: 0.08,
-    ease: 'linear',
-  };
-
   return (
     <div className="auth">
       <DrawOutline strokeWidth={2} rx="15px">
@@ -57,8 +42,8 @@ const Auth = () => {
             initial="hidden"
             animate="visible"
             exit="hidden"
-            variants={SignInVariants}
-            transition={transition}
+            variants={signInVariants}
+            transition={TWEEN_TRANSITION}
           >
             <LogInForm handleCreateAccountClick={handleCreateAccountClick} />
           </motion.div>
@@ -68,8 +53,8 @@ const Auth = () => {
             initial="hidden"
             animate="visible"
             exit="hidden"
-            variants={SignUpVariants}
-            transition={transition}
+            variants={signUpVariants}
+            transition={TWEEN_TRANSITION}
           >
             <CreateAccForm />
           </motion.div>

@@ -9,13 +9,13 @@ import {
   map,
 } from 'rxjs';
 import './MessagesList.css';
-import UserIcon from '../../../icons/UserIcon';
-import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
-import SearchIcon from '../../../icons/SearchIcon';
 import { GET_USER_CHATS } from '../../../graphql/query/chats';
 import { FIND_USERS } from '../../../graphql/query/user';
 import { useProfile } from '../../../hooks/useProfile';
 import useAuth from '../../../hooks/useAuth';
+import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
+import UserIcon from '../../../icons/UserIcon';
+import SearchIcon from '../../../icons/SearchIcon';
 
 type ChatWithoutMessages = {
   id: string;

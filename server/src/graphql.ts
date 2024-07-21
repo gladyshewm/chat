@@ -16,6 +16,12 @@ export class UserInput {
     password: string;
 }
 
+export class ChangeCredentialsInput {
+    name?: Nullable<string>;
+    password?: Nullable<string>;
+    email?: Nullable<string>;
+}
+
 export class User {
     uuid: string;
     name: string;
@@ -54,6 +60,8 @@ export abstract class IMutation {
     abstract uploadAvatar(image: Upload, userUuid: string): AvatarInfo | Promise<AvatarInfo>;
 
     abstract deleteAvatar(userUuid: string, avatarUrl: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract changeCredentials(credentials: ChangeCredentialsInput): UserInfo | Promise<UserInfo>;
 }
 
 export class Chat {

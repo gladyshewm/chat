@@ -4,6 +4,7 @@
   --base-color: #212121; /* rgba(33, 33, 33, 1); */
   --col1: #48dd93; /* rgba(72, 221, 147, 1); */
   --col2: #258770; /* rgba(37, 135, 112, 1); */
+  --error-color: #fc7d6c; /* rgba(252, 125, 108, 1) */
   --outline-main-color: #999999; /* rgba(153, 153, 153, 1); */
   --outline-hover-color: #707070; /* rgba(112, 112, 112, 1); */
 }

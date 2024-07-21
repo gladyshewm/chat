@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './FullScreenSlider.css';
-import ChevronLeft from '../../../../../icons/ChevronLeftIcon';
-import XmarkIcon from '../../../../../icons/XmarkIcon';
-import { useFullScreen } from '../../../../../hooks/useFullScreen';
-import TrashIcon from '../../../../../icons/TrashIcon';
-import DownLoadButton from '../../../../DownLoadButton/DownLoadButton';
+import { useFullScreen } from '../../../hooks/useFullScreen';
+import {
+  ANIMATION_DURATION,
+  imageTransition,
+  imageVariants,
+  sliderVariants,
+} from '../../../motion';
+import DownLoadButton from '../../DownLoadButton/DownLoadButton';
+import ChevronLeft from '../../../icons/ChevronLeftIcon';
+import XmarkIcon from '../../../icons/XmarkIcon';
+import TrashIcon from '../../../icons/TrashIcon';
 
 const FullScreenSlider = () => {
   const [direction, setDirection] = useState(0);
@@ -44,50 +50,6 @@ const FullScreenSlider = () => {
     return Math.abs(offset) * velocity;
   };
 
-  const sliderTransition = {
-    type: 'spring',
-    stiffness: 300,
-    damping: 30,
-    ease: 'linear',
-    duration: 0.5,
-  };
-
-  const sliderVariants = {
-    initial: {
-      opacity: 0,
-      transition: sliderTransition,
-    },
-    animate: {
-      opacity: 1,
-      transition: sliderTransition,
-    },
-    exit: {
-      opacity: 0,
-      transition: sliderTransition,
-    },
-  };
-
-  const imageVariants = {
-    enter: (direction: number) => {
-      return {
-        x: direction > 0 ? 1000 : -1000,
-        opacity: 0,
-      };
-    },
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => {
-      return {
-        zIndex: 0,
-        x: direction < 0 ? 1000 : -1000,
-        opacity: 0,
-      };
-    },
-  };
-
   if (!images || !images.length) return null;
 
   return (
@@ -117,7 +79,7 @@ const FullScreenSlider = () => {
           initial="initial"
           animate="animate"
           exit="exit"
-          transition={{ duration: 0.5 }}
+          transition={{ duration: ANIMATION_DURATION }}
         >
           <motion.img
             src={currentImage.url}
@@ -128,10 +90,7 @@ const FullScreenSlider = () => {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{
-              x: { type: 'spring', stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 },
-            }}
+            transition={imageTransition}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={1}

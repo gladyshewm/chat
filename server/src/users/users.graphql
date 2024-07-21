@@ -17,6 +17,12 @@ type AvatarInfo {
   createdAt: Date!
 }
 
+input ChangeCredentialsInput {
+  name: String
+  password: String
+  email: String
+}
+
 type Query {
   user: UserWithToken
   users: [UserWithAvatar!]!
@@ -28,4 +34,5 @@ type Query {
 type Mutation {
   uploadAvatar(image: Upload!, userUuid: String!): AvatarInfo!
   deleteAvatar(userUuid: String!, avatarUrl: String!): String
+  changeCredentials(credentials: ChangeCredentialsInput!): UserInfo!
 }

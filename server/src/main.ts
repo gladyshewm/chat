@@ -22,6 +22,8 @@ async function bootstrap() {
     }),
   );
   app.enableCors(corsOptions);
-  await app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+  await app.listen(PORT, () =>
+    console.log(`Server started on http://localhost:${PORT}/graphql`),
+  );
 }
 bootstrap();

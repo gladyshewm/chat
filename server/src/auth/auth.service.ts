@@ -2,6 +2,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { SupabaseService } from 'src/supabase/supabase.service';
@@ -9,6 +10,8 @@ import { AuthPayload, UserInfo, UserInput } from 'src/graphql';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(private supabaseService: SupabaseService) {}
 
   async createUser(userInput: UserInput): Promise<AuthPayload> {
@@ -26,6 +29,7 @@ export class AuthService {
         },
       });
     if (authError) {
+      this.logger.error('Ошибка при регистрации:', authError.message);
       throw new HttpException(authError.message, HttpStatus.BAD_REQUEST);
     }
 
@@ -39,6 +43,7 @@ export class AuthService {
       });
 
     if (profileError) {
+      this.logger.error('Ошибка при регистрации:', profileError.message);
       throw new HttpException(profileError.message, HttpStatus.BAD_REQUEST);
     }
 
@@ -60,6 +65,7 @@ export class AuthService {
       });
 
     if (error) {
+      this.logger.error('Ошибка при входе в систему:', error.message);
       throw new UnauthorizedException({ message: error.message });
     }
 
@@ -75,6 +81,7 @@ export class AuthService {
   async logOutUser(): Promise<boolean> {
     const { error } = await this.supabaseService.getClient().auth.signOut();
     if (error) {
+      this.logger.error('Ошибка при выходе из системы:', error.message);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
     return true;

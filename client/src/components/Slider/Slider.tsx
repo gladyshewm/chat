@@ -2,6 +2,7 @@ import React, { FC, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { wrap } from 'popmotion';
 import './Slider.css';
+import { imageTransition, imageVariants } from '../../motion';
 import ChevronLeft from '../../icons/ChevronLeftIcon';
 
 interface SliderProps {
@@ -22,27 +23,6 @@ const Slider: FC<SliderProps> = ({ images, onImageClick }) => {
     return Math.abs(offset) * velocity;
   };
 
-  const variants = {
-    enter: (direction: number) => {
-      return {
-        x: direction > 0 ? 1000 : -1000,
-        opacity: 0,
-      };
-    },
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => {
-      return {
-        zIndex: 0,
-        x: direction < 0 ? 1000 : -1000,
-        opacity: 0,
-      };
-    },
-  };
-
   return (
     <div className="slider">
       <AnimatePresence initial={false} custom={direction}>
@@ -51,14 +31,11 @@ const Slider: FC<SliderProps> = ({ images, onImageClick }) => {
           key={page}
           src={images[imageIndex]}
           custom={direction}
-          variants={variants}
+          variants={imageVariants}
           initial="enter"
           animate="center"
           exit="exit"
-          transition={{
-            x: { type: 'spring', stiffness: 300, damping: 30 },
-            opacity: { duration: 0.2 },
-          }}
+          transition={imageTransition}
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={1}

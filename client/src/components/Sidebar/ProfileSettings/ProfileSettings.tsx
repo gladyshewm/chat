@@ -1,7 +1,13 @@
 import React, { FC, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import './ProfileSettings.css';
 import EditProfile from './EditProfile/EditProfile';
 import ProfileInfo from './ProfileInfo/ProfileInfo';
-import { AnimatePresence, motion } from 'framer-motion';
+import {
+  editProfileVariants,
+  profileInfoVariants,
+  TWEEN_TRANSITION,
+} from '../../../motion';
 
 interface ProfileSettingsProps {
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
@@ -16,40 +22,18 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
     setIsProfileSettings(false);
   };
 
-  const profileInfoVariants = {
-    hidden: { scale: 0.95, opacity: 0.8 },
-    visible: { scale: 1, opacity: 1 },
-  };
-
-  const editProfileVariants = {
-    hidden: { x: '10%' },
-    visible: { x: 0 },
-  };
-
-  const transition = {
-    type: 'tween',
-    duration: 0.08,
-    ease: 'linear',
-  };
-
   return (
     <>
       <AnimatePresence initial={false} mode="wait">
         {isProfileInfo ? (
           <motion.div
+            className="profile-settings__container"
             key="profileInfo"
             initial="hidden"
             animate="visible"
             exit="hidden"
             variants={profileInfoVariants}
-            transition={transition}
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              top: 0,
-              left: 0,
-            }}
+            transition={TWEEN_TRANSITION}
           >
             <ProfileInfo
               handleBackClick={handleBackClick}
@@ -58,19 +42,13 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({
           </motion.div>
         ) : (
           <motion.div
+            className="profile-settings__container"
             key="editProfile"
             initial="hidden"
             animate="visible"
             exit="hidden"
             variants={editProfileVariants}
-            transition={transition}
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              top: 0,
-              left: 0,
-            }}
+            transition={TWEEN_TRANSITION}
           >
             <EditProfile setIsProfileInfo={setIsProfileInfo} />
           </motion.div>

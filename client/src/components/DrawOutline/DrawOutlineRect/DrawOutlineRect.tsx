@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './DrawOutlineRect.css';
+import { createDrawVariants } from '../../../motion';
 
 interface DrawOutlineRectProps {
   children: React.ReactNode;
@@ -8,7 +9,6 @@ interface DrawOutlineRectProps {
   stroke?: string;
   strokeWidth?: number;
   rx?: number | string;
-  /* delay?: number; */
   key?: string | number;
 }
 
@@ -18,24 +18,11 @@ const DrawOutlineRect: FC<DrawOutlineRectProps> = ({
   stroke = '#999999',
   strokeWidth = 2,
   rx = 0,
-  /* delay = 0, */
 }) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
-
-  const delay = Math.random() * 0.5;
-  const drawVariants = {
-    hidden: { pathLength: 0, opacity: 0 },
-    visible: {
-      pathLength: 1,
-      opacity: 1,
-      transition: {
-        pathLength: { delay, type: 'spring', duration: 1.5, bounce: 0 },
-        opacity: { duration: 0.01 },
-      },
-    },
-  };
+  const drawVariants = createDrawVariants();
 
   useEffect(() => {
     if (!wrapperRef.current) return;
@@ -80,7 +67,6 @@ const DrawOutlineRect: FC<DrawOutlineRectProps> = ({
               stroke={stroke}
               strokeWidth={strokeWidth}
               rx={rx}
-              fill="none"
             />
           </motion.svg>
         )}

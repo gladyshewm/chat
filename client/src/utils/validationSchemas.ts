@@ -9,3 +9,5 @@ export type CreateAccSchema = LoginSchema & {
   username: string;
   confirmPassword?: string;
 };
+
+export type ChangeCredentialsSchema = Partial<CreateAccSchema>;

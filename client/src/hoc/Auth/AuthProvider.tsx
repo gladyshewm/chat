@@ -22,7 +22,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const client = useApolloClient();
 
-  const { refetch } = useQuery(GET_USER, {
+  const { refetch: refetchUser } = useQuery(GET_USER, {
     fetchPolicy: 'network-only',
     skip: true,
   });
@@ -34,7 +34,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       const token = localStorage.getItem('authToken');
       if (token) {
         try {
-          const { data } = await refetch();
+          const { data } = await refetchUser();
           if (data && data.user) {
             setUser({
               uuid: data.user.user.uuid,
@@ -57,7 +57,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     };
 
     checkAuth();
-  }, [refetch]);
+  }, [refetchUser]);
 
   const login = async (email: string, password: string): Promise<void> => {
     try {
@@ -104,6 +104,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       value={{
         user,
         setUser,
+        refetchUser,
         isAuthenticated,
         setIsAuthenticated,
         login,

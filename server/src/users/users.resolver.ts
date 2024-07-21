@@ -1,6 +1,11 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { UserWithToken, UserWithAvatar, AvatarInfo } from 'src/graphql';
+import {
+  UserWithToken,
+  UserWithAvatar,
+  AvatarInfo,
+  ChangeCredentialsInput,
+} from 'src/graphql';
 import { UseGuards } from '@nestjs/common';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { JwtHttpAuthGuard } from 'src/auth/guards/jwt-http-auth.guard';
@@ -55,5 +60,14 @@ export class UsersResolver {
     @Args('avatarUrl') avatarUrl: string,
   ): Promise<string> | null {
     return this.usersService.deleteAvatar(userUuid, avatarUrl);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('changeCredentials')
+  async changeCredentials(
+    @Context('user_uuid') userUuid: string,
+    @Args('credentials') credentials: ChangeCredentialsInput,
+  ) {
+    return this.usersService.changeCredentials(userUuid, credentials);
   }
 }

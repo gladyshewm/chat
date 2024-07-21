@@ -5,21 +5,27 @@ import {
   GET_USER_ALL_AVATARS,
   GET_USER_AVATAR,
 } from '../../graphql/query/user';
+import {
+  CHANGE_CREDENTIALS,
+  DELETE_AVATAR,
+  UPLOAD_AVATAR,
+} from '../../graphql/mutations/user';
 import useAuth from '../../hooks/useAuth';
-import { DELETE_AVATAR, UPLOAD_AVATAR } from '../../graphql/mutations/user';
 import { Avatar } from '../FullScreen/FullScreenContext';
+import { ChangeCredentialsSchema } from '../../utils/validationSchemas';
 
 interface ProfileProviderProps {
   children: ReactNode;
 }
 
 export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
-  const { user } = useAuth();
+  const { user, setUser, refetchUser } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [allAvatars, setAllAvatars] = useState<Avatar[] | []>([]);
   const [avatarUrls, setAvatarUrls] = useState<string[] | []>([]);
   const [deleteAvatar] = useMutation(DELETE_AVATAR);
   const [uploadAvatar] = useMutation(UPLOAD_AVATAR);
+  const [changeCredentials] = useMutation(CHANGE_CREDENTIALS);
   const {
     data: dataQueryAvatar,
     loading: loadingQueryAvatar,
@@ -63,11 +69,13 @@ export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
       });
       setAllAvatars(allAvatars.filter((avatar) => avatar.url !== url));
       if (avatarUrl === url) {
-        await refetchQueryAvatar();
+        const { data } = await refetchQueryAvatar();
+        setAvatarUrl(data.userAvatar.url);
       }
       await refetchQueryAllAvatars();
     } catch (error) {
       console.log(error);
+      throw error;
     }
   };
 
@@ -86,7 +94,51 @@ export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
         await refetchQueryAllAvatars();
       } catch (error) {
         console.error(error);
+        throw error;
       }
+    }
+  };
+
+  const handleChangeCredentials = async (
+    values: ChangeCredentialsSchema,
+  ): Promise<string[] | null> => {
+    if (!user) return null;
+
+    try {
+      const { data } = await changeCredentials({
+        variables: {
+          credentials: values,
+        },
+      });
+
+      if (data && data.changeCredentials) {
+        setUser({
+          uuid: data.changeCredentials.uuid,
+          name: data.changeCredentials.name,
+          email: data.changeCredentials.email,
+        });
+      }
+
+      const successMessage = Object.entries(values)
+        .filter(
+          ([_, value]) => value !== '' && value !== null && value !== undefined,
+        )
+        .map(([key, _]) => {
+          switch (key) {
+            case 'name':
+              return 'Имя успешно изменено';
+            case 'email':
+              return 'Email успешно изменён';
+            case 'password':
+              return 'Пароль успешно изменён';
+            default:
+              return '';
+          }
+        });
+      return successMessage;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   };
 
@@ -125,6 +177,7 @@ export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
         avatarUrls: avatarUrls,
         handleDeleteAvatar: handleDeleteAvatar,
         handleUploadAvatar: handleUploadAvatar,
+        handleChangeCredentials: handleChangeCredentials,
       }}
     >
       {children}

@@ -1,9 +1,14 @@
 import React, { SetStateAction, FC, useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './Modal.css';
+import {
+  modalContentVariants,
+  modalTransition,
+  modalVariants,
+} from '../../motion';
+import DrawOutline from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import XmarkIcon from '../../icons/XmarkIcon';
 import ChevronLeftIcon from '../../icons/ChevronLeftIcon';
-import DrawOutline from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 
 interface ModalProps {
   active: boolean;
@@ -30,30 +35,13 @@ const Modal: FC<ModalProps> = ({
     }
   }, [active, children]);
 
-  const modalContentVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 },
-  };
-
-  const modalVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-  };
-
-  const transition = {
-    type: 'tween',
-    duration: 0.05,
-    ease: 'linear',
-  };
-
   if (!active) return null;
 
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.div
         variants={modalContentVariants}
-        transition={transition}
+        transition={modalTransition}
         initial="hidden"
         animate="visible"
         exit="exit"
@@ -66,7 +54,7 @@ const Modal: FC<ModalProps> = ({
         >
           <motion.div
             variants={modalVariants}
-            transition={transition}
+            transition={modalTransition}
             className="modal__content"
             ref={contentRef}
           >

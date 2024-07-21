@@ -15,6 +15,7 @@ import AtSymbolIcon from '../../../../icons/AtSymbolIcon';
 import ExitIcon from '../../../../icons/ExitIcon';
 import Slider from '../../../Slider/Slider';
 import DrawOutline from '../../../DrawOutline/DrawOutline/DrawOutline';
+import { logoutButtonVariants } from '../../../../motion';
 
 interface ProfileInfoProps {
   handleBackClick: () => void;
@@ -34,7 +35,7 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
     errorQueryAvatar,
     allAvatars,
     avatarUrls,
-    handleDeleteAvatar
+    handleDeleteAvatar,
   } = useProfile();
   const { user, logout } = useAuth();
 
@@ -89,30 +90,6 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
         setTimeout(() => setCopyMessage(''), 3000);
       })
       .catch((err) => console.error('Ошибка копирования текста:', err));
-  };
-
-  const logoutButtonTransition = {
-    type: 'spring',
-    duration: 0.2,
-    ease: 'linear',
-  };
-
-  const logoutButtonVariants = {
-    initial: {
-      opacity: 0,
-      y: -10,
-      transition: logoutButtonTransition,
-    },
-    animate: {
-      opacity: 1,
-      y: 0,
-      transition: logoutButtonTransition,
-    },
-    exit: {
-      opacity: 0,
-      y: -10,
-      transition: logoutButtonTransition,
-    },
   };
 
   return (
@@ -179,10 +156,13 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
                   <Slider images={avatarUrls} onImageClick={handleImageClick} />
                 </>
               ) : (
-                <img src={avatarUrl} alt="avatar" onClick={() => handleImageClick(0)} />
+                <img
+                  src={avatarUrl}
+                  alt="avatar"
+                  onClick={() => handleImageClick(0)}
+                />
               )}
             </div>
-            <AnimatePresence></AnimatePresence>
           </DrawOutline>
           <div className="credentials">
             <motion.div

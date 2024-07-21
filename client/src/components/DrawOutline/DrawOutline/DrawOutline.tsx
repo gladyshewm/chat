@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './DrawOutline.css';
+import { createDrawVariants } from '../../../motion';
 
 interface DrawOutlineRectProps {
   children: React.ReactNode;
@@ -22,6 +23,7 @@ const DrawOutline: FC<DrawOutlineRectProps> = ({
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const drawVariants = createDrawVariants();
 
   useEffect(() => {
     if (!wrapperRef.current) return;
@@ -40,19 +42,6 @@ const DrawOutline: FC<DrawOutlineRectProps> = ({
       resizeObserver.disconnect();
     };
   }, []);
-
-  const delay = Math.random() * 0.5;
-  const drawVariants = {
-    hidden: { pathLength: 0, opacity: 0 },
-    visible: {
-      pathLength: 1,
-      opacity: 1,
-      transition: {
-        pathLength: { delay, type: 'spring', duration: 1.5, bounce: 0 },
-        opacity: { duration: 0.01 },
-      },
-    },
-  };
 
   const getLineCoordinates = () => {
     if (orientation === 'vertical') {
@@ -110,9 +99,7 @@ const DrawOutline: FC<DrawOutlineRectProps> = ({
             width={svgDimensions.width}
             height={svgDimensions.height}
             style={{
-              position: 'absolute',
               ...svgPosition,
-              pointerEvents: 'none',
             }}
           >
             <motion.line
