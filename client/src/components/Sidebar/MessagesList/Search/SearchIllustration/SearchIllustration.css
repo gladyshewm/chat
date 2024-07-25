@@ -1,0 +1,39 @@
+.search-illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  position: relative;
+}
+
+.magnifier {
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+
+.magnifier-handle {
+  position: absolute;
+  top: 80%;
+  right: 20%;
+  width: 10px;
+  height: 60px;
+  background-color: var(--outline-main-color);
+  transform: rotate(-45deg);
+  transform-origin: top left;
+}
+
+.magnifier-glass {
+  width: 60px;
+  height: 60px;
+  border: 8px solid var(--outline-main-color);
+  border-radius: 50%;
+}
+
+.particle {
+  width: 8px;
+  height: 8px;
+  background-color: var(--outline-main-color);
+  border-radius: 50%;
+  position: absolute;
+}

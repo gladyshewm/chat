@@ -1,40 +1,50 @@
-import React, { useState, useEffect, FC } from 'react';
-import { useQuery, useMutation, useApolloClient } from '@apollo/client';
-import { GET_USER } from '../../graphql/query/user';
-import { SIGN_OUT_USER } from '../../graphql/mutations/user';
-import { LOGIN_USER } from '../../graphql/mutations/user';
-import CustomLoader from '../../components/CustomLoader/CustomLoader';
+import React, { useState, useEffect, FC, useCallback } from 'react';
+import { useApolloClient } from '@apollo/client';
 import { AuthContext } from './AuthContext';
-
-export interface User {
-  uuid: string;
-  name: string;
-  email: string;
-}
+import {
+  useCreateUserMutation,
+  useLogInUserMutation,
+  useLogOutUserMutation,
+  useUserLazyQuery,
+} from './auth.generated';
+import { UserInfo, UserInput, UserWithToken } from '../../types.generated';
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const client = useApolloClient();
-
-  const { refetch: refetchUser } = useQuery(GET_USER, {
-    fetchPolicy: 'network-only',
-    skip: true,
+  const [user, setUser] = useState<UserInfo | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loadingStates, setLoadingStates] = useState({
+    checkAuth: false,
+    user: false,
+    createUser: false,
+    logIn: false,
+    logOut: false,
   });
-  const [signOut] = useMutation(SIGN_OUT_USER);
-  const [signIn] = useMutation(LOGIN_USER);
+
+  const setLoading = useCallback(
+    (key: keyof typeof loadingStates, value: boolean) => {
+      setLoadingStates((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
+
+  const [createUser] = useCreateUserMutation();
+  const [fetchUser] = useUserLazyQuery();
+  const [logOutUserMutation] = useLogOutUserMutation();
+  const [logInUserMutation] = useLogInUserMutation();
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('authToken');
+      setLoading('checkAuth', true);
+      const token = localStorage.getItem('accessToken');
+
       if (token) {
         try {
-          const { data } = await refetchUser();
+          const { data } = await fetchUser();
           if (data && data.user) {
             setUser({
               uuid: data.user.user.uuid,
@@ -43,7 +53,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
             });
             setIsAuthenticated(true);
           } else {
-            localStorage.removeItem('authToken');
+            localStorage.removeItem('accessToken');
             setIsAuthenticated(false);
           }
         } catch (error) {
@@ -53,63 +63,107 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       } else {
         setIsAuthenticated(false);
       }
-      setIsLoading(false);
+
+      setLoading('checkAuth', false);
     };
 
     checkAuth();
-  }, [refetchUser]);
+  }, [fetchUser, setLoading]);
 
-  const login = async (email: string, password: string): Promise<void> => {
+  const register = async (input: UserInput): Promise<UserWithToken> => {
+    setLoading('createUser', true);
     try {
-      const res = await signIn({
+      const res = await createUser({
+        variables: {
+          input: {
+            name: input.name,
+            email: input.email,
+            password: input.password,
+          },
+        },
+      });
+
+      if (!res.data) {
+        console.error('Не удалось зарегистрироваться');
+        throw new Error('Не удалось зарегистрироваться');
+      }
+
+      const { user, accessToken } = res.data.createUser;
+      setUser(user);
+      setIsAuthenticated(true);
+      localStorage.setItem('accessToken', accessToken);
+      client.resetStore();
+
+      return { user, token: accessToken };
+    } catch (error) {
+      console.error('Ошибка при регистрации:', error.message);
+      throw new Error(error.message);
+    } finally {
+      setLoading('createUser', false);
+    }
+  };
+
+  const login = async (
+    email: string,
+    password: string,
+  ): Promise<UserWithToken> => {
+    setLoading('logIn', true);
+    try {
+      const res = await logInUserMutation({
         variables: {
           email,
           password,
         },
       });
-      const { user, token }: { user: User; token: string } = res.data.logInUser;
+
+      if (!res.data) {
+        console.error('Не удалось войти в систему');
+        throw new Error('Не удалось войти в систему');
+      }
+
+      const { user, accessToken } = res.data.logInUser;
       setUser(user);
       setIsAuthenticated(true);
-      localStorage.setItem('authToken', token);
+      localStorage.setItem('accessToken', accessToken);
       client.resetStore();
+
+      return { user, token: accessToken };
     } catch (error) {
       console.error('Ошибка при входе в систему:', error.message);
       throw new Error(error.message);
+    } finally {
+      setLoading('logIn', false);
     }
   };
 
   const logout = async (): Promise<void> => {
+    setLoading('logOut', true);
     try {
-      const { data } = await signOut();
-      if (data.logOutUser) {
-        setUser(null);
-        setIsAuthenticated(false);
-        localStorage.removeItem('authToken');
-        client.clearStore();
-      } else {
-        console.error('Не удалось выйти из системы', data.message);
-      }
+      await logOutUserMutation();
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('accessToken');
+      client.clearStore();
     } catch (error) {
       console.error('Ошибка при выходе из системы:', error.message);
       throw new Error(error.message);
+    } finally {
+      setLoading('logOut', false);
     }
   };
-
-  if (isLoading) {
-    return <CustomLoader />;
-  }
 
   return (
     <AuthContext.Provider
       value={{
         user,
         setUser,
-        refetchUser,
+        fetchUser,
         isAuthenticated,
         setIsAuthenticated,
+        register,
         login,
         logout,
-        isLoading,
+        loadingStates,
       }}
     >
       {children}

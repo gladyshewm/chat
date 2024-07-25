@@ -1,16 +1,23 @@
 import { createContext } from 'react';
-import { User } from './AuthProvider';
-import { ApolloQueryResult } from '@apollo/client';
+import { UserQueryResult } from './auth.generated';
+import { UserInfo, UserInput, UserWithToken } from '../../types.generated';
 
 interface AuthContextType {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  refetchUser: () => Promise<ApolloQueryResult<any>>;
+  user: UserInfo | null;
+  setUser: React.Dispatch<React.SetStateAction<UserInfo | null>>;
+  fetchUser: () => Promise<UserQueryResult>;
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  login: (email: string, password: string) => Promise<void>;
+  register: (input: UserInput) => Promise<UserWithToken>;
+  login: (email: string, password: string) => Promise<UserWithToken>;
   logout: () => Promise<void>;
-  isLoading: boolean;
+  loadingStates: {
+    checkAuth: boolean;
+    user: boolean;
+    createUser: boolean;
+    logIn: boolean;
+    logOut: boolean;
+  };
 }
 
 export const AuthContext = createContext<AuthContextType>(

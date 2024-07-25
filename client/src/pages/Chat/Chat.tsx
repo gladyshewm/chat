@@ -1,57 +1,40 @@
 import React, { FC, useEffect, useState } from 'react';
-import { useMutation, useQuery, useSubscription } from '@apollo/client';
-import { motion } from 'framer-motion';
-import { MESSAGES_SUBSCRIPTION } from '../../graphql/subscriptions/messages';
-import './Chat.css';
-import SendIcon from '../../icons/SendIcon';
 import { useParams } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import './Chat.css';
 import useAuth from '../../hooks/useAuth';
-import { GET_CHAT_MESSAGES } from '../../graphql/query/chats';
-import { SEND_MESSAGE } from '../../graphql/mutations/messages';
-
-interface User {
-  uuid: string;
-  name: string;
-  email: string;
-}
+import {
+  useChatMessagesQuery,
+  useMessageSentSubscription,
+  useSendMessageMutation,
+} from './chat.generated';
+import { Message, UserInfo } from '../../types.generated';
+import SendIcon from '../../icons/SendIcon';
 
 interface MessagesProps {
-  user: User;
+  user: UserInfo;
   chat_id: string;
 }
 
-interface Message {
-  id: string;
-  userId: string;
-  userName: string;
-  avatarUrl?: string;
-  content: string;
-  createdAt: Date;
-  isRead: boolean;
-}
-
 const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
-  const { data: messagesContent, loading: loadingMessages } = useSubscription(
-    MESSAGES_SUBSCRIPTION,
-    {
-      variables: {
-        chatId: chat_id,
-      },
-      onError: (error) => {
-        console.error(error);
-      },
-    },
-  );
-
   const [messages, setMessages] = useState<Message[]>([]);
 
-  useQuery(GET_CHAT_MESSAGES, {
+  const { data: messagesContent } = useMessageSentSubscription({
+    variables: {
+      chatId: chat_id,
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  useChatMessagesQuery({
     variables: {
       chatId: chat_id,
     },
     onCompleted: (data) => {
       if (data) {
-        setMessages(data.chatMessages);
+        setMessages(data.chatMessages as Message[]);
       }
     },
     onError: (error) => {
@@ -106,14 +89,14 @@ const Chat = () => {
   const { id: chat_id } = useParams<{ id: string }>();
   const [message, setMessage] = useState('');
 
-  const [postMessage] = useMutation(SEND_MESSAGE);
+  const [postMessage] = useSendMessageMutation();
 
   const sendMessage = (
     e: React.MouseEvent<HTMLButtonElement> | React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault();
 
-    if (message) {
+    if (chat_id && message) {
       postMessage({
         variables: {
           chatId: chat_id,
@@ -132,7 +115,7 @@ const Chat = () => {
       className="chat"
     >
       <div className="chat__header">Чат</div>
-      <Messages user={user as User} chat_id={chat_id as string} />
+      <Messages user={user as UserInfo} chat_id={chat_id as string} />
       <form className="message-form" id="message-form">
         <input
           type="text"

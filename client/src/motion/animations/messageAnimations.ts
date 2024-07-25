@@ -1,4 +1,4 @@
-import { ANIMATION_DURATION, SPRING_TRANSITION } from '../constants';
+import { MID_ANIMATION_DURATION, SPRING_TRANSITION } from '../constants';
 
 export const successMessageVariants = {
   initial: {
@@ -31,7 +31,7 @@ export const successMessageVariants = {
     scale: 0,
     opacity: 0,
     transition: {
-      duration: ANIMATION_DURATION,
+      duration: MID_ANIMATION_DURATION,
     },
   },
 };
@@ -40,7 +40,7 @@ export const errorMessageVariants = {
   initial: { x: 0 },
   animate: {
     x: [-10, 10, -10, 10, 0],
-    transition: { duration: ANIMATION_DURATION },
+    transition: { duration: MID_ANIMATION_DURATION },
   },
   hover: {
     scale: 1.03,
@@ -55,7 +55,7 @@ export const errorMessageVariants = {
     scale: 0,
     opacity: 0,
     transition: {
-      duration: ANIMATION_DURATION,
+      duration: MID_ANIMATION_DURATION,
     },
   },
 };

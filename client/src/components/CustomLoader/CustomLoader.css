@@ -1,0 +1,23 @@
+.custom-loader-wrapper {
+  z-index: 99999;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-loader {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.loader-circle {
+  border-radius: 50%;
+}

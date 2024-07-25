@@ -10,6 +10,8 @@ interface DrawOutlineRectProps {
   strokeWidth?: number;
   rx?: number | string;
   key?: string | number;
+  showOnHover?: boolean;
+  isActive?: boolean;
 }
 
 const DrawOutlineRect: FC<DrawOutlineRectProps> = ({
@@ -18,11 +20,17 @@ const DrawOutlineRect: FC<DrawOutlineRectProps> = ({
   stroke = '#999999',
   strokeWidth = 2,
   rx = 0,
+  showOnHover = false,
+  isActive = false,
 }) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isVisible, setIsVisible] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const drawVariants = createDrawVariants();
+
+  const shouldShowOutline =
+    !showOnHover || (showOnHover && isHovered) || isActive;
 
   useEffect(() => {
     if (!wrapperRef.current) return;
@@ -45,31 +53,36 @@ const DrawOutlineRect: FC<DrawOutlineRectProps> = ({
   return (
     <div
       ref={wrapperRef}
-      className={`draw-outline-rect-wrapper ${className || ''}`}
+      className={`draw-outline-rect-wrapper ${className || ''} ${isActive ? 'active' : ''}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {children}
       <AnimatePresence>
-        {isVisible && dimensions.width > 0 && dimensions.height > 0 && (
-          <motion.svg
-            className="draw-outline-rect-svg"
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
-          >
-            <motion.rect
-              className="draw-outline-rect-rect"
-              x={strokeWidth / 2}
-              y={strokeWidth / 2}
-              width={dimensions.width - strokeWidth}
-              height={dimensions.height - strokeWidth}
-              variants={drawVariants}
-              stroke={stroke}
-              strokeWidth={strokeWidth}
-              rx={rx}
-            />
-          </motion.svg>
-        )}
+        {isVisible &&
+          dimensions.width > 0 &&
+          dimensions.height > 0 &&
+          shouldShowOutline && (
+            <motion.svg
+              className={`draw-outline-rect-svg ${isActive ? 'active' : ''}`}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
+            >
+              <motion.rect
+                className="draw-outline-rect-rect"
+                x={strokeWidth / 2}
+                y={strokeWidth / 2}
+                width={dimensions.width - strokeWidth}
+                height={dimensions.height - strokeWidth}
+                variants={drawVariants}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
+                rx={rx}
+              />
+            </motion.svg>
+          )}
       </AnimatePresence>
     </div>
   );

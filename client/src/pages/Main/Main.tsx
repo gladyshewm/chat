@@ -1,7 +1,8 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import './Main.css';
-const Scene = lazy(() => import('../../components/Sphere/Globe'));
+import SpaceBackground from './SpaceBackground/SpaceBackground';
+/* const Scene = lazy(() => import('../../components/Sphere/Globe')); */
 
 const Main = () => {
   return (
@@ -11,7 +12,8 @@ const Main = () => {
       exit={{ opacity: 0 }}
       className="main-page"
     >
-      <div>MAINMAINMAINMAINMAINMAINMAIN</div>
+      <SpaceBackground />
+      <div className="main-content">asdsa</div>
       {/* <Suspense fallback={<CustomLoader />}>
         <Scene />
       </Suspense> */}

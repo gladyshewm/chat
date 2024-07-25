@@ -20,6 +20,7 @@ import {
   successMessageVariants,
   errorMessageVariants,
 } from '../../../../motion';
+import CustomLoader from '../../../CustomLoader/CustomLoader';
 
 interface EditProfileProps {
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,6 +35,7 @@ const EditProfile: FC<EditProfileProps> = ({ setIsProfileInfo }) => {
     errorQueryAvatar,
     handleUploadAvatar,
     handleChangeCredentials,
+    profileLoadingStates,
   } = useProfile();
   const { user } = useAuth();
   const initialValues: ChangeCredentialsSchema = {
@@ -138,6 +140,7 @@ const EditProfile: FC<EditProfileProps> = ({ setIsProfileInfo }) => {
           {avatar ? (
             <div className="preview-avatar">
               <div className="preview-avatar__avatar">
+                {profileLoadingStates.uploadAvatar && <CustomLoader />}
                 <img src={URL.createObjectURL(avatar)} alt="new avatar" />
               </div>
               <div className="avatar-buttons">
@@ -177,6 +180,7 @@ const EditProfile: FC<EditProfileProps> = ({ setIsProfileInfo }) => {
             </DrawOutlineRect>
           )}
         </div>
+        {profileLoadingStates.changeCredentials && <CustomLoader />}
         <Formik
           initialValues={initialValues}
           validationSchema={validationChangeCredentialsSchema}

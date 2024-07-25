@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import './FullScreenSlider.css';
 import { useFullScreen } from '../../../hooks/useFullScreen';
 import {
-  ANIMATION_DURATION,
+  MID_ANIMATION_DURATION,
   imageTransition,
   imageVariants,
   sliderVariants,
@@ -12,6 +12,8 @@ import DownLoadButton from '../../DownLoadButton/DownLoadButton';
 import ChevronLeft from '../../../icons/ChevronLeftIcon';
 import XmarkIcon from '../../../icons/XmarkIcon';
 import TrashIcon from '../../../icons/TrashIcon';
+import CustomLoader from '../../CustomLoader/CustomLoader';
+import { useProfile } from '../../../hooks/useProfile';
 
 const FullScreenSlider = () => {
   const [direction, setDirection] = useState(0);
@@ -26,6 +28,7 @@ const FullScreenSlider = () => {
     deleteImage,
     removeImage,
   } = useFullScreen();
+  const { profileLoadingStates } = useProfile();
 
   if (!isFullScreen || !currentImage) return null;
 
@@ -54,6 +57,7 @@ const FullScreenSlider = () => {
 
   return (
     <AnimatePresence custom={direction}>
+      {profileLoadingStates.deleteAvatar && <CustomLoader />}
       <motion.div
         className="full-screen-slider"
         variants={sliderVariants}
@@ -79,7 +83,7 @@ const FullScreenSlider = () => {
           initial="initial"
           animate="animate"
           exit="exit"
-          transition={{ duration: ANIMATION_DURATION }}
+          transition={{ duration: MID_ANIMATION_DURATION }}
         >
           <motion.img
             src={currentImage.url}

@@ -28,8 +28,10 @@
   border-radius: 15px;
   background-color: var(--modal-color);
   transition: 0.2s all;
-  min-height: 50vh;
   min-width: 30vw;
+  width: 30vw;
+  min-height: 50vh;
+  overflow: hidden;
 }
 
 .modal__close {

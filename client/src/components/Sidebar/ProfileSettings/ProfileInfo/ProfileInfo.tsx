@@ -16,6 +16,7 @@ import ExitIcon from '../../../../icons/ExitIcon';
 import Slider from '../../../Slider/Slider';
 import DrawOutline from '../../../DrawOutline/DrawOutline/DrawOutline';
 import { logoutButtonVariants } from '../../../../motion';
+import CustomLoader from '../../../CustomLoader/CustomLoader';
 
 interface ProfileInfoProps {
   handleBackClick: () => void;
@@ -36,8 +37,9 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
     allAvatars,
     avatarUrls,
     handleDeleteAvatar,
+    profileLoadingStates,
   } = useProfile();
-  const { user, logout } = useAuth();
+  const { user, logout, loadingStates } = useAuth();
 
   const handleImageClick = (index: number) => {
     const headerContent = (
@@ -94,6 +96,9 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
 
   return (
     <>
+      {(loadingStates.logOut || profileLoadingStates.profileData) && (
+        <CustomLoader />
+      )}
       {copyMessage && (
         <div className="copy-message">
           <ExclamationCircleIcon />

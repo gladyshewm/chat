@@ -1,0 +1,23 @@
+query findUsers($input: String!) {
+  findUsers(input: $input) {
+    id
+    name
+    avatarUrl
+  }
+}
+
+query userChats {
+  userChats {
+    id
+    userUuid
+    name
+    isGroupChat
+    groupAvatarUrl
+    createdAt
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+}

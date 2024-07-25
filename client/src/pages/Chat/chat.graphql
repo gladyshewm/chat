@@ -1,0 +1,33 @@
+query chatMessages($chatId: ID!, $limit: Int, $offset: Int) {
+  chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {
+    id
+    userId
+    content
+    createdAt
+    isRead
+    userName
+    avatarUrl
+  }
+}
+
+mutation sendMessage($chatId: ID!, $content: String!) {
+  sendMessage(chatId: $chatId, content: $content) {
+    userName
+    content
+    avatarUrl
+    createdAt
+  }
+}
+
+subscription messageSent($chatId: ID!) {
+  messageSent(chatId: $chatId) {
+    id
+    userId
+    chatId
+    content
+    createdAt
+    isRead
+    userName
+    avatarUrl
+  }
+}

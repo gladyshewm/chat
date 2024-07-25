@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import ProfileScene from './ProfileScene';
 import MessagesList from './MessagesList/MessagesList';
-import { User } from '../../hoc/Auth/AuthProvider';
 import { ApolloError } from '@apollo/client';
+import { UserInfo } from '../../types.generated';
 
 interface SceneContentProps {
-  user: User | null;
+  user: UserInfo | null;
   avatarUrl: string;
   errorQueryAvatar: ApolloError | undefined;
   isProfileSettings: boolean;

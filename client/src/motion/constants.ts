@@ -1,4 +1,6 @@
-export const ANIMATION_DURATION = 0.5;
+export const FAST_ANIMATION_DURATION = 0.2;
+export const MID_ANIMATION_DURATION = 0.5;
+export const SLOW_ANIMATION_DURATION = 0.8;
 
 export const SPRING_TRANSITION = {
   type: 'spring',

@@ -1,14 +1,9 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import useAuth from '../../hooks/useAuth';
-import CustomLoader from '../../components/CustomLoader/CustomLoader';
 
 const PrivateRoute = () => {
-  const { isAuthenticated, isLoading } = useAuth();
-
-  if (isLoading) {
-    return <CustomLoader />;
-  }
+  const { isAuthenticated } = useAuth();
 
   return isAuthenticated ? <Outlet /> : <Navigate to="/auth" />;
 };

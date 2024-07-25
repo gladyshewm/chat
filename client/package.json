@@ -29,15 +29,17 @@
     "react-scripts": "5.0.1",
     "rxjs": "^7.8.1",
     "three": "^0.166.1",
-    "typescript": "^5.5.3",
+    "typescript": "^5.5.4",
     "web-vitals": "^2.1.4",
     "yup": "^1.4.0"
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:dev": "concurrently \"npm run codegen --watch\" \"npm run start\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "eslintConfig": {
     "extends": [
@@ -58,7 +60,16 @@
     ]
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/client-preset": "4.3.2",
+    "@graphql-codegen/near-operation-file-preset": "^3.0.0",
+    "@graphql-codegen/typescript": "^4.0.9",
+    "@graphql-codegen/typescript-operations": "^4.2.3",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.0",
+    "@graphql-typed-document-node/core": "^3.2.0",
+    "@parcel/watcher": "^2.4.1",
     "@types/apollo-upload-client": "^18.0.0",
+    "concurrently": "^8.2.2",
     "prettier": "^3.3.2"
   },
   "proxy": "http://localhost:5000"

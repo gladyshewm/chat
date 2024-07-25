@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ExclamationTriangleIcon = () => {
+const ExclamationTriangleIcon = ({ ...props }) => {
   return (
     <svg
       fill="none"
@@ -11,6 +11,7 @@ const ExclamationTriangleIcon = () => {
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
+      {...props}
     >
       <path
         strokeLinecap="round"

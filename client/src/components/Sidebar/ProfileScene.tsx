@@ -7,13 +7,13 @@ import UserIcon from '../../icons/UserIcon';
 import IdentificationIcon from '../../icons/IdentificationIcon';
 import AtSymbolIcon from '../../icons/AtSymbolIcon';
 import { ApolloError } from '@apollo/client';
-import { User } from '../../hoc/Auth/AuthProvider';
 import ExclamationCircleIcon from '../../icons/ExclamationCircleIcon';
 import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
+import { UserInfo } from '../../types.generated';
 
 interface ProfileSettingsProps {
-  user: User | null;
+  user: UserInfo | null;
   avatarUrl: string;
   errorQueryAvatar: ApolloError | undefined;
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;

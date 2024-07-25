@@ -1,0 +1,50 @@
+query user {
+  user {
+    user {
+      uuid
+      name
+      email
+    }
+    token
+  }
+}
+
+mutation createUser($input: UserInput!) {
+  createUser(input: $input) {
+    user {
+      uuid
+      name
+      email
+    }
+    accessToken
+    refreshToken
+  }
+}
+
+mutation logInUser($email: String!, $password: String!) {
+  logInUser(email: $email, password: $password) {
+    user {
+      uuid
+      email
+      name
+    }
+    accessToken
+    refreshToken
+  }
+}
+
+mutation logOutUser {
+  logOutUser
+}
+
+mutation refreshToken {
+  refreshToken {
+    user {
+      uuid
+      name
+      email
+    }
+    accessToken
+    refreshToken
+  }
+}
