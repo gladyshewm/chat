@@ -37,10 +37,34 @@ export class UserInfo {
 
 export class AuthPayload {
     user: UserInfo;
+    accessToken: string;
+    refreshToken: string;
+}
+
+export class UserWithToken {
+    user: UserInfo;
     token: string;
 }
 
+export abstract class IQuery {
+    abstract user(): Nullable<UserWithToken> | Promise<Nullable<UserWithToken>>;
+
+    abstract users(): UserWithAvatar[] | Promise<UserWithAvatar[]>;
+
+    abstract userChats(): ChatWithoutMessages[] | Promise<ChatWithoutMessages[]>;
+
+    abstract chatMessages(chatId: string, limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Message[]> | Promise<Nullable<Message[]>>;
+
+    abstract findUsers(input: string): Nullable<UserWithAvatar>[] | Promise<Nullable<UserWithAvatar>[]>;
+
+    abstract userAvatar(userUuid: string): Nullable<AvatarInfo> | Promise<Nullable<AvatarInfo>>;
+
+    abstract userAllAvatars(userUuid: string): Nullable<AvatarInfo>[] | Promise<Nullable<AvatarInfo>[]>;
+}
+
 export abstract class IMutation {
+    abstract refreshToken(refreshToken?: Nullable<string>): AuthPayload | Promise<AuthPayload>;
+
     abstract createUser(input: UserInput): AuthPayload | Promise<AuthPayload>;
 
     abstract logInUser(email: string, password: string): AuthPayload | Promise<AuthPayload>;
@@ -57,9 +81,9 @@ export abstract class IMutation {
 
     abstract deleteChatAvatar(chatId: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract uploadAvatar(image: Upload, userUuid: string): AvatarInfo | Promise<AvatarInfo>;
+    abstract uploadAvatar(image: Upload): AvatarInfo | Promise<AvatarInfo>;
 
-    abstract deleteAvatar(userUuid: string, avatarUrl: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract deleteAvatar(avatarUrl: string): Nullable<string> | Promise<Nullable<string>>;
 
     abstract changeCredentials(credentials: ChangeCredentialsInput): UserInfo | Promise<UserInfo>;
 }
@@ -74,6 +98,7 @@ export class Chat {
 export class ChatWithoutMessages {
     id: string;
     name?: Nullable<string>;
+    userUuid: string;
     isGroupChat: boolean;
     groupAvatarUrl?: Nullable<string>;
     participants: UserWithAvatar[];
@@ -97,22 +122,6 @@ export class Message {
     isRead: boolean;
 }
 
-export abstract class IQuery {
-    abstract userChats(): ChatWithoutMessages[] | Promise<ChatWithoutMessages[]>;
-
-    abstract chatMessages(chatId: string, limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Message[]> | Promise<Nullable<Message[]>>;
-
-    abstract user(): Nullable<UserWithToken> | Promise<Nullable<UserWithToken>>;
-
-    abstract users(): UserWithAvatar[] | Promise<UserWithAvatar[]>;
-
-    abstract findUsers(input: string): Nullable<UserWithAvatar[]> | Promise<Nullable<UserWithAvatar[]>>;
-
-    abstract userAvatar(userUuid: string): Nullable<AvatarInfo> | Promise<Nullable<AvatarInfo>>;
-
-    abstract userAllAvatars(userUuid: string): Nullable<AvatarInfo>[] | Promise<Nullable<AvatarInfo>[]>;
-}
-
 export abstract class ISubscription {
     abstract messageSent(chatId: string): Message | Promise<Message>;
 }
@@ -120,11 +129,6 @@ export abstract class ISubscription {
 export class Info {
     id: string;
     name: string;
-}
-
-export class UserWithToken {
-    user: UserInfo;
-    token: string;
 }
 
 export class AvatarInfo {

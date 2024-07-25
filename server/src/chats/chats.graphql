@@ -11,6 +11,7 @@ type Chat {
 type ChatWithoutMessages {
   id: ID!
   name: String
+  userUuid: ID!
   isGroupChat: Boolean!
   groupAvatarUrl: String
   participants: [UserWithAvatar!]!

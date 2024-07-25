@@ -1,7 +1,6 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import {
-  UserWithToken,
   UserWithAvatar,
   AvatarInfo,
   ChangeCredentialsInput,
@@ -14,17 +13,6 @@ import { JwtHttpAuthGuard } from 'src/auth/guards/jwt-http-auth.guard';
 export class UsersResolver {
   constructor(private usersService: UsersService) {}
 
-  @Query('user')
-  async getUser(): Promise<UserWithToken> | null {
-    return this.usersService.getUser();
-  }
-
-  @UseGuards(JwtHttpAuthGuard)
-  @Query('users')
-  async getAllUsers(): Promise<UserWithAvatar[]> {
-    return this.usersService.getAll();
-  }
-
   @UseGuards(JwtHttpAuthGuard)
   @Query('findUsers')
   async findUsers(@Args('input') input: string): Promise<UserWithAvatar[]> {
@@ -35,7 +23,7 @@ export class UsersResolver {
   @Mutation('uploadAvatar')
   async uploadAvatar(
     @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
-    @Args('userUuid') userUuid: string,
+    @Context('user_uuid') userUuid: string,
   ): Promise<AvatarInfo> {
     return this.usersService.uploadAvatar(image, userUuid);
   }
@@ -56,7 +44,7 @@ export class UsersResolver {
   @UseGuards(JwtHttpAuthGuard)
   @Mutation('deleteAvatar')
   async deleteChatAvatar(
-    @Args('userUuid') userUuid: string,
+    @Context('user_uuid') userUuid: string,
     @Args('avatarUrl') avatarUrl: string,
   ): Promise<string> | null {
     return this.usersService.deleteAvatar(userUuid, avatarUrl);

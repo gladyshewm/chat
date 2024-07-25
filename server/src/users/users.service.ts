@@ -2,7 +2,6 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { FileUpload } from 'graphql-upload-ts';
 import {
-  UserWithToken,
   UserWithAvatar,
   AvatarInfo,
   ChangeCredentialsInput,
@@ -15,57 +14,6 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
   constructor(private supabaseService: SupabaseService) {}
-
-  async getUser(): Promise<UserWithToken> | null {
-    try {
-      const [{ data: userData }, { data: sessionData }] = await Promise.all([
-        this.supabaseService.getClient().auth.getUser(),
-        this.supabaseService.getClient().auth.getSession(),
-      ]);
-
-      if (!userData || !sessionData || userData.user === null) {
-        return null;
-      }
-
-      if (sessionData.session === null) {
-        throw new HttpException(
-          'Сессия пользователя не найдена',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return {
-        user: {
-          uuid: userData.user.id,
-          name: userData.user.user_metadata.name,
-          email: userData.user.email,
-        },
-        token: sessionData.session.access_token,
-      };
-    } catch (error) {
-      this.logger.error('Ошибка получения пользователя:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  async getAll(): Promise<UserWithAvatar[]> {
-    const { data: users, error }: { data: UserData[]; error: any } =
-      await this.supabaseService
-        .getClient()
-        .from('profiles')
-        .select('uuid, name, avatar_url');
-
-    if (error) {
-      this.logger.error('Ошибка получения пользователей:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    const allUsers = users.map((user) => {
-      return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
-    });
-
-    return allUsers;
-  }
 
   async findUsers(input: string): Promise<UserWithAvatar[]> {
     const { data, error }: { data: UserData[]; error: any } =

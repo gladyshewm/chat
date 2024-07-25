@@ -6,11 +6,6 @@ type Info {
   name: String!
 }
 
-type UserWithToken {
-  user: UserInfo!
-  token: String!
-}
-
 type AvatarInfo {
   url: String!
   name: String!
@@ -24,15 +19,13 @@ input ChangeCredentialsInput {
 }
 
 type Query {
-  user: UserWithToken
-  users: [UserWithAvatar!]!
-  findUsers(input: String!): [UserWithAvatar!]
+  findUsers(input: String!): [UserWithAvatar]!
   userAvatar(userUuid: ID!): AvatarInfo
   userAllAvatars(userUuid: ID!): [AvatarInfo]!
 }
 
 type Mutation {
-  uploadAvatar(image: Upload!, userUuid: String!): AvatarInfo!
-  deleteAvatar(userUuid: String!, avatarUrl: String!): String
+  uploadAvatar(image: Upload!): AvatarInfo!
+  deleteAvatar(avatarUrl: String!): String
   changeCredentials(credentials: ChangeCredentialsInput!): UserInfo!
 }

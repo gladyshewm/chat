@@ -23,6 +23,7 @@ import { DateScalar } from 'src/common/scalars/date.scalar';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
+      context: ({ req, res }) => ({ req, res }),
       typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),

@@ -6,6 +6,7 @@ export type Profile = {
 
 export type Chat = {
   chat_id: string;
+  user_uuid: string;
   name: string;
   is_group_chat: boolean;
   created_at: Date;

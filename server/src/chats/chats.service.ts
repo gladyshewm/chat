@@ -5,7 +5,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { ChatWithoutMessages, Message, UserWithAvatar } from 'src/graphql';
+import { ChatWithoutMessages, Message } from 'src/graphql';
 import { SupabaseService } from 'src/supabase/supabase.service';
 import {
   MessageData,
@@ -30,6 +30,8 @@ export class ChatsService {
     participantsIds: string[],
     name: string,
   ): Promise<ChatWithoutMessages> {
+    participantsIds.push(userUuid);
+
     try {
       const { data, error } = (await this.supabaseService
         .getClient()
@@ -54,6 +56,7 @@ export class ChatsService {
       };
 
       if (error) {
+        this.logger.error(`Ошибка при создании чата: ${error.message}`);
         throw new HttpException(
           error.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -88,6 +91,9 @@ export class ChatsService {
           };
 
         if (participantError) {
+          this.logger.error(
+            `Ошибка получения данных участников чата: ${participantError.message}`,
+          );
           throw new HttpException(
             participantError.message,
             HttpStatus.INTERNAL_SERVER_ERROR,
@@ -109,6 +115,9 @@ export class ChatsService {
           });
 
         if (partyError) {
+          this.logger.error(
+            `Ошибка при добавлении участника в чат: ${partyError.message}`,
+          );
           throw new HttpException(
             partyError.message,
             HttpStatus.INTERNAL_SERVER_ERROR,
@@ -118,20 +127,41 @@ export class ChatsService {
 
       return chat;
     } catch (error) {
+      this.logger.error(`Ошибка при создании чата: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
   async getUserChats(userUuid: string): Promise<ChatWithoutMessages[]> {
     try {
-      const { data: chatsData, error: chatsError } = (await this.supabaseService
+      const { data: userChats, error: chatsError } = await this.supabaseService
         .getClient()
         .from('party')
-        .select(
-          `
+        .select('chat_id')
+        .eq('user_uuid', userUuid);
+
+      if (chatsError) {
+        this.logger.error(
+          `Ошибка при получении чатов пользователя: ${chatsError.message}`,
+        );
+        throw new HttpException(
+          chatsError.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      const chatIds = userChats.map((chat) => chat.chat_id);
+
+      const { data: chatsData, error: participantsError } =
+        (await this.supabaseService
+          .getClient()
+          .from('party')
+          .select(
+            `
               chat_id,
               chat:chat_id (
                   chat_id,
+                  user_uuid,
                   name,
                   is_group_chat,
                   created_at
@@ -142,12 +172,16 @@ export class ChatsService {
                   avatar_url
               )
               `,
-        )) as /* .neq('user_uuid', userUuid) */ {
-        data: PartyItem[];
-        error: any;
-      };
+          )
+          .in('chat_id', chatIds)) as {
+          data: PartyItem[];
+          error: any;
+        };
 
-      if (chatsError) {
+      if (participantsError) {
+        this.logger.error(
+          `Ошибка при получении чатов пользователя: ${participantsError.message}`,
+        );
         throw new HttpException(
           chatsError.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -166,6 +200,9 @@ export class ChatsService {
           .in('chat_id', groupChatIds);
 
       if (groupAvatarsError) {
+        this.logger.error(
+          `Ошибка при аватаров чатов: ${groupAvatarsError.message}`,
+        );
         throw new HttpException(
           groupAvatarsError.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -182,6 +219,7 @@ export class ChatsService {
         if (!chatMap.has(item.chat_id)) {
           chatMap.set(item.chat_id, {
             id: item.chat_id,
+            userUuid: item.chat.user_uuid,
             name: item.chat.name,
             isGroupChat: item.chat.is_group_chat,
             groupAvatarUrl: item.chat.is_group_chat
@@ -193,15 +231,20 @@ export class ChatsService {
         }
 
         const chat = chatMap.get(item.chat_id)!;
-        chat.participants.push({
-          id: item.profiles.uuid,
-          name: item.profiles.name,
-          avatarUrl: item.profiles.avatar_url,
-        });
+        if (!chat.participants.some((p) => p.id === item.profiles.uuid)) {
+          chat.participants.push({
+            id: item.profiles.uuid,
+            name: item.profiles.name,
+            avatarUrl: item.profiles.avatar_url,
+          });
+        }
       });
 
       return Array.from(chatMap.values());
     } catch (error) {
+      this.logger.error(
+        `Ошибка при получении чатов пользователя: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -238,6 +281,9 @@ export class ChatsService {
         };
 
       if (messagesError) {
+        this.logger.error(
+          `Ошибка при получении сообщений чата: ${messagesError.message}`,
+        );
         throw new HttpException(
           messagesError.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -259,6 +305,9 @@ export class ChatsService {
 
       return messages;
     } catch (error) {
+      this.logger.error(
+        `Ошибка при получении сообщений чата: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -296,6 +345,7 @@ export class ChatsService {
         )) as { data: MessageData; error: any };
 
       if (error) {
+        this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
         throw new HttpException(
           error.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -316,6 +366,7 @@ export class ChatsService {
 
       return message;
     } catch (error) {
+      this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -354,6 +405,7 @@ export class ChatsService {
         .single()) as { data: MessageData; error: any };
 
       if (error) {
+        this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
         throw new HttpException(
           error.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -375,6 +427,7 @@ export class ChatsService {
 
       return message;
     } catch (error) {
+      this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -403,7 +456,7 @@ export class ChatsService {
       });
 
     if (error) {
-      this.logger.error(`Error uploading file: ${error.message}`);
+      this.logger.error(`Ошибка при загрузке аватара: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -418,7 +471,7 @@ export class ChatsService {
 
       return publicURL;
     } catch (error) {
-      this.logger.error(`Error getting public URL: ${error.message}`);
+      this.logger.error(`Ошибка получения публичной ссылки: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -430,7 +483,9 @@ export class ChatsService {
       .insert({ chat_id: chatId, avatar_url: publicURL });
 
     if (updateError) {
-      this.logger.error(`Error updating chat avatar: ${updateError.message}`);
+      this.logger.error(
+        `Ошибка при обновлении аватара: ${updateError.message}`,
+      );
       throw new HttpException(
         updateError.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -465,7 +520,7 @@ export class ChatsService {
       });
 
     if (error) {
-      this.logger.error(`Error uploading file: ${error.message}`);
+      this.logger.error(`Ошибка при обновлении аватара: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -480,7 +535,7 @@ export class ChatsService {
 
       return publicURL;
     } catch (error) {
-      this.logger.error(`Error getting public URL: ${error.message}`);
+      this.logger.error(`Ошибка получения публичной ссылки: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -493,7 +548,9 @@ export class ChatsService {
       .eq('chat_id', chatId);
 
     if (updateError) {
-      this.logger.error(`Error updating chat avatar: ${updateError.message}`);
+      this.logger.error(
+        `Ошибка при обновлении аватара: ${updateError.message}`,
+      );
       throw new HttpException(
         updateError.message,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -512,7 +569,7 @@ export class ChatsService {
           .single();
 
       if (fetchError) {
-        this.logger.error(`Error fetching chat: ${fetchError.message}`);
+        this.logger.error(`Ошибка при получении чата: ${fetchError.message}`);
         throw new HttpException(
           fetchError.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -531,7 +588,9 @@ export class ChatsService {
         .rpc('check_chat_delete_access', { file_path: currentAvatarPath });
 
       if (accessError) {
-        this.logger.error(`Error checking access: ${accessError.message}`);
+        this.logger.error(
+          `Ошибка при проверке доступа: ${accessError.message}`,
+        );
         throw new HttpException(
           accessError.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -540,7 +599,7 @@ export class ChatsService {
 
       if (!hasAccess) {
         throw new HttpException(
-          'You do not have permission to delete this chat avatar',
+          'Недостаточно прав для удаления аватара',
           HttpStatus.FORBIDDEN,
         );
       }
@@ -551,7 +610,9 @@ export class ChatsService {
         .remove([currentAvatarPath]);
 
       if (deleteError) {
-        this.logger.error(`Error deleting file: ${deleteError.message}`);
+        this.logger.error(
+          `Ошибка при удалении аватара: ${deleteError.message}`,
+        );
         throw new HttpException(
           deleteError.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -564,7 +625,9 @@ export class ChatsService {
         .list(`chats/${chatId}`);
 
       if (listError) {
-        this.logger.error(`Error listing files: ${listError.message}`);
+        this.logger.error(
+          `Ошибка при получении списка файлов: ${listError.message}`,
+        );
         throw new HttpException(
           listError.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -591,7 +654,9 @@ export class ChatsService {
         .eq('chat_id', chatId);
 
       if (updateError) {
-        this.logger.error(`Error updating chat avatar: ${updateError.message}`);
+        this.logger.error(
+          `Ошибка при обновлении аватара чата: ${updateError.message}`,
+        );
         throw new HttpException(
           updateError.message,
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -600,7 +665,7 @@ export class ChatsService {
 
       return newAvatarUrl;
     } catch (error) {
-      this.logger.error(`Error deleting chat avatar: ${error.message}`);
+      this.logger.error(`Ошибка удаления аватара: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
