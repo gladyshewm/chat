@@ -9,8 +9,8 @@ query user {
   }
 }
 
-mutation createUser($input: UserInput!) {
-  createUser(input: $input) {
+mutation createUser($createInput: CreateUserInput!) {
+  createUser(createInput: $createInput) {
     user {
       uuid
       name
@@ -21,12 +21,12 @@ mutation createUser($input: UserInput!) {
   }
 }
 
-mutation logInUser($email: String!, $password: String!) {
-  logInUser(email: $email, password: $password) {
+mutation logInUser($loginInput: LoginUserInput!) {
+  logInUser(loginInput: $loginInput) {
     user {
       uuid
-      email
       name
+      email
     }
     accessToken
     refreshToken

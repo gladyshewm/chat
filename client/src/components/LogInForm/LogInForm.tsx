@@ -23,7 +23,7 @@ const LogInForm: FC<LogInFormProps> = ({ handleCreateAccountClick }) => {
 
   const signIn = async ({ email, password }: LoginSchema) => {
     try {
-      await login(email, password);
+      await login({ email, password });
     } catch (error) {
       setErrorMessage('Ошибка входа. Проверьте правильность введённых данных');
       console.log(error);

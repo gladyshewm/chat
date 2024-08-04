@@ -5,22 +5,17 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { SupabaseService } from 'src/supabase/supabase.service';
-import {
-  AuthPayload,
-  UserInfo,
-  UserWithAvatar,
-  UserWithToken,
-} from 'src/graphql';
-import { UserData } from 'src/users/types/users.types';
+import { SupabaseService } from '../supabase/supabase.service';
+import { AuthPayload, UserInfo, UserWithToken } from '../graphql';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Response } from 'express';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
-
   constructor(private supabaseService: SupabaseService) {}
+
+  private readonly logger = new Logger(AuthService.name);
 
   async refreshToken(): Promise<AuthPayload> {
     try {
@@ -82,25 +77,6 @@ export class AuthService {
     }
   }
 
-  async getAllUsers(): Promise<UserWithAvatar[]> {
-    const { data: users, error }: { data: UserData[]; error: any } =
-      await this.supabaseService
-        .getClient()
-        .from('profiles')
-        .select('uuid, name, avatar_url');
-
-    if (error) {
-      this.logger.error('Ошибка получения пользователей:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    const allUsers = users.map((user) => {
-      return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
-    });
-
-    return allUsers;
-  }
-
   async createUser(userInput: CreateUserDto): Promise<AuthPayload> {
     const profile_id: string = Date.now().toString();
     const { data, error: authError } = await this.supabaseService
@@ -148,16 +124,15 @@ export class AuthService {
   }
 
   async logInUser(
-    email: string,
-    password: string,
+    loginData: LoginUserDto,
     res: Response,
   ): Promise<AuthPayload> {
     try {
       const { data, error } = await this.supabaseService
         .getClient()
         .auth.signInWithPassword({
-          email,
-          password,
+          email: loginData.email,
+          password: loginData.password,
         });
 
       if (error) {

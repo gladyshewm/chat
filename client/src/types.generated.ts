@@ -55,10 +55,21 @@ export type ChatWithoutMessages = {
   userUuid: Scalars['ID']['output'];
 };
 
+export type CreateUserInput = {
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 export type Info = {
   __typename?: 'Info';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+export type LoginUserInput = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 };
 
 export type Message = {
@@ -102,7 +113,7 @@ export type MutationCreateChatArgs = {
 
 
 export type MutationCreateUserArgs = {
-  input: UserInput;
+  createInput: CreateUserInput;
 };
 
 
@@ -117,8 +128,7 @@ export type MutationDeleteChatAvatarArgs = {
 
 
 export type MutationLogInUserArgs = {
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
+  loginInput: LoginUserInput;
 };
 
 
@@ -205,12 +215,6 @@ export type UserInfo = {
   email: Scalars['String']['output'];
   name: Scalars['String']['output'];
   uuid: Scalars['ID']['output'];
-};
-
-export type UserInput = {
-  email: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  password: Scalars['String']['input'];
 };
 
 export type UserWithAvatar = {

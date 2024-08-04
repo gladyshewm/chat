@@ -1,17 +1,16 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AuthPayload, UserWithAvatar, UserWithToken } from 'src/graphql';
-import { UseGuards } from '@nestjs/common';
-import { JwtHttpAuthGuard } from './guards/jwt-http-auth.guard';
+import { AuthPayload, UserWithToken } from '../graphql';
 import { Response } from 'express';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Resolver('Auth')
 export class AuthResolver {
   constructor(private authService: AuthService) {}
 
   @Mutation('refreshToken')
-  async refreshToken() {
+  async refreshToken(): Promise<AuthPayload> {
     return this.authService.refreshToken();
   }
 
@@ -20,24 +19,19 @@ export class AuthResolver {
     return this.authService.getUser();
   }
 
-  @UseGuards(JwtHttpAuthGuard)
-  @Query('users')
-  async getAllUsers(): Promise<UserWithAvatar[]> {
-    return this.authService.getAllUsers();
-  }
-
   @Mutation('createUser')
-  async createUser(@Args('input') input: CreateUserDto): Promise<AuthPayload> {
-    return this.authService.createUser(input);
+  async createUser(
+    @Args('createInput') createInput: CreateUserDto,
+  ): Promise<AuthPayload> {
+    return this.authService.createUser(createInput);
   }
 
   @Mutation('logInUser')
   async logInUser(
-    @Args('email') email: string,
-    @Args('password') password: string,
+    @Args('loginInput') loginData: LoginUserDto,
     @Context('res') res: Response,
   ): Promise<AuthPayload> {
-    return this.authService.logInUser(email, password, res);
+    return this.authService.logInUser(loginData, res);
   }
 
   @Mutation('logOutUser')

@@ -9,19 +9,18 @@ export type UserQueryVariables = Types.Exact<{ [key: string]: never; }>;
 export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'UserWithToken', token: string, user: { __typename?: 'UserInfo', uuid: string, name: string, email: string } } | null };
 
 export type CreateUserMutationVariables = Types.Exact<{
-  input: Types.UserInput;
+  createInput: Types.CreateUserInput;
 }>;
 
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'AuthPayload', accessToken: string, refreshToken: string, user: { __typename?: 'UserInfo', uuid: string, name: string, email: string } } };
 
 export type LogInUserMutationVariables = Types.Exact<{
-  email: Types.Scalars['String']['input'];
-  password: Types.Scalars['String']['input'];
+  loginInput: Types.LoginUserInput;
 }>;
 
 
-export type LogInUserMutation = { __typename?: 'Mutation', logInUser: { __typename?: 'AuthPayload', accessToken: string, refreshToken: string, user: { __typename?: 'UserInfo', uuid: string, email: string, name: string } } };
+export type LogInUserMutation = { __typename?: 'Mutation', logInUser: { __typename?: 'AuthPayload', accessToken: string, refreshToken: string, user: { __typename?: 'UserInfo', uuid: string, name: string, email: string } } };
 
 export type LogOutUserMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -79,8 +78,8 @@ export type UserLazyQueryHookResult = ReturnType<typeof useUserLazyQuery>;
 export type UserSuspenseQueryHookResult = ReturnType<typeof useUserSuspenseQuery>;
 export type UserQueryResult = Apollo.QueryResult<UserQuery, UserQueryVariables>;
 export const CreateUserDocument = gql`
-    mutation createUser($input: UserInput!) {
-  createUser(input: $input) {
+    mutation createUser($createInput: CreateUserInput!) {
+  createUser(createInput: $createInput) {
     user {
       uuid
       name
@@ -106,7 +105,7 @@ export type CreateUserMutationFn = Apollo.MutationFunction<CreateUserMutation, C
  * @example
  * const [createUserMutation, { data, loading, error }] = useCreateUserMutation({
  *   variables: {
- *      input: // value for 'input'
+ *      createInput: // value for 'createInput'
  *   },
  * });
  */
@@ -118,12 +117,12 @@ export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutati
 export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
 export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
 export const LogInUserDocument = gql`
-    mutation logInUser($email: String!, $password: String!) {
-  logInUser(email: $email, password: $password) {
+    mutation logInUser($loginInput: LoginUserInput!) {
+  logInUser(loginInput: $loginInput) {
     user {
       uuid
-      email
       name
+      email
     }
     accessToken
     refreshToken
@@ -145,8 +144,7 @@ export type LogInUserMutationFn = Apollo.MutationFunction<LogInUserMutation, Log
  * @example
  * const [logInUserMutation, { data, loading, error }] = useLogInUserMutation({
  *   variables: {
- *      email: // value for 'email'
- *      password: // value for 'password'
+ *      loginInput: // value for 'loginInput'
  *   },
  * });
  */

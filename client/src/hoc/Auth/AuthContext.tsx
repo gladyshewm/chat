@@ -1,6 +1,11 @@
 import { createContext } from 'react';
 import { UserQueryResult } from './auth.generated';
-import { UserInfo, UserInput, UserWithToken } from '../../types.generated';
+import {
+  UserInfo,
+  CreateUserInput,
+  LoginUserInput,
+  UserWithToken,
+} from '../../types.generated';
 
 interface AuthContextType {
   user: UserInfo | null;
@@ -8,8 +13,8 @@ interface AuthContextType {
   fetchUser: () => Promise<UserQueryResult>;
   isAuthenticated: boolean;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
-  register: (input: UserInput) => Promise<UserWithToken>;
-  login: (email: string, password: string) => Promise<UserWithToken>;
+  register: (createInput: CreateUserInput) => Promise<UserWithToken>;
+  login: (loginInput: LoginUserInput) => Promise<UserWithToken>;
   logout: () => Promise<void>;
   loadingStates: {
     checkAuth: boolean;

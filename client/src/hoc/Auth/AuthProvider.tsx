@@ -7,7 +7,12 @@ import {
   useLogOutUserMutation,
   useUserLazyQuery,
 } from './auth.generated';
-import { UserInfo, UserInput, UserWithToken } from '../../types.generated';
+import {
+  UserInfo,
+  CreateUserInput,
+  UserWithToken,
+  LoginUserInput,
+} from '../../types.generated';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -70,12 +75,12 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, [fetchUser, setLoading]);
 
-  const register = async (input: UserInput): Promise<UserWithToken> => {
+  const register = async (input: CreateUserInput): Promise<UserWithToken> => {
     setLoading('createUser', true);
     try {
       const res = await createUser({
         variables: {
-          input: {
+          createInput: {
             name: input.name,
             email: input.email,
             password: input.password,
@@ -103,16 +108,15 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const login = async (
-    email: string,
-    password: string,
-  ): Promise<UserWithToken> => {
+  const login = async (input: LoginUserInput): Promise<UserWithToken> => {
     setLoading('logIn', true);
     try {
       const res = await logInUserMutation({
         variables: {
-          email,
-          password,
+          loginInput: {
+            email: input.email,
+            password: input.password,
+          },
         },
       });
 

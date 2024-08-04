@@ -10,8 +10,13 @@
 
 import { FileUpload } from "graphql-upload-ts";
 
-export class UserInput {
+export class CreateUserInput {
     name: string;
+    email: string;
+    password: string;
+}
+
+export class LoginUserInput {
     email: string;
     password: string;
 }
@@ -49,11 +54,11 @@ export class UserWithToken {
 export abstract class IQuery {
     abstract user(): Nullable<UserWithToken> | Promise<Nullable<UserWithToken>>;
 
-    abstract users(): UserWithAvatar[] | Promise<UserWithAvatar[]>;
-
     abstract userChats(): ChatWithoutMessages[] | Promise<ChatWithoutMessages[]>;
 
     abstract chatMessages(chatId: string, limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Message[]> | Promise<Nullable<Message[]>>;
+
+    abstract users(): UserWithAvatar[] | Promise<UserWithAvatar[]>;
 
     abstract findUsers(input: string): Nullable<UserWithAvatar>[] | Promise<Nullable<UserWithAvatar>[]>;
 
@@ -65,9 +70,9 @@ export abstract class IQuery {
 export abstract class IMutation {
     abstract refreshToken(refreshToken?: Nullable<string>): AuthPayload | Promise<AuthPayload>;
 
-    abstract createUser(input: UserInput): AuthPayload | Promise<AuthPayload>;
+    abstract createUser(createInput: CreateUserInput): AuthPayload | Promise<AuthPayload>;
 
-    abstract logInUser(email: string, password: string): AuthPayload | Promise<AuthPayload>;
+    abstract logInUser(loginInput: LoginUserInput): AuthPayload | Promise<AuthPayload>;
 
     abstract logOutUser(): boolean | Promise<boolean>;
 
