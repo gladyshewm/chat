@@ -3,7 +3,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ConfigModule } from '@nestjs/config';
 import { join } from 'path';
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from '../users/users.module';
 import { SupabaseModule } from '../supabase/supabase.module';
@@ -47,7 +46,6 @@ import { DateScalar } from 'src/common/scalars/date.scalar';
       },
     }),
   ],
-  controllers: [AppController],
   providers: [AppService, DateScalar, UploadScalar],
 })
 export class AppModule {}
