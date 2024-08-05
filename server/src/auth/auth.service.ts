@@ -166,6 +166,15 @@ export class AuthService {
   }
 
   async logOutUser(): Promise<boolean> {
+    const { data: session } = await this.supabaseService
+      .getClient()
+      .auth.getSession();
+
+    if (!session.session) {
+      this.logger.warn('Попытка выхода не авторизованного пользователя');
+      return false;
+    }
+
     const { error } = await this.supabaseService.getClient().auth.signOut();
     if (error) {
       this.logger.error('Ошибка при выходе из системы:', error.message);
