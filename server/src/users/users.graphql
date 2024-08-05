@@ -19,6 +19,7 @@ input ChangeCredentialsInput {
 }
 
 type Query {
+  users: [UserWithAvatar!]!
   findUsers(input: String!): [UserWithAvatar]!
   userAvatar(userUuid: ID!): AvatarInfo
   userAllAvatars(userUuid: ID!): [AvatarInfo]!

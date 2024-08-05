@@ -15,6 +15,25 @@ export class UsersService {
 
   constructor(private supabaseService: SupabaseService) {}
 
+  async getAllUsers(): Promise<UserWithAvatar[]> {
+    const { data: users, error }: { data: UserData[]; error: any } =
+      await this.supabaseService
+        .getClient()
+        .from('profiles')
+        .select('uuid, name, avatar_url');
+
+    if (error) {
+      this.logger.error('Ошибка получения пользователей:', error.message);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    const allUsers = users.map((user) => {
+      return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
+    });
+
+    return allUsers;
+  }
+
   async findUsers(input: string): Promise<UserWithAvatar[]> {
     const { data, error }: { data: UserData[]; error: any } =
       await this.supabaseService

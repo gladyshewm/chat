@@ -14,6 +14,12 @@ export class UsersResolver {
   constructor(private usersService: UsersService) {}
 
   @UseGuards(JwtHttpAuthGuard)
+  @Query('users')
+  async getAllUsers(): Promise<UserWithAvatar[]> {
+    return this.usersService.getAllUsers();
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
   @Query('findUsers')
   async findUsers(@Args('input') input: string): Promise<UserWithAvatar[]> {
     return this.usersService.findUsers(input);
