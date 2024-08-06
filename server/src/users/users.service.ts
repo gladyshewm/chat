@@ -6,7 +6,7 @@ import {
   AvatarInfo,
   ChangeCredentialsInput,
   UserInfo,
-} from 'src/graphql';
+} from '../graphql';
 import { AvatarInfoData, UserData } from './types/users.types';
 
 @Injectable()
@@ -16,11 +16,10 @@ export class UsersService {
   constructor(private supabaseService: SupabaseService) {}
 
   async getAllUsers(): Promise<UserWithAvatar[]> {
-    const { data: users, error }: { data: UserData[]; error: any } =
-      await this.supabaseService
-        .getClient()
-        .from('profiles')
-        .select('uuid, name, avatar_url');
+    const { data: users, error } = await this.supabaseService
+      .getClient()
+      .from('profiles')
+      .select('uuid, name, avatar_url');
 
     if (error) {
       this.logger.error('Ошибка получения пользователей:', error.message);
@@ -35,12 +34,11 @@ export class UsersService {
   }
 
   async findUsers(input: string): Promise<UserWithAvatar[]> {
-    const { data, error }: { data: UserData[]; error: any } =
-      await this.supabaseService
-        .getClient()
-        .from('profiles')
-        .select('uuid, name, avatar_url')
-        .ilike('name', `%${input}%`);
+    const { data, error } = await this.supabaseService
+      .getClient()
+      .from('profiles')
+      .select('uuid, name, avatar_url')
+      .ilike('name', `%${input}%`);
 
     if (error) {
       this.logger.error('Ошибка поиска пользователей:', error.message);
@@ -58,7 +56,7 @@ export class UsersService {
     const { createReadStream, filename, mimetype } = file;
     const stream = createReadStream();
 
-    const chunks = [];
+    const chunks: Buffer[] = [];
     for await (const chunk of stream) {
       chunks.push(chunk);
     }
@@ -187,7 +185,7 @@ export class UsersService {
           limit: 100,
           offset: 0,
           sortBy: { column: 'name', order: 'asc' },
-        })) as { data: AvatarInfoData[]; error: any };
+        })) as unknown as { data: AvatarInfoData[]; error: any };
 
       if (error) {
         this.logger.error('Ошибка получения аватаров:', error.message);
@@ -222,7 +220,7 @@ export class UsersService {
   async deleteAvatar(
     userUuid: string,
     avatarUrl: string,
-  ): Promise<string> | null {
+  ): Promise<string | null> {
     try {
       const { data: currentAvatar, error: fetchError } =
         await this.supabaseService

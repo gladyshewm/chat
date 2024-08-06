@@ -10,6 +10,12 @@ import { LoginUserDto } from './dto/login-user.dto';
 
 jest.mock('./auth.service');
 
+const mockGqlContextRequest = () => {
+  const req: Partial<Request> = {};
+  // req.accessToken = '';
+  return req as Request;
+};
+
 const mockGqlContextResponse = () => {
   const res: Partial<Response> = {};
   res.status = jest.fn().mockReturnValue(res);
@@ -59,10 +65,11 @@ describe('AuthResolver', () => {
   });
 
   describe('getUser', () => {
-    let user: UserWithToken;
+    let user: UserWithToken | null;
 
     beforeEach(async () => {
-      user = await authResolver.getUser();
+      const mockReq = mockGqlContextRequest();
+      user = await authResolver.getUser(mockReq);
     });
 
     it('should call authService', async () => {

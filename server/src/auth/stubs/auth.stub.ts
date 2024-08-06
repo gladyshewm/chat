@@ -1,4 +1,4 @@
-import { AuthPayload, UserWithToken } from 'src/graphql';
+import { AuthPayload, UserWithToken } from 'graphql';
 
 export const authPayloadStub = (): AuthPayload => {
   return {

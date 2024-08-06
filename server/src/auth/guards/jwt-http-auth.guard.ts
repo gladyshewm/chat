@@ -21,6 +21,7 @@ export class JwtHttpAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const gqlContext = ctx.getContext();
+    /* console.log(ctx.getType()); */
     const req = gqlContext.req;
     const res = gqlContext.res;
 

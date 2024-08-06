@@ -20,9 +20,14 @@ export class JwtWsAuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
-    const { connectionParams } = ctx.getContext().req;
+    const gqlContext = ctx.getContext();
+    const req = gqlContext.req;
+    /*  console.log(ctx.getType());
+    const { connectionParams } = ctx.getContext().req; */
 
     try {
+      const { connectionParams } = req;
+
       if (!connectionParams || !connectionParams.authorization) {
         this.logger.error(`Authorization header is missing`);
         throw new WsException('Authorization header is missing');

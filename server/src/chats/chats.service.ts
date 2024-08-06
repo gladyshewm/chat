@@ -5,14 +5,15 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { ChatWithoutMessages, Message } from 'src/graphql';
-import { SupabaseService } from 'src/supabase/supabase.service';
+import { ChatWithoutMessages, Message } from '../graphql';
+import { SupabaseService } from '../supabase/supabase.service';
 import {
+  Chat,
   MessageData,
   PartyItem,
   UserWithAvatarData,
 } from './types/chats.types';
-import { PUB_SUB } from 'src/common/pubsub/pubsub.provider';
+import { PUB_SUB } from '../common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
 import { FileUpload } from 'graphql-upload-ts';
 
@@ -51,7 +52,7 @@ export class ChatsService {
           created_at
            `,
         )) as {
-        data: ChatWithoutMessages;
+        data: Chat[];
         error: any;
       };
 
@@ -63,11 +64,13 @@ export class ChatsService {
         );
       }
 
-      let chat = data[0];
-      chat = {
-        id: chat.chat_id,
-        name: chat.name,
-        isGroupChat: chat.is_group_chat,
+      const chatData = data[0];
+      const chat: ChatWithoutMessages = {
+        id: chatData.chat_id,
+        userUuid: userUuid,
+        name: chatData.name,
+        isGroupChat: chatData.is_group_chat,
+        createdAt: chatData.created_at,
         groupAvatarUrl: null,
         participants: [],
       };
@@ -134,30 +137,50 @@ export class ChatsService {
 
   async getUserChats(userUuid: string): Promise<ChatWithoutMessages[]> {
     try {
-      const { data: userChats, error: chatsError } = await this.supabaseService
+      const chatIds = await this.getUserChatIds(userUuid);
+      const chatsData = await this.getChatsWithParticipants(chatIds);
+      const groupAvatarMap = await this.getGroupAvatarsMap(chatsData);
+
+      return this.buildChatResponse(chatsData, groupAvatarMap);
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при получении чатов пользователя: ${error.message}`,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private async getUserChatIds(userUuid: string): Promise<string[]> {
+    const { data: userChats, error: chatsError } = await this.supabaseService
+      .getClient()
+      .from('party')
+      .select('chat_id')
+      .eq('user_uuid', userUuid);
+
+    if (chatsError) {
+      this.logger.error(
+        `Ошибка при получении чатов пользователя: ${chatsError.message}`,
+      );
+      throw new HttpException(
+        chatsError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    const chatIds = userChats.map((chat) => chat.chat_id);
+
+    return chatIds;
+  }
+
+  private async getChatsWithParticipants(
+    chatIds: string[],
+  ): Promise<PartyItem[]> {
+    const { data: chatsData, error: participantsError } =
+      (await this.supabaseService
         .getClient()
         .from('party')
-        .select('chat_id')
-        .eq('user_uuid', userUuid);
-
-      if (chatsError) {
-        this.logger.error(
-          `Ошибка при получении чатов пользователя: ${chatsError.message}`,
-        );
-        throw new HttpException(
-          chatsError.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      const chatIds = userChats.map((chat) => chat.chat_id);
-
-      const { data: chatsData, error: participantsError } =
-        (await this.supabaseService
-          .getClient()
-          .from('party')
-          .select(
-            `
+        .select(
+          `
               chat_id,
               chat:chat_id (
                   chat_id,
@@ -172,81 +195,88 @@ export class ChatsService {
                   avatar_url
               )
               `,
-          )
-          .in('chat_id', chatIds)) as {
-          data: PartyItem[];
-          error: any;
-        };
+        )
+        .in('chat_id', chatIds)) as unknown as {
+        data: PartyItem[];
+        error: any;
+      };
 
-      if (participantsError) {
-        this.logger.error(
-          `Ошибка при получении чатов пользователя: ${participantsError.message}`,
-        );
-        throw new HttpException(
-          chatsError.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      const groupChatIds = chatsData
-        .filter((item) => item.chat.is_group_chat)
-        .map((item) => item.chat_id);
-
-      const { data: groupAvatars, error: groupAvatarsError } =
-        await this.supabaseService
-          .getClient()
-          .from('group_chat')
-          .select('chat_id, avatar_url')
-          .in('chat_id', groupChatIds);
-
-      if (groupAvatarsError) {
-        this.logger.error(
-          `Ошибка при аватаров чатов: ${groupAvatarsError.message}`,
-        );
-        throw new HttpException(
-          groupAvatarsError.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      const groupAvatarMap = new Map(
-        groupAvatars.map((item) => [item.chat_id, item.avatar_url]),
-      );
-
-      const chatMap = new Map<string, ChatWithoutMessages>();
-
-      chatsData.forEach((item) => {
-        if (!chatMap.has(item.chat_id)) {
-          chatMap.set(item.chat_id, {
-            id: item.chat_id,
-            userUuid: item.chat.user_uuid,
-            name: item.chat.name,
-            isGroupChat: item.chat.is_group_chat,
-            groupAvatarUrl: item.chat.is_group_chat
-              ? groupAvatarMap.get(item.chat_id) || null
-              : null,
-            participants: [],
-            createdAt: item.chat.created_at,
-          });
-        }
-
-        const chat = chatMap.get(item.chat_id)!;
-        if (!chat.participants.some((p) => p.id === item.profiles.uuid)) {
-          chat.participants.push({
-            id: item.profiles.uuid,
-            name: item.profiles.name,
-            avatarUrl: item.profiles.avatar_url,
-          });
-        }
-      });
-
-      return Array.from(chatMap.values());
-    } catch (error) {
+    if (participantsError) {
       this.logger.error(
-        `Ошибка при получении чатов пользователя: ${error.message}`,
+        `Ошибка при получении участников чатов: ${participantsError.message}`,
       );
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        participantsError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
+
+    return chatsData;
+  }
+
+  private async getGroupAvatarsMap(
+    chatsData: PartyItem[],
+  ): Promise<Map<string, string>> {
+    const groupChatIds = chatsData
+      .filter((item) => item.chat.is_group_chat)
+      .map((item) => item.chat_id);
+
+    const { data: groupAvatars, error: groupAvatarsError } =
+      await this.supabaseService
+        .getClient()
+        .from('group_chat')
+        .select('chat_id, avatar_url')
+        .in('chat_id', groupChatIds);
+
+    if (groupAvatarsError) {
+      this.logger.error(
+        `Ошибка при получении аватаров чатов: ${groupAvatarsError.message}`,
+      );
+      throw new HttpException(
+        groupAvatarsError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    const groupAvatarMap = new Map(
+      groupAvatars.map((item) => [item.chat_id, item.avatar_url]),
+    );
+
+    return groupAvatarMap;
+  }
+
+  private buildChatResponse(
+    chatsData: PartyItem[],
+    groupAvatarMap: Map<string, string | null>,
+  ): ChatWithoutMessages[] {
+    const chatMap = new Map<string, ChatWithoutMessages>();
+
+    chatsData.forEach((item) => {
+      if (!chatMap.has(item.chat_id)) {
+        chatMap.set(item.chat_id, {
+          id: item.chat_id,
+          userUuid: item.chat.user_uuid,
+          name: item.chat.name,
+          isGroupChat: item.chat.is_group_chat,
+          groupAvatarUrl: item.chat.is_group_chat
+            ? groupAvatarMap.get(item.chat_id) || null
+            : null,
+          participants: [],
+          createdAt: item.chat.created_at,
+        });
+      }
+
+      const chat = chatMap.get(item.chat_id)!;
+      if (!chat.participants.some((p) => p.id === item.profiles.uuid)) {
+        chat.participants.push({
+          id: item.profiles.uuid,
+          name: item.profiles.name,
+          avatarUrl: item.profiles.avatar_url,
+        });
+      }
+    });
+
+    return Array.from(chatMap.values());
   }
 
   async getChatMessages(
@@ -275,7 +305,7 @@ export class ChatsService {
           )
           .eq('chat_id', chatId)
           .order('created_at', { ascending: false })
-          .range(offset, offset + limit - 1)) as {
+          .range(offset, offset + limit - 1)) as unknown as {
           data: MessageData[];
           error: any;
         };
@@ -342,7 +372,7 @@ export class ChatsService {
             avatar_url
           )
           `,
-        )) as { data: MessageData; error: any };
+        )) as { data: MessageData[]; error: any };
 
       if (error) {
         this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
@@ -352,16 +382,16 @@ export class ChatsService {
         );
       }
 
-      let message = data[0];
-      message = {
-        id: message.message_id,
-        chatId: message.chat_id,
-        userId: message.user_uuid,
-        content: message.content,
-        createdAt: new Date(message.created_at),
-        isRead: message.is_read,
-        userName: message.profiles.name,
-        avatarUrl: message.profiles.avatar_url,
+      const messageData = data[0];
+      const message = {
+        id: messageData.message_id,
+        chatId: messageData.chat_id,
+        userId: messageData.user_uuid,
+        content: messageData.content,
+        createdAt: new Date(messageData.created_at),
+        isRead: messageData.is_read,
+        userName: messageData.profiles.name,
+        avatarUrl: messageData.profiles.avatar_url,
       };
 
       return message;
@@ -496,7 +526,7 @@ export class ChatsService {
   async updateChatAvatar(
     file: FileUpload,
     chatId: string,
-  ): Promise<string> | null {
+  ): Promise<string | null> {
     const { createReadStream, filename, mimetype } = file;
     const stream = createReadStream();
 
@@ -558,7 +588,7 @@ export class ChatsService {
     }
   }
 
-  async deleteChatAvatar(chatId: string): Promise<string> {
+  async deleteChatAvatar(chatId: string): Promise<string | null> {
     try {
       const { data: currentChat, error: fetchError } =
         await this.supabaseService

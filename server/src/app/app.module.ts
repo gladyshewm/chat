@@ -7,9 +7,10 @@ import { AppService } from './app.service';
 import { UsersModule } from '../users/users.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { AuthModule } from '../auth/auth.module';
-import { UploadScalar } from 'src/common/scalars/upload.scalar';
-import { ChatsModule } from 'src/chats/chats.module';
-import { DateScalar } from 'src/common/scalars/date.scalar';
+import { UploadScalar } from '../common/scalars/upload.scalar';
+import { ChatsModule } from '../chats/chats.module';
+import { DateScalar } from '../common/scalars/date.scalar';
+import { Request, Response } from 'express';
 
 @Module({
   imports: [
@@ -22,7 +23,10 @@ import { DateScalar } from 'src/common/scalars/date.scalar';
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      context: ({ req, res }) => ({ req, res }),
+      context: ({ req, res }: { req: Request; res: Response }) => ({
+        req,
+        res,
+      }),
       typePaths: ['./**/*.graphql'],
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
@@ -39,7 +43,7 @@ import { DateScalar } from 'src/common/scalars/date.scalar';
           },
         },
         'subscriptions-transport-ws': {
-          onConnect: (connectionParams) => {
+          onConnect: (connectionParams: any) => {
             return { connectionParams };
           },
         },

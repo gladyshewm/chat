@@ -2,7 +2,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AuthPayload, UserWithToken } from '../graphql';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { LoginUserDto } from './dto/login-user.dto';
 
 @Resolver('Auth')
@@ -15,8 +15,12 @@ export class AuthResolver {
   }
 
   @Query('user')
-  async getUser(): Promise<UserWithToken> | null {
-    return this.authService.getUser();
+  async getUser(@Context('req') req: Request): Promise<UserWithToken | null> {
+    const token = req.accessToken;
+    if (!token) {
+      return null;
+    }
+    return this.authService.getUser(token);
   }
 
   @Mutation('createUser')

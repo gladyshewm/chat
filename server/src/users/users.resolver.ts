@@ -1,13 +1,9 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import {
-  UserWithAvatar,
-  AvatarInfo,
-  ChangeCredentialsInput,
-} from 'src/graphql';
+import { UserWithAvatar, AvatarInfo, ChangeCredentialsInput } from '../graphql';
 import { UseGuards } from '@nestjs/common';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
-import { JwtHttpAuthGuard } from 'src/auth/guards/jwt-http-auth.guard';
+import { JwtHttpAuthGuard } from '../auth/guards/jwt-http-auth.guard';
 
 @Resolver('User')
 export class UsersResolver {
@@ -52,7 +48,7 @@ export class UsersResolver {
   async deleteChatAvatar(
     @Context('user_uuid') userUuid: string,
     @Args('avatarUrl') avatarUrl: string,
-  ): Promise<string> | null {
+  ): Promise<string | null> {
     return this.usersService.deleteAvatar(userUuid, avatarUrl);
   }
 

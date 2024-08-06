@@ -28,10 +28,20 @@ export class AuthService {
         throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
       }
 
+      if (!data.user) {
+        this.logger.error('Ошибка обновления токена: пользователь не найден');
+        throw new UnauthorizedException();
+      }
+
+      if (!data.session) {
+        this.logger.error('Ошибка обновления токена: сессия не найдена');
+        throw new UnauthorizedException();
+      }
+
       const user = {
         uuid: data.user.id,
         name: data.user.user_metadata.name,
-        email: data.user.email,
+        email: data.user.email as string,
       };
 
       return {
@@ -45,7 +55,30 @@ export class AuthService {
     }
   }
 
-  async getUser(): Promise<UserWithToken> | null {
+  async getUser(token: string): Promise<UserWithToken | null> {
+    try {
+      const { data: userData } = await this.supabaseService
+        .getClient()
+        .auth.getUser(token);
+
+      if (!userData || userData.user === null) {
+        return null;
+      }
+
+      return {
+        user: {
+          uuid: userData.user.id,
+          name: userData.user.user_metadata.name,
+          email: userData.user.email as string,
+        },
+        token: token,
+      };
+    } catch (error) {
+      this.logger.error('Ошибка получения пользователя:', error.message);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  /* async getUser(): Promise<UserWithToken> | null {
     try {
       const [{ data: userData }, { data: sessionData }] = await Promise.all([
         this.supabaseService.getClient().auth.getUser(),
@@ -75,7 +108,7 @@ export class AuthService {
       this.logger.error('Ошибка получения пользователя:', error.message);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
+  } */
 
   async createUser(userInput: CreateUserDto): Promise<AuthPayload> {
     const profile_id: string = Date.now().toString();
@@ -91,9 +124,20 @@ export class AuthService {
           },
         },
       });
+
     if (authError) {
       this.logger.error('Ошибка при регистрации:', authError.message);
       throw new HttpException(authError.message, HttpStatus.BAD_REQUEST);
+    }
+
+    if (!data.user) {
+      this.logger.error('Ошибка при регистрации: пользователь не создан');
+      throw new HttpException('Пользователь не создан', HttpStatus.BAD_REQUEST);
+    }
+
+    if (!data.session) {
+      this.logger.error('Ошибка при регистрации: сессия не создана');
+      throw new HttpException('Сессия не создана', HttpStatus.BAD_REQUEST);
     }
 
     const { error: profileError } = await this.supabaseService
@@ -143,7 +187,7 @@ export class AuthService {
       const user = {
         uuid: data.user.id,
         name: data.user.user_metadata.name,
-        email: data.user.email,
+        email: data.user.email as string,
       };
       const { access_token, refresh_token } = data.session;
 
@@ -175,11 +219,15 @@ export class AuthService {
       return false;
     }
 
-    const { error } = await this.supabaseService.getClient().auth.signOut();
+    const { error } = await this.supabaseService
+      .getClient()
+      .auth.signOut({ scope: 'local' });
+
     if (error) {
       this.logger.error('Ошибка при выходе из системы:', error.message);
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+
     return true;
   }
 }

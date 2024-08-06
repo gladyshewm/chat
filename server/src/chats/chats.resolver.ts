@@ -9,11 +9,11 @@ import {
 import { ChatsService } from './chats.service';
 import { Inject, UseGuards } from '@nestjs/common';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
-import { ChatWithoutMessages, Message } from 'src/graphql';
-import { PUB_SUB } from 'src/common/pubsub/pubsub.provider';
+import { ChatWithoutMessages, Message } from '../graphql';
+import { PUB_SUB } from '../common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
-import { JwtHttpAuthGuard } from 'src/auth/guards/jwt-http-auth.guard';
-import { JwtWsAuthGuard } from 'src/auth/guards/jwt-ws-auth.guard';
+import { JwtHttpAuthGuard } from '../auth/guards/jwt-http-auth.guard';
+import { JwtWsAuthGuard } from '../auth/guards/jwt-ws-auth.guard';
 
 @Resolver('Chats')
 export class ChatsResolver {
@@ -85,7 +85,7 @@ export class ChatsResolver {
   async updateChatAvatar(
     @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
     @Args('chatId') chatId: string,
-  ): Promise<string> {
+  ): Promise<string | null> {
     return this.chatsService.updateChatAvatar(image, chatId);
   }
 
@@ -93,7 +93,7 @@ export class ChatsResolver {
   @Mutation('deleteChatAvatar')
   async deleteChatAvatar(
     @Args('chatId') chatId: string,
-  ): Promise<string> | null {
+  ): Promise<string | null> {
     return this.chatsService.deleteChatAvatar(chatId);
   }
 }
