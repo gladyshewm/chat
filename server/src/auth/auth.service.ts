@@ -78,37 +78,6 @@ export class AuthService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  /* async getUser(): Promise<UserWithToken> | null {
-    try {
-      const [{ data: userData }, { data: sessionData }] = await Promise.all([
-        this.supabaseService.getClient().auth.getUser(),
-        this.supabaseService.getClient().auth.getSession(),
-      ]);
-
-      if (!userData || !sessionData || userData.user === null) {
-        return null;
-      }
-
-      if (sessionData.session === null) {
-        throw new HttpException(
-          'Сессия пользователя не найдена',
-          HttpStatus.NOT_FOUND,
-        );
-      }
-
-      return {
-        user: {
-          uuid: userData.user.id,
-          name: userData.user.user_metadata.name,
-          email: userData.user.email,
-        },
-        token: sessionData.session.access_token,
-      };
-    } catch (error) {
-      this.logger.error('Ошибка получения пользователя:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  } */
 
   async createUser(userInput: CreateUserDto): Promise<AuthPayload> {
     const profile_id: string = Date.now().toString();
@@ -140,19 +109,7 @@ export class AuthService {
       throw new HttpException('Сессия не создана', HttpStatus.BAD_REQUEST);
     }
 
-    const { error: profileError } = await this.supabaseService
-      .getClient()
-      .from('profiles')
-      .insert({
-        id: profile_id,
-        name: userInput.name,
-        uuid: data.user.id,
-      });
-
-    if (profileError) {
-      this.logger.error('Ошибка при регистрации:', profileError.message);
-      throw new HttpException(profileError.message, HttpStatus.BAD_REQUEST);
-    }
+    await this.createUserProfile(data.user.id, profile_id, userInput.name);
 
     const user: UserInfo = {
       uuid: profile_id,
@@ -165,6 +122,26 @@ export class AuthService {
       accessToken: data.session.access_token,
       refreshToken: data.session.refresh_token,
     };
+  }
+
+  private async createUserProfile(
+    userUuid: string,
+    profileId: string,
+    userName: string,
+  ): Promise<void> {
+    const { error: profileError } = await this.supabaseService
+      .getClient()
+      .from('profiles')
+      .insert({
+        id: profileId,
+        name: userName,
+        uuid: userUuid,
+      });
+
+    if (profileError) {
+      this.logger.error('Ошибка при регистрации:', profileError.message);
+      throw new HttpException(profileError.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   async logInUser(

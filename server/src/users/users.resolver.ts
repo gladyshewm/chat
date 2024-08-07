@@ -39,7 +39,9 @@ export class UsersResolver {
 
   @UseGuards(JwtHttpAuthGuard)
   @Query('userAllAvatars')
-  async getUserAllAvatars(@Args('userUuid') userUuid: string) {
+  async getUserAllAvatars(
+    @Args('userUuid') userUuid: string,
+  ): Promise<AvatarInfo[]> {
     return this.usersService.getUserAllAvatars(userUuid);
   }
 
