@@ -1,49 +1,39 @@
 import {
   CanActivate,
   ExecutionContext,
+  Inject,
   Injectable,
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { AuthService } from '../auth.service';
+import { AuthStrategy } from 'auth/strategies/auth.strategy.interface';
+import { AUTH_STRATEGY } from 'auth/strategies/auth-strategy.token';
 
 @Injectable()
 export class JwtHttpAuthGuard implements CanActivate {
   private readonly logger = new Logger(JwtHttpAuthGuard.name);
 
-  constructor(
-    private jwtService: JwtService,
-    private authService: AuthService,
-  ) {}
+  constructor(@Inject(AUTH_STRATEGY) private authStrategy: AuthStrategy) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const gqlContext = ctx.getContext();
-    /* console.log(ctx.getType()); */
     const req = gqlContext.req;
     const res = gqlContext.res;
 
     try {
-      const authHeader = req.headers.authorization;
-
-      if (!authHeader) {
-        this.logger.error('No authorization header');
-        throw new UnauthorizedException({ message: 'No authorization header' });
-      }
-
-      const [bearer, accessToken] = authHeader.split(' ');
-
-      if (bearer !== 'Bearer' || !accessToken) {
-        this.logger.error('Invalid authorization header format');
-        throw new UnauthorizedException({ message: 'User not authorized' });
+      const accessToken = this.extractTokenFromHeader(req);
+      if (!accessToken) {
+        this.logger.error('Access token not found');
+        throw new UnauthorizedException({ message: 'Access token not found' });
       }
 
       try {
-        const user = await this.jwtService.verifyAsync(accessToken);
+        const user = await this.authStrategy.validateToken(accessToken);
         req.user = user;
         gqlContext['user_uuid'] = user.sub;
+
         return true;
       } catch (error) {
         this.logger.warn(`JWT verification failed: ${error.message}`);
@@ -55,40 +45,44 @@ export class JwtHttpAuthGuard implements CanActivate {
           throw new UnauthorizedException({ message: 'User not authorized' });
         }
 
-        try {
-          const {
-            user,
-            accessToken: newAccessToken,
-            refreshToken: newRefreshToken,
-          } = await this.authService.refreshToken();
+        await this.refreshToken(req, res, gqlContext);
 
-          res.cookie('refreshToken', newRefreshToken, {
-            httpOnly: true,
-            sameSite: 'strict',
-            secure: false, //SET TO TRUE IN PRODUCTION
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-          });
-
-          if (newAccessToken) {
-            res.setHeader('X-Access-Token-Updated', 'true');
-            res.setHeader('X-New-Access-Token', newAccessToken);
-          }
-
-          req.user = user;
-          gqlContext['user_uuid'] = user.uuid;
-
-          this.logger.log('Token refreshed successfully');
-          return true;
-        } catch (error) {
-          this.logger.error(`Token refresh failed: ${error.message}`);
-          throw new UnauthorizedException({
-            message: 'User not authorized',
-          });
-        }
+        return true;
       }
     } catch (error) {
       this.logger.error(`Authentication failed: ${error.message}`);
       throw new UnauthorizedException({ message: 'User not authorized' });
+    }
+  }
+
+  private extractTokenFromHeader(request: any): string | undefined {
+    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    return type === 'Bearer' ? token : undefined;
+  }
+
+  private async refreshToken(request: any, response: any, context: any) {
+    try {
+      const {
+        user,
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      } = await this.authStrategy.refreshToken();
+
+      this.authStrategy.setRefreshTokenCookie(response, newRefreshToken);
+
+      if (newAccessToken) {
+        response.setHeader('X-Access-Token-Updated', 'true');
+        response.setHeader('X-New-Access-Token', newAccessToken);
+      } else {
+        response.setHeader('X-Access-Token-Updated', 'false');
+      }
+
+      request.user = user;
+      context['user_uuid'] = user.uuid;
+    } catch (error) {
+      throw new UnauthorizedException({
+        message: 'User not authorized',
+      });
     }
   }
 }

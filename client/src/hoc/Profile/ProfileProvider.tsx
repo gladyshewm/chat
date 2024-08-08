@@ -162,13 +162,10 @@ export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
         variables: { userUuid: user?.uuid },
       });
 
-      if (
-        !loadingQueryAvatar &&
-        !errorQueryAvatar &&
-        dataQueryAvatar &&
-        dataQueryAvatar.userAvatar
-      ) {
+      if (dataQueryAvatar && dataQueryAvatar.userAvatar) {
         setAvatarUrl(dataQueryAvatar.userAvatar.url);
+      } else {
+        setAvatarUrl(null);
       }
 
       const { data: dataQueryAllAvatars } = await userAllAvatarsQuery({
@@ -182,12 +179,7 @@ export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
         },
       });
 
-      if (
-        !loadingQueryAllAvatars &&
-        !errorQueryAllAvatars &&
-        dataQueryAllAvatars &&
-        dataQueryAllAvatars.userAllAvatars
-      ) {
+      if (dataQueryAllAvatars && dataQueryAllAvatars.userAllAvatars) {
         setAllAvatars(dataQueryAllAvatars.userAllAvatars as Avatar[]);
       }
 

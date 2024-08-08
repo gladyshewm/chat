@@ -5,14 +5,16 @@ import Auth from '../pages/Authentication/Auth';
 import PrivateRoute from '../hoc/PrivateRoute/PrivateRoute';
 import useAuth from '../hooks/useAuth';
 import Layout from '../components/Layout/Layout';
+import CustomLoader from '../components/CustomLoader/CustomLoader';
 const Main = lazy(() => import('../pages/Main/Main'));
 const Chat = lazy(() => import('../pages/Chat/Chat'));
 
 const AppRoutes = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loadingStates } = useAuth();
 
   return (
     <AnimatePresence>
+      {loadingStates.checkAuth && <CustomLoader key={`loader-${Date.now()}`} />}
       <Routes>
         <Route
           path="/auth"

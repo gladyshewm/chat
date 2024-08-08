@@ -1,0 +1,1 @@
+export const AUTH_STRATEGY = 'AUTH_STRATEGY';

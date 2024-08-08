@@ -1,67 +1,87 @@
 import {
   CanActivate,
   ExecutionContext,
+  Inject,
   Injectable,
   Logger,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
-import { AuthService } from '../auth.service';
+import { AUTH_STRATEGY } from 'auth/strategies/auth-strategy.token';
+import { AuthStrategy } from 'auth/strategies/auth.strategy.interface';
 
 @Injectable()
 export class JwtWsAuthGuard implements CanActivate {
   private readonly logger = new Logger(JwtWsAuthGuard.name);
 
-  constructor(
-    private jwtService: JwtService,
-    private authService: AuthService,
-  ) {}
+  constructor(@Inject(AUTH_STRATEGY) private authStrategy: AuthStrategy) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const gqlContext = ctx.getContext();
     const req = gqlContext.req;
-    /*  console.log(ctx.getType());
-    const { connectionParams } = ctx.getContext().req; */
 
     try {
-      const { connectionParams } = req;
-
-      if (!connectionParams || !connectionParams.authorization) {
-        this.logger.error(`Authorization header is missing`);
-        throw new WsException('Authorization header is missing');
-      }
-
-      const authHeader = connectionParams.authorization;
-      const [bearer, accessToken] = authHeader.split(' ');
-
-      if (bearer !== 'Bearer' || !accessToken) {
-        this.logger.error(`Invalid authorization header format`);
-        throw new WsException({
-          message: 'Invalid authorization header format',
-        });
+      const accessToken = this.extractTokenFromHeader(req);
+      if (!accessToken) {
+        this.logger.error('Access token not found');
+        throw new WsException({ message: 'Access token not found' });
       }
 
       try {
-        const user = await this.jwtService.verifyAsync(accessToken);
-        ctx.getContext().user = user;
-        ctx.getContext()['user_uuid'] = user.sub;
+        const user = await this.authStrategy.validateToken(accessToken);
+        gqlContext.user = user;
+        gqlContext['user_uuid'] = user.sub;
 
         return true;
       } catch (error) {
         this.logger.warn(`JWT verification failed: ${error.message}`);
-        const { accessToken: newAccessToken, user } =
-          await this.authService.refreshToken();
-        ctx.getContext().user = user;
-        ctx.getContext()['user_uuid'] = user.uuid;
-        ctx.getContext().req.connectionParams.authorization = `Bearer ${newAccessToken}`;
+        await this.refreshToken(gqlContext);
 
         return true;
       }
     } catch (error) {
       this.logger.error(`Authentication failed: ${error.message}`);
       throw new WsException({ message: 'User not authorized' });
+    }
+  }
+
+  private extractTokenFromHeader(request: any): string | undefined {
+    const { connectionParams } = request;
+
+    if (!connectionParams || !connectionParams.authorization) {
+      this.logger.error(`Authorization header is missing`);
+      throw new WsException('Authorization header is missing');
+    }
+
+    const authHeader = connectionParams.authorization;
+    const [bearer, accessToken] = authHeader.split(' ');
+
+    if (bearer !== 'Bearer' || !accessToken) {
+      this.logger.error(`Invalid authorization header format`);
+      throw new WsException({
+        message: 'Invalid authorization header format',
+      });
+    }
+
+    return accessToken;
+  }
+
+  private async refreshToken(context: any) {
+    try {
+      const { user, accessToken: newAccessToken } =
+        await this.authStrategy.refreshToken();
+
+      context.user = user;
+      context['user_uuid'] = user.uuid;
+      context.req.connectionParams.authorization = `Bearer ${newAccessToken}`;
+
+      this.logger.log('Token refreshed successfully');
+    } catch (error) {
+      this.logger.error(`Token refresh failed: ${error.message}`);
+      throw new WsException({
+        message: 'User not authorized',
+      });
     }
   }
 }

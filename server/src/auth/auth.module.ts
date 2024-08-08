@@ -4,6 +4,8 @@ import { AuthResolver } from './auth.resolver';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthMiddleware } from './middlewares/auth.middleware';
+import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
+import { AUTH_STRATEGY } from './strategies/auth-strategy.token';
 
 @Module({
   imports: [
@@ -16,8 +18,15 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
       }),
     }),
   ],
-  providers: [AuthService, AuthResolver],
-  exports: [AuthService, JwtModule],
+  providers: [
+    AuthService,
+    AuthResolver,
+    {
+      provide: AUTH_STRATEGY,
+      useClass: JwtAuthStrategy,
+    },
+  ],
+  exports: [AuthService, JwtModule, AUTH_STRATEGY],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

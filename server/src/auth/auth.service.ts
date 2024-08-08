@@ -17,6 +17,15 @@ export class AuthService {
 
   private readonly logger = new Logger(AuthService.name);
 
+  setRefreshTokenCookie(res: Response, refreshToken: string) {
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      sameSite: 'strict',
+      secure: false, //SET TO TRUE IN PRODUCTION (HTTPS)
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+  }
+
   async refreshToken(): Promise<AuthPayload> {
     try {
       const { data, error } = await this.supabaseService
@@ -43,6 +52,8 @@ export class AuthService {
         name: data.user.user_metadata.name,
         email: data.user.email as string,
       };
+
+      this.logger.log('Токен успешно обновлён');
 
       return {
         user,
@@ -168,12 +179,7 @@ export class AuthService {
       };
       const { access_token, refresh_token } = data.session;
 
-      res.cookie('refreshToken', refresh_token, {
-        httpOnly: true,
-        sameSite: 'strict',
-        secure: false, //SET TO TRUE IN PRODUCTION
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      this.setRefreshTokenCookie(res, refresh_token);
 
       return {
         user,

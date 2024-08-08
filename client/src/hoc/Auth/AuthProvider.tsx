@@ -5,6 +5,7 @@ import {
   useCreateUserMutation,
   useLogInUserMutation,
   useLogOutUserMutation,
+  useRefreshTokenMutation,
   useUserLazyQuery,
 } from './auth.generated';
 import {
@@ -41,39 +42,64 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const [fetchUser] = useUserLazyQuery();
   const [logOutUserMutation] = useLogOutUserMutation();
   const [logInUserMutation] = useLogInUserMutation();
+  const [refreshTokenMutation] = useRefreshTokenMutation();
 
   useEffect(() => {
     const checkAuth = async () => {
       setLoading('checkAuth', true);
       const token = localStorage.getItem('accessToken');
 
-      if (token) {
-        try {
-          const { data } = await fetchUser();
-          if (data && data.user) {
-            setUser({
-              uuid: data.user.user.uuid,
-              name: data.user.user.name,
-              email: data.user.user.email,
-            });
-            setIsAuthenticated(true);
-          } else {
+      if (!token) {
+        setIsAuthenticated(false);
+        setLoading('checkAuth', false);
+        return;
+      }
+
+      try {
+        const { data } = await fetchUser();
+
+        if (!data || !data.user) {
+          const { data: refresh } = await refreshTokenMutation();
+
+          if (!refresh || !refresh.refreshToken.accessToken) {
             localStorage.removeItem('accessToken');
             setIsAuthenticated(false);
+            setUser(null);
+            setLoading('checkAuth', false);
+            return;
           }
-        } catch (error) {
-          console.error('Ошибка получения пользователя:', error.message);
-          setIsAuthenticated(false);
+
+          const { accessToken: newToken, user: refreshedUser } =
+            refresh.refreshToken;
+          localStorage.setItem('accessToken', newToken);
+          setUser({
+            uuid: refreshedUser.uuid,
+            name: refreshedUser.name,
+            email: refreshedUser.email,
+          });
+          setIsAuthenticated(true);
+          setLoading('checkAuth', false);
+
+          return;
         }
-      } else {
+
+        setUser({
+          uuid: data.user.user.uuid,
+          name: data.user.user.name,
+          email: data.user.user.email,
+        });
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Ошибка получения пользователя:', error.message);
         setIsAuthenticated(false);
+        setUser(null);
       }
 
       setLoading('checkAuth', false);
     };
 
     checkAuth();
-  }, [fetchUser, setLoading]);
+  }, [fetchUser, setLoading, refreshTokenMutation]);
 
   const register = async (input: CreateUserInput): Promise<UserWithToken> => {
     setLoading('createUser', true);
