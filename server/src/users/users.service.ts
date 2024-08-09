@@ -33,7 +33,7 @@ export class UsersService {
     return allUsers;
   }
 
-  async findUsers(input: string): Promise<UserWithAvatar[]> {
+  async findUsers(input: string, userUuid: string): Promise<UserWithAvatar[]> {
     const { data, error } = await this.supabaseService
       .getClient()
       .from('profiles')
@@ -45,9 +45,11 @@ export class UsersService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    const allUsers = data.map((user) => {
-      return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
-    });
+    const allUsers = data
+      .map((user) => {
+        return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
+      })
+      .filter((user) => user.id !== userUuid);
 
     return allUsers;
   }

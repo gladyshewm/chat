@@ -17,8 +17,11 @@ export class UsersResolver {
 
   @UseGuards(JwtHttpAuthGuard)
   @Query('findUsers')
-  async findUsers(@Args('input') input: string): Promise<UserWithAvatar[]> {
-    return this.usersService.findUsers(input);
+  async findUsers(
+    @Args('input') input: string,
+    @Context('user_uuid') userUuid: string,
+  ): Promise<UserWithAvatar[]> {
+    return this.usersService.findUsers(input, userUuid);
   }
 
   @UseGuards(JwtHttpAuthGuard)
