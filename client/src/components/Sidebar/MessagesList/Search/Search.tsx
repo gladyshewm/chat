@@ -1,13 +1,77 @@
 import React, { FC } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ApolloError } from '@apollo/client';
 import { motion } from 'framer-motion';
 import './Search.css';
 import { UserWithAvatar } from '../../../../types.generated';
+import DrawOutlineRect from '../../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import Cross from './Cross/Cross';
 import SearchIllustration from './SearchIllustration/SearchIllustration';
 import UserIcon from '../../../../icons/UserIcon';
 import ExclamationTriangleIcon from '../../../../icons/ExclamationTriangleIcon';
-import DrawOutlineRect from '../../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
+import {
+  useChatWithUserQuery,
+  useCreateChatMutation,
+} from './search.generated';
+import CustomLoader from '../../../CustomLoader/CustomLoader';
+
+const SearchResultItem = ({ user }: { user: UserWithAvatar }) => {
+  const navigate = useNavigate();
+
+  const { data, loading, error } = useChatWithUserQuery({
+    variables: {
+      userUuid: user.id,
+    },
+  });
+  const [createChat] = useCreateChatMutation();
+
+  const handleClick = async () => {
+    if (loading) return <CustomLoader />;
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (data && data.chatWithUser) {
+      navigate(`/chat/${data.chatWithUser.id}`);
+    } else {
+      try {
+        const result = await createChat({
+          variables: {
+            participantsIds: [user.id],
+            name: null,
+          },
+        });
+
+        navigate(`/chat/${result.data?.createChat?.id}`);
+      } catch (error) {
+        console.error('Не удалось создать чат', error);
+      }
+    }
+  };
+
+  return (
+    <div className="search-list-block" onClick={handleClick}>
+      <div className="user-result">
+        {user.avatarUrl ? (
+          <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
+            <div className="user-avatar">
+              <img src={user.avatarUrl} alt={user.name} />
+            </div>
+          </DrawOutlineRect>
+        ) : (
+          <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
+            <div className="empty-avatar">
+              <UserIcon />
+            </div>
+          </DrawOutlineRect>
+        )}
+        <span className="user-name">{user.name}</span>
+      </div>
+    </div>
+  );
+};
 
 interface SearchProps {
   searchValue: string;
@@ -71,32 +135,7 @@ const renderSearchResults: FC<SearchProps> = ({
                 strokeWidth={1}
                 showOnHover={true}
               >
-                <div className="search-list-block">
-                  <div className="user-result">
-                    {user.avatarUrl ? (
-                      <DrawOutlineRect
-                        className="avatar-wrapper"
-                        strokeWidth={1}
-                        rx="50%"
-                      >
-                        <div className="user-avatar">
-                          <img src={user.avatarUrl} alt={user.name} />
-                        </div>
-                      </DrawOutlineRect>
-                    ) : (
-                      <DrawOutlineRect
-                        className="avatar-wrapper"
-                        strokeWidth={1}
-                        rx="50%"
-                      >
-                        <div className="empty-avatar">
-                          <UserIcon />
-                        </div>
-                      </DrawOutlineRect>
-                    )}
-                    <span className="user-name">{user.name}</span>
-                  </div>
-                </div>
+                <SearchResultItem user={user} />
               </DrawOutlineRect>
             </motion.div>
           ))}

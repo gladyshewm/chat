@@ -90,6 +90,13 @@ export type Mutation = {
   createChat: ChatWithoutMessages;
   createUser: AuthPayload;
   deleteAvatar?: Maybe<Scalars['String']['output']>;
+  /**
+   * Групповой чат удаляет создатель для всех.
+   *
+   * Одиночный чат помечается флагом is_deleted в таблице party
+   * у пользователя, который удалил чат.
+   */
+  deleteChat: Scalars['Boolean']['output'];
   deleteChatAvatar?: Maybe<Scalars['String']['output']>;
   logInUser: AuthPayload;
   logOutUser: Scalars['Boolean']['output'];
@@ -119,6 +126,11 @@ export type MutationCreateUserArgs = {
 
 export type MutationDeleteAvatarArgs = {
   avatarUrl: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteChatArgs = {
+  chatId: Scalars['ID']['input'];
 };
 
 
@@ -162,6 +174,8 @@ export type MutationUploadChatAvatarArgs = {
 export type Query = {
   __typename?: 'Query';
   chatMessages?: Maybe<Array<Message>>;
+  /** Запрос одиночного чата с указанным пользователем */
+  chatWithUser?: Maybe<ChatWithoutMessages>;
   findUsers: Array<Maybe<UserWithAvatar>>;
   user?: Maybe<UserWithToken>;
   userAllAvatars: Array<Maybe<AvatarInfo>>;
@@ -175,6 +189,11 @@ export type QueryChatMessagesArgs = {
   chatId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryChatWithUserArgs = {
+  userUuid: Scalars['String']['input'];
 };
 
 
