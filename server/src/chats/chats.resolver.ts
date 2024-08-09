@@ -33,6 +33,15 @@ export class ChatsResolver {
   }
 
   @UseGuards(JwtHttpAuthGuard)
+  @Mutation('deleteChat')
+  async deleteChat(
+    @Args('chatId') chatId: string,
+    @Context('user_uuid') userUuid: string,
+  ): Promise<boolean> {
+    return this.chatsService.deleteChat(chatId, userUuid);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
   @Query('userChats')
   async getUserChats(
     @Context('user_uuid') userUuid: string,

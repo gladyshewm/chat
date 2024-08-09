@@ -162,6 +162,103 @@ export class ChatsService {
     }
   }
 
+  async deleteChat(chatId: string, userUuid: string): Promise<boolean> {
+    try {
+      const chat = await this.getChatById(chatId);
+
+      if (!chat) {
+        this.logger.error(`Чат не найден`);
+        throw new HttpException('Chat not found', HttpStatus.NOT_FOUND);
+      }
+
+      if (chat.is_group_chat) {
+        return this.deleteGroupChat(chat, userUuid);
+      } else {
+        return this.deleteOneOnOneChat(chat, userUuid);
+      }
+    } catch (error) {
+      this.logger.error(`Ошибка при удалении чата: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private async getChatById(chatId: string): Promise<Chat | null> {
+    const { data, error } = (await this.supabaseService
+      .getClient()
+      .from('chat')
+      .select(
+        `
+        chat_id,
+        user_uuid,
+        name,
+        is_group_chat,
+        created_at
+        `,
+      )
+      .eq('chat_id', chatId)
+      .single()) as { data: Chat; error: any };
+
+    if (error) {
+      this.logger.error(`Ошибка при получении чата: ${error.message}`);
+      throw new Error(`Error fetching chat: ${error.message}`);
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return data;
+  }
+
+  private async deleteGroupChat(
+    chat: Chat,
+    userUuid: string,
+  ): Promise<boolean> {
+    if (chat.user_uuid !== userUuid) {
+      this.logger.error(`Недостаточно прав для удаления чата`);
+      throw new HttpException(
+        'Недостаточно прав для удаления чата',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('chat')
+      .delete()
+      .eq('chat_id', chat.chat_id);
+
+    if (error) {
+      this.logger.error(
+        `Ошибка при удалении группового чата: ${error.message}`,
+      );
+      throw new Error(`Error deleting group chat: ${error.message}`);
+    }
+
+    return true;
+  }
+
+  private async deleteOneOnOneChat(
+    chat: Chat,
+    userUuid: string,
+  ): Promise<boolean> {
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('party')
+      .update({ is_deleted: true })
+      .eq('chat_id', chat.chat_id)
+      .eq('user_uuid', userUuid);
+
+    if (error) {
+      this.logger.error(
+        `Ошибка при удалении одиночного чата: ${error.message}`,
+      );
+      throw new Error(`Error soft deleting one-on-one chat: ${error.message}`);
+    }
+
+    return true;
+  }
+
   async getUserChats(userUuid: string): Promise<ChatWithoutMessages[]> {
     try {
       const chatIds = await this.getUserChatIds(userUuid);

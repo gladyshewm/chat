@@ -78,6 +78,8 @@ export abstract class IMutation {
 
     abstract createChat(participantsIds: string[], name?: Nullable<string>): ChatWithoutMessages | Promise<ChatWithoutMessages>;
 
+    abstract deleteChat(chatId: string): boolean | Promise<boolean>;
+
     abstract sendMessage(chatId: string, content: string): Message | Promise<Message>;
 
     abstract uploadChatAvatar(image: Upload, chatId: string): string | Promise<string>;

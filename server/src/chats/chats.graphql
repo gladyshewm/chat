@@ -42,6 +42,13 @@ type Query {
 
 type Mutation {
   createChat(participantsIds: [ID!]!, name: String): ChatWithoutMessages!
+  """
+  Групповой чат удаляет создатель для всех.
+
+  Одиночный чат помечается флагом is_deleted в таблице party
+  у пользователя, который удалил чат.
+  """
+  deleteChat(chatId: ID!): Boolean!
   sendMessage(chatId: ID!, content: String!): Message!
   uploadChatAvatar(image: Upload!, chatId: ID!): String!
   updateChatAvatar(image: Upload!, chatId: ID!): String!
