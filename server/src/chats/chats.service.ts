@@ -16,6 +16,7 @@ import {
 import { PUB_SUB } from '../common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
 import { FileUpload } from 'graphql-upload-ts';
+import { AvatarInfoData } from 'users/types/users.types';
 
 @Injectable()
 export class ChatsService {
@@ -34,40 +35,15 @@ export class ChatsService {
     participantsIds.push(userUuid);
 
     try {
-      const { data, error } = (await this.supabaseService
-        .getClient()
-        .from('chat')
-        .insert({
-          chat_id: Date.now().toString(),
-          created_at: new Date(),
-          user_uuid: userUuid,
-          name: name,
-          is_group_chat: participantsIds.length > 2,
-        })
-        .select(
-          `
-          chat_id,
-          name, 
-          is_group_chat,
-          created_at
-           `,
-        )) as {
-        data: Chat[];
-        error: any;
-      };
+      const chatData = await this.createNewChat(
+        userUuid,
+        participantsIds,
+        name,
+      );
 
-      if (error) {
-        this.logger.error(`Ошибка при создании чата: ${error.message}`);
-        throw new HttpException(
-          error.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      const chatData = data[0];
       const chat: ChatWithoutMessages = {
         id: chatData.chat_id,
-        userUuid: userUuid,
+        userUuid: chatData.user_uuid,
         name: chatData.name,
         isGroupChat: chatData.is_group_chat,
         createdAt: chatData.created_at,
@@ -77,61 +53,112 @@ export class ChatsService {
 
       for (let i = 0; i < participantsIds.length; i++) {
         const participant = participantsIds[i];
-        const { data: participantData, error: participantError } =
-          (await this.supabaseService
-            .getClient()
-            .from('profiles')
-            .select(
-              `
-              uuid,
-              name,
-              avatar_url
-              `,
-            )
-            .eq('uuid', participant)) as {
-            data: UserWithAvatarData[];
-            error: any;
-          };
-
-        if (participantError) {
-          this.logger.error(
-            `Ошибка получения данных участников чата: ${participantError.message}`,
-          );
-          throw new HttpException(
-            participantError.message,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
+        const participantData = await this.getParticipants(participant);
 
         chat.participants.push({
-          id: participantData[0].uuid,
-          name: participantData[0].name,
-          avatarUrl: participantData[0].avatar_url,
+          id: participantData.uuid,
+          name: participantData.name,
+          avatarUrl: participantData.avatar_url,
         });
 
-        const { error: partyError } = await this.supabaseService
-          .getClient()
-          .from('party')
-          .insert({
-            chat_id: chat.id,
-            user_uuid: participant,
-          });
-
-        if (partyError) {
-          this.logger.error(
-            `Ошибка при добавлении участника в чат: ${partyError.message}`,
-          );
-          throw new HttpException(
-            partyError.message,
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
+        await this.createParty(chat.id, participant);
       }
 
       return chat;
     } catch (error) {
       this.logger.error(`Ошибка при создании чата: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private async createNewChat(
+    userUuid: string,
+    participantsIds: string[],
+    name: string,
+  ): Promise<Chat> {
+    const { data, error } = (await this.supabaseService
+      .getClient()
+      .from('chat')
+      .insert({
+        chat_id: Date.now().toString(),
+        created_at: new Date(),
+        user_uuid: userUuid,
+        name: name,
+        is_group_chat: participantsIds.length > 2,
+      })
+      .select(
+        `
+        chat_id,
+        user_uuid,
+        name, 
+        is_group_chat,
+        created_at
+         `,
+      )) as {
+      data: Chat[];
+      error: any;
+    };
+
+    if (error) {
+      this.logger.error(`Ошибка при создании чата: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    return data[0];
+  }
+
+  private async getParticipants(
+    participant: string,
+  ): Promise<UserWithAvatarData> {
+    const { data: participantData, error: participantError } =
+      (await this.supabaseService
+        .getClient()
+        .from('profiles')
+        .select(
+          `
+              uuid,
+              name,
+              avatar_url
+              `,
+        )
+        .eq('uuid', participant)) as {
+        data: UserWithAvatarData[];
+        error: any;
+      };
+
+    if (participantError) {
+      this.logger.error(
+        `Ошибка получения данных участников чата: ${participantError.message}`,
+      );
+      throw new HttpException(
+        participantError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return participantData[0];
+  }
+
+  private async createParty(
+    chat_id: string,
+    participant_id: string,
+  ): Promise<void> {
+    const { error: partyError } = await this.supabaseService
+      .getClient()
+      .from('party')
+      .insert({
+        chat_id: chat_id,
+        user_uuid: participant_id,
+      });
+
+    if (partyError) {
+      this.logger.error(
+        `Ошибка при добавлении участника в чат: ${partyError.message}`,
+      );
+      throw new HttpException(
+        partyError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 
@@ -463,20 +490,45 @@ export class ChatsService {
   }
 
   async uploadChatAvatar(file: FileUpload, chatId: string): Promise<string> {
-    const { createReadStream, filename, mimetype } = file;
-    const stream = createReadStream();
+    const buffer = await this.readFile(file);
+    const uniqueFilename = this.generateUniqueFilename(file.filename);
+    const filePath = `chats/${chatId}/${uniqueFilename}`;
 
-    const chunks = [];
+    await this.uploadAvatarToChatStorage(buffer, filePath, file.mimetype);
+
+    try {
+      const publicURL = await this.getAvatarPublicUrl(chatId, uniqueFilename);
+      await this.insertChatAvatar(chatId, publicURL);
+
+      return publicURL;
+    } catch (error) {
+      this.logger.error(`Ошибка получения публичной ссылки: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private async readFile(file: FileUpload): Promise<Buffer> {
+    const { createReadStream } = file;
+    const stream = createReadStream();
+    const chunks: Buffer[] = [];
+
     for await (const chunk of stream) {
       chunks.push(chunk);
     }
 
-    const buffer = Buffer.concat(chunks);
+    return Buffer.concat(chunks);
+  }
 
+  private generateUniqueFilename(filename: string): string {
     const fileExtension = filename.split('.').pop();
-    const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
-    const filePath = `chats/${chatId}/${uniqueFilename}`;
+    return `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
+  }
 
+  private async uploadAvatarToChatStorage(
+    buffer: Buffer,
+    filePath: string,
+    mimetype: string,
+  ): Promise<void> {
     const { error } = await this.supabaseService
       .getClient()
       .storage.from('avatars')
@@ -489,19 +541,21 @@ export class ChatsService {
       this.logger.error(`Ошибка при загрузке аватара: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
 
+  private async getAvatarPublicUrl(
+    chatId: string,
+    fileName: string,
+  ): Promise<string> {
     try {
-      const { data: dataPublicURL } = await this.supabaseService
+      const { data } = await this.supabaseService
         .getClient()
         .storage.from('avatars')
-        .getPublicUrl(filePath);
+        .getPublicUrl(`chats/${chatId}/${fileName}`);
 
-      const publicURL = dataPublicURL.publicUrl;
-      await this.insertChatAvatar(chatId, publicURL);
-
-      return publicURL;
+      return data.publicUrl;
     } catch (error) {
-      this.logger.error(`Ошибка получения публичной ссылки: ${error.message}`);
+      this.logger.error('Ошибка получения публичного URL:', error.message);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
@@ -527,40 +581,14 @@ export class ChatsService {
     file: FileUpload,
     chatId: string,
   ): Promise<string | null> {
-    const { createReadStream, filename, mimetype } = file;
-    const stream = createReadStream();
-
-    const chunks = [];
-    for await (const chunk of stream) {
-      chunks.push(chunk);
-    }
-
-    const buffer = Buffer.concat(chunks);
-
-    const fileExtension = filename.split('.').pop();
-    const uniqueFilename = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
+    const buffer = await this.readFile(file);
+    const uniqueFilename = this.generateUniqueFilename(file.filename);
     const filePath = `chats/${chatId}/${uniqueFilename}`;
 
-    const { error } = await this.supabaseService
-      .getClient()
-      .storage.from('avatars')
-      .upload(filePath, buffer, {
-        contentType: mimetype,
-        upsert: true,
-      });
-
-    if (error) {
-      this.logger.error(`Ошибка при обновлении аватара: ${error.message}`);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    await this.uploadAvatarToChatStorage(buffer, filePath, file.mimetype);
 
     try {
-      const { data: dataPublicURL } = await this.supabaseService
-        .getClient()
-        .storage.from('avatars')
-        .getPublicUrl(filePath);
-
-      const publicURL = dataPublicURL.publicUrl;
+      const publicURL = await this.getAvatarPublicUrl(chatId, uniqueFilename);
       await this.updateGroupChatAvatar(chatId, publicURL);
 
       return publicURL;
@@ -570,7 +598,10 @@ export class ChatsService {
     }
   }
 
-  private async updateGroupChatAvatar(chatId: string, publicURL: string) {
+  private async updateGroupChatAvatar(
+    chatId: string,
+    publicURL: string | null,
+  ) {
     const { error: updateError } = await this.supabaseService
       .getClient()
       .from('group_chat')
@@ -590,42 +621,15 @@ export class ChatsService {
 
   async deleteChatAvatar(chatId: string): Promise<string | null> {
     try {
-      const { data: currentChat, error: fetchError } =
-        await this.supabaseService
-          .getClient()
-          .from('group_chat')
-          .select('avatar_url')
-          .eq('chat_id', chatId)
-          .single();
-
-      if (fetchError) {
-        this.logger.error(`Ошибка при получении чата: ${fetchError.message}`);
-        throw new HttpException(
-          fetchError.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      if (!currentChat?.avatar_url) return null;
+      const currentChat = await this.getCurrentChatAvatar(chatId);
+      if (!currentChat) return null;
 
       const currentAvatarPath = currentChat.avatar_url
         .split('/')
         .slice(-3)
         .join('/');
 
-      const { data: hasAccess, error: accessError } = await this.supabaseService
-        .getClient()
-        .rpc('check_chat_delete_access', { file_path: currentAvatarPath });
-
-      if (accessError) {
-        this.logger.error(
-          `Ошибка при проверке доступа: ${accessError.message}`,
-        );
-        throw new HttpException(
-          accessError.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
+      const hasAccess = await this.checkDeleteAccess(currentAvatarPath);
 
       if (!hasAccess) {
         throw new HttpException(
@@ -634,69 +638,108 @@ export class ChatsService {
         );
       }
 
-      const { error: deleteError } = await this.supabaseService
-        .getClient()
-        .storage.from('avatars')
-        .remove([currentAvatarPath]);
+      await this.removeAvatarFromStorage(currentAvatarPath);
 
-      if (deleteError) {
-        this.logger.error(
-          `Ошибка при удалении аватара: ${deleteError.message}`,
-        );
-        throw new HttpException(
-          deleteError.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      const { data: files, error: listError } = await this.supabaseService
-        .getClient()
-        .storage.from('avatars')
-        .list(`chats/${chatId}`);
-
-      if (listError) {
-        this.logger.error(
-          `Ошибка при получении списка файлов: ${listError.message}`,
-        );
-        throw new HttpException(
-          listError.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
+      const files = await this.listChatAvatars(chatId);
       let newAvatarUrl: string | null = null;
+
       if (files && files.length > 0) {
         const lastFile = files.sort((a, b) =>
-          b.created_at.localeCompare(a.created_at),
+          String(b.created_at).localeCompare(String(a.created_at)),
         )[0];
-        const { data: publicUrlData } = await this.supabaseService
-          .getClient()
-          .storage.from('avatars')
-          .getPublicUrl(`chats/${chatId}/${lastFile.name}`);
 
-        newAvatarUrl = publicUrlData.publicUrl;
+        const publicUrlData = await this.getAvatarPublicUrl(
+          chatId,
+          lastFile.name,
+        );
+
+        newAvatarUrl = publicUrlData;
       }
 
-      const { error: updateError } = await this.supabaseService
-        .getClient()
-        .from('group_chat')
-        .update({ avatar_url: newAvatarUrl })
-        .eq('chat_id', chatId);
-
-      if (updateError) {
-        this.logger.error(
-          `Ошибка при обновлении аватара чата: ${updateError.message}`,
-        );
-        throw new HttpException(
-          updateError.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
+      await this.updateGroupChatAvatar(chatId, newAvatarUrl);
 
       return newAvatarUrl;
     } catch (error) {
       this.logger.error(`Ошибка удаления аватара: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  private async getCurrentChatAvatar(
+    chatId: string,
+  ): Promise<{ avatar_url: string } | null> {
+    const { data: currentChat, error: fetchError } = await this.supabaseService
+      .getClient()
+      .from('group_chat')
+      .select('avatar_url')
+      .eq('chat_id', chatId)
+      .single();
+
+    if (fetchError) {
+      this.logger.error(
+        `Ошибка при получении аватара чата: ${fetchError.message}`,
+      );
+      throw new HttpException(
+        fetchError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    if (!currentChat?.avatar_url) return null;
+
+    return currentChat;
+  }
+
+  private async checkDeleteAccess(file_path: string): Promise<boolean> {
+    const { data: hasAccess, error: accessError } = await this.supabaseService
+      .getClient()
+      .rpc('check_chat_delete_access', { file_path });
+
+    if (accessError) {
+      this.logger.error(`Ошибка при проверке доступа: ${accessError.message}`);
+      throw new HttpException(
+        accessError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return hasAccess;
+  }
+
+  private async removeAvatarFromStorage(avatarPath: string): Promise<void> {
+    const { error: deleteError } = await this.supabaseService
+      .getClient()
+      .storage.from('avatars')
+      .remove([avatarPath]);
+
+    if (deleteError) {
+      this.logger.error(`Ошибка при удалении аватара: ${deleteError.message}`);
+      throw new HttpException(
+        deleteError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  private async listChatAvatars(chatId: string): Promise<AvatarInfoData[]> {
+    const { data: files, error: listError } = (await this.supabaseService
+      .getClient()
+      .storage.from('avatars')
+      .list(`chats/${chatId}`)) as unknown as {
+      data: AvatarInfoData[];
+      error: any;
+    };
+
+    if (listError) {
+      this.logger.error(
+        `Ошибка при получении списка файлов: ${listError.message}`,
+      );
+      throw new HttpException(
+        listError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    return files;
   }
 }
