@@ -56,6 +56,8 @@ export abstract class IQuery {
 
     abstract userChats(): ChatWithoutMessages[] | Promise<ChatWithoutMessages[]>;
 
+    abstract chatWithUser(userUuid: string): Nullable<ChatWithoutMessages> | Promise<Nullable<ChatWithoutMessages>>;
+
     abstract chatMessages(chatId: string, limit?: Nullable<number>, offset?: Nullable<number>): Nullable<Message[]> | Promise<Nullable<Message[]>>;
 
     abstract users(): UserWithAvatar[] | Promise<UserWithAvatar[]>;

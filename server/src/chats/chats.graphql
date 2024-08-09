@@ -37,6 +37,8 @@ type Message {
 
 type Query {
   userChats: [ChatWithoutMessages!]!
+  "Запрос одиночного чата с указанным пользователем"
+  chatWithUser(userUuid: String!): ChatWithoutMessages
   chatMessages(chatId: ID!, limit: Int, offset: Int): [Message!]
 }
 

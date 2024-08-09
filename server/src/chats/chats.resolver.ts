@@ -50,6 +50,15 @@ export class ChatsResolver {
   }
 
   @UseGuards(JwtHttpAuthGuard)
+  @Query('chatWithUser')
+  async getChatWithUser(
+    @Args('userUuid') withUser: string,
+    @Context('user_uuid') userUuid: string,
+  ): Promise<ChatWithoutMessages | null> {
+    return this.chatsService.getChatWithUser(userUuid, withUser);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
   @Query('chatMessages')
   async getChatMessages(
     @Args('chatId') chatId: string,

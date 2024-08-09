@@ -403,6 +403,30 @@ export class ChatsService {
     return Array.from(chatMap.values());
   }
 
+  async getChatWithUser(
+    userUuid: string,
+    otherUserId: string,
+  ): Promise<ChatWithoutMessages | null> {
+    try {
+      const userChats = await this.getUserChats(userUuid);
+
+      const existingChat = userChats.find(
+        (chat) =>
+          !chat.isGroupChat &&
+          chat.participants.some(
+            (participant) => participant.id === otherUserId,
+          ),
+      );
+
+      return existingChat || null;
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при получении чата с пользователем: ${error.message}`,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async getChatMessages(
     chatId: string,
     limit: number = 20,
