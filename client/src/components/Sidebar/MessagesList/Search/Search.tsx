@@ -1,11 +1,13 @@
 import React, { FC } from 'react';
 import { ApolloError } from '@apollo/client';
+import { motion } from 'framer-motion';
 import './Search.css';
 import { UserWithAvatar } from '../../../../types.generated';
 import Cross from './Cross/Cross';
 import SearchIllustration from './SearchIllustration/SearchIllustration';
 import UserIcon from '../../../../icons/UserIcon';
 import ExclamationTriangleIcon from '../../../../icons/ExclamationTriangleIcon';
+import DrawOutlineRect from '../../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 
 interface SearchProps {
   searchValue: string;
@@ -28,6 +30,7 @@ const renderSearchResults: FC<SearchProps> = ({
       </div>
     );
   }
+
   if (searchValue !== '' && searchError) {
     return (
       <div className="search-block">
@@ -36,6 +39,7 @@ const renderSearchResults: FC<SearchProps> = ({
       </div>
     );
   }
+
   if (searchValue !== '' && (!searchData || !searchData.length)) {
     return (
       <div className="search-block">
@@ -55,16 +59,46 @@ const renderSearchResults: FC<SearchProps> = ({
       ) : (
         <>
           {searchData?.map((user: UserWithAvatar) => (
-            <div key={user.id} className="user-result">
-              <div className="user-avatar">
-                {user.avatarUrl ? (
-                  <img src={user.avatarUrl} alt={user.name} />
-                ) : (
-                  <UserIcon />
-                )}
-              </div>
-              <span>{user.name}</span>
-            </div>
+            <motion.div
+              key={user.id}
+              className="search-result"
+              whileTap={{ scale: 0.95 }}
+            >
+              <DrawOutlineRect
+                className="search-result-wrapper"
+                rx="15px"
+                stroke="#fff"
+                strokeWidth={1}
+                showOnHover={true}
+              >
+                <div className="search-list-block">
+                  <div className="user-result">
+                    {user.avatarUrl ? (
+                      <DrawOutlineRect
+                        className="avatar-wrapper"
+                        strokeWidth={1}
+                        rx="50%"
+                      >
+                        <div className="user-avatar">
+                          <img src={user.avatarUrl} alt={user.name} />
+                        </div>
+                      </DrawOutlineRect>
+                    ) : (
+                      <DrawOutlineRect
+                        className="avatar-wrapper"
+                        strokeWidth={1}
+                        rx="50%"
+                      >
+                        <div className="empty-avatar">
+                          <UserIcon />
+                        </div>
+                      </DrawOutlineRect>
+                    )}
+                    <span className="user-name">{user.name}</span>
+                  </div>
+                </div>
+              </DrawOutlineRect>
+            </motion.div>
           ))}
         </>
       )}

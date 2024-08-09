@@ -16,6 +16,7 @@ import {
   useUserChatsLazyQuery,
 } from './messagesList.generated';
 import { ChatWithoutMessages, UserWithAvatar } from '../../../types.generated';
+import DrawOutline from '../../DrawOutline/DrawOutline/DrawOutline';
 import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import UserIcon from '../../../icons/UserIcon';
 import SearchIcon from '../../../icons/SearchIcon';
@@ -25,7 +26,6 @@ import {
   backButtonVariants,
   searchInputVariants,
 } from '../../../motion';
-import DrawOutline from '../../DrawOutline/DrawOutline/DrawOutline';
 import renderChats from './Chats/Chats';
 import renderSearchResults from './Search/Search';
 
@@ -56,9 +56,11 @@ const MessagesList: FC<MessagesListProps> = ({ setIsProfileSettings }) => {
         console.error(chatsError);
       }
 
-      if (chatsData) {
-        setChats(chatsData.userChats as ChatWithoutMessages[]);
+      if (!chatsData) {
+        return;
       }
+
+      setChats(chatsData.userChats as ChatWithoutMessages[]);
     };
 
     fetchUserChat();
@@ -71,6 +73,7 @@ const MessagesList: FC<MessagesListProps> = ({ setIsProfileSettings }) => {
   const handleBackClick = () => {
     setIsSearch(false);
     setSearchValue('');
+
     if (inputRef.current) {
       inputRef.current.value = '';
     }
