@@ -51,6 +51,8 @@ export class ChatsService {
         participants: [],
       };
 
+      if (chat.isGroupChat) await this.createGroupChat(chat.id);
+
       for (let i = 0; i < participantsIds.length; i++) {
         const participant = participantsIds[i];
         const participantData = await this.getParticipants(participant);
@@ -105,6 +107,20 @@ export class ChatsService {
     }
 
     return data[0];
+  }
+
+  private async createGroupChat(chatId: string): Promise<void> {
+    try {
+      await this.supabaseService.getClient().from('group_chat').insert({
+        chat_id: chatId,
+        avatar_url: null,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при создании группового чата: ${error.message}`,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   private async getParticipants(
@@ -204,6 +220,7 @@ export class ChatsService {
     }
 
     if (!data) {
+      this.logger.warn(`Чат не найден`);
       return null;
     }
 
@@ -425,6 +442,108 @@ export class ChatsService {
       );
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  async getChatInfoById(chatId: string): Promise<ChatWithoutMessages | null> {
+    try {
+      const chatData = await this.getChatById(chatId);
+
+      if (!chatData) return null;
+
+      const chat: ChatWithoutMessages = {
+        id: chatData.chat_id,
+        name: chatData.name,
+        userUuid: chatData.user_uuid,
+        isGroupChat: chatData.is_group_chat,
+        groupAvatarUrl: null,
+        participants: [],
+        createdAt: chatData.created_at,
+      };
+
+      const chatParticipants = await this.getChatParticipants(chatId);
+
+      if (!chatParticipants) return null;
+
+      chat.participants = chatParticipants.map((item) => ({
+        id: item.profiles.uuid,
+        name: item.profiles.name,
+        avatarUrl: item.profiles.avatar_url,
+      }));
+
+      if (chat.isGroupChat) {
+        const groupAvatar = await this.getGroupAvatar(chatId);
+
+        chat.groupAvatarUrl = groupAvatar;
+      }
+
+      return chat;
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при получении информации о чате: ${error.message}`,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private async getChatParticipants(
+    chatId: string,
+  ): Promise<Pick<PartyItem, 'profiles'>[] | null> {
+    const { data: chatParticipants, error } = (await this.supabaseService
+      .getClient()
+      .from('party')
+      .select(
+        `
+        profiles:user_uuid (
+          uuid,
+          name,
+          avatar_url
+        )
+      `,
+      )
+      .eq('chat_id', chatId)) as unknown as {
+      data: Pick<PartyItem, 'profiles'>[];
+      error: any;
+    };
+
+    if (error) {
+      this.logger.error(
+        `Ошибка при получении участников чата: ${error.message}`,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    if (!chatParticipants) {
+      this.logger.warn(`Участники чата не найдены`);
+      return null;
+    }
+
+    return chatParticipants;
+  }
+
+  private async getGroupAvatar(chatId: string): Promise<string | null> {
+    const { data: groupAvatar, error: groupAvatarError } =
+      await this.supabaseService
+        .getClient()
+        .from('group_chat')
+        .select('chat_id, avatar_url')
+        .eq('chat_id', chatId);
+
+    if (groupAvatarError) {
+      this.logger.error(
+        `Ошибка при получении аватаров чатов: ${groupAvatarError.message}`,
+      );
+      throw new HttpException(
+        groupAvatarError.message,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+
+    if (!groupAvatar) {
+      this.logger.warn(`Аватар чата не найден`);
+      return null;
+    }
+
+    return groupAvatar[0].avatar_url;
   }
 
   async getChatMessages(

@@ -59,6 +59,14 @@ export class ChatsResolver {
   }
 
   @UseGuards(JwtHttpAuthGuard)
+  @Query('chatById')
+  async getChatInfoById(
+    @Args('chatId') chatId: string,
+  ): Promise<ChatWithoutMessages | null> {
+    return this.chatsService.getChatInfoById(chatId);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
   @Query('chatMessages')
   async getChatMessages(
     @Args('chatId') chatId: string,
