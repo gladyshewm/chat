@@ -9,7 +9,14 @@ export class DateScalar implements CustomScalar<string, Date> {
     return new Date(value);
   }
 
-  serialize(value: Date | string): string {
+  serialize(value: Date | string): number {
+    if (typeof value === 'string') {
+      return new Date(value).getTime();
+    }
+    return value.getTime();
+  }
+
+  /* serialize(value: Date | string): string {
     if (!(value instanceof Date)) {
       value = new Date(value);
     }
@@ -27,7 +34,7 @@ export class DateScalar implements CustomScalar<string, Date> {
     });
 
     return formatter.format(value);
-  }
+  } */
 
   parseLiteral(ast: ValueNode): Date | null {
     if (ast.kind === Kind.INT || ast.kind === Kind.STRING) {
