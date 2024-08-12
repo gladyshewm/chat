@@ -173,15 +173,23 @@ export type MutationUploadChatAvatarArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  /** Запрос чата по ID (участники чата включают текущего пользователя) */
+  chatById?: Maybe<ChatWithoutMessages>;
   chatMessages?: Maybe<Array<Message>>;
   /** Запрос одиночного чата с указанным пользователем */
   chatWithUser?: Maybe<ChatWithoutMessages>;
+  /** Поиск пользователей (не включая текущего пользователя) */
   findUsers: Array<Maybe<UserWithAvatar>>;
   user?: Maybe<UserWithToken>;
   userAllAvatars: Array<Maybe<AvatarInfo>>;
   userAvatar?: Maybe<AvatarInfo>;
   userChats: Array<ChatWithoutMessages>;
   users: Array<UserWithAvatar>;
+};
+
+
+export type QueryChatByIdArgs = {
+  chatId: Scalars['ID']['input'];
 };
 
 

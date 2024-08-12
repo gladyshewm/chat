@@ -4,6 +4,7 @@ import {
   CreateAccSchema,
   LoginSchema,
   ChangeCredentialsSchema,
+  MessageFormSchema,
 } from './validationSchemas';
 
 const regex: TRegex = {
@@ -72,4 +73,9 @@ export const validationChangeCredentialsSchema: Yup.ObjectSchema<ChangeCredentia
     email: changeCredentials.email,
     password: changeCredentials.password,
     confirmPassword: changeCredentials.confirmPassword,
+  });
+
+export const validationMessageFormSchema: Yup.ObjectSchema<MessageFormSchema> =
+  Yup.object().shape({
+    message: Yup.string().required(),
   });

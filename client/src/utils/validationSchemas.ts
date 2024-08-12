@@ -11,3 +11,7 @@ export type CreateAccSchema = LoginSchema & {
 };
 
 export type ChangeCredentialsSchema = Partial<CreateAccSchema>;
+
+export type MessageFormSchema = {
+  message: string;
+};

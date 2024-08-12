@@ -17,7 +17,7 @@ interface DrawOutlineRectProps {
 const DrawOutlineRect: FC<DrawOutlineRectProps> = ({
   children,
   className,
-  stroke = '#999999',
+  stroke = 'var(--outline-main-color)',
   strokeWidth = 2,
   rx = 0,
   showOnHover = false,

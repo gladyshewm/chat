@@ -1,3 +1,19 @@
+query chatById($chatId: ID!) {
+  chatById(chatId: $chatId) {
+    id
+    name
+    userUuid
+    isGroupChat
+    groupAvatarUrl
+    participants {
+      id
+      name
+      avatarUrl
+    }
+    createdAt
+  }
+}
+
 query chatMessages($chatId: ID!, $limit: Int, $offset: Int) {
   chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {
     id

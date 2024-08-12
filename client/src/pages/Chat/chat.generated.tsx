@@ -3,6 +3,13 @@ import * as Types from '../../types.generated';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
+export type ChatByIdQueryVariables = Types.Exact<{
+  chatId: Types.Scalars['ID']['input'];
+}>;
+
+
+export type ChatByIdQuery = { __typename?: 'Query', chatById?: { __typename?: 'ChatWithoutMessages', id: string, name?: string | null, userUuid: string, isGroupChat: boolean, groupAvatarUrl?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> } | null };
+
 export type ChatMessagesQueryVariables = Types.Exact<{
   chatId: Types.Scalars['ID']['input'];
   limit?: Types.InputMaybe<Types.Scalars['Int']['input']>;
@@ -28,6 +35,56 @@ export type MessageSentSubscriptionVariables = Types.Exact<{
 export type MessageSentSubscription = { __typename?: 'Subscription', messageSent: { __typename?: 'Message', id: string, userId: string, chatId: string, content: string, createdAt: any, isRead: boolean, userName: string, avatarUrl?: string | null } };
 
 
+export const ChatByIdDocument = gql`
+    query chatById($chatId: ID!) {
+  chatById(chatId: $chatId) {
+    id
+    name
+    userUuid
+    isGroupChat
+    groupAvatarUrl
+    participants {
+      id
+      name
+      avatarUrl
+    }
+    createdAt
+  }
+}
+    `;
+
+/**
+ * __useChatByIdQuery__
+ *
+ * To run a query within a React component, call `useChatByIdQuery` and pass it any options that fit your needs.
+ * When your component renders, `useChatByIdQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useChatByIdQuery({
+ *   variables: {
+ *      chatId: // value for 'chatId'
+ *   },
+ * });
+ */
+export function useChatByIdQuery(baseOptions: Apollo.QueryHookOptions<ChatByIdQuery, ChatByIdQueryVariables> & ({ variables: ChatByIdQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<ChatByIdQuery, ChatByIdQueryVariables>(ChatByIdDocument, options);
+      }
+export function useChatByIdLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ChatByIdQuery, ChatByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<ChatByIdQuery, ChatByIdQueryVariables>(ChatByIdDocument, options);
+        }
+export function useChatByIdSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<ChatByIdQuery, ChatByIdQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<ChatByIdQuery, ChatByIdQueryVariables>(ChatByIdDocument, options);
+        }
+export type ChatByIdQueryHookResult = ReturnType<typeof useChatByIdQuery>;
+export type ChatByIdLazyQueryHookResult = ReturnType<typeof useChatByIdLazyQuery>;
+export type ChatByIdSuspenseQueryHookResult = ReturnType<typeof useChatByIdSuspenseQuery>;
+export type ChatByIdQueryResult = Apollo.QueryResult<ChatByIdQuery, ChatByIdQueryVariables>;
 export const ChatMessagesDocument = gql`
     query chatMessages($chatId: ID!, $limit: Int, $offset: Int) {
   chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {

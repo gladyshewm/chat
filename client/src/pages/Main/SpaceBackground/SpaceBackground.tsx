@@ -37,6 +37,7 @@ const SpaceBackground = () => {
           repeatType: 'reverse',
         }}
       />
+      <div className="blur" />
     </div>
   );
 };
