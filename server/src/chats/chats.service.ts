@@ -609,65 +609,6 @@ export class ChatsService {
     }
   }
 
-  async sendMessage(
-    chatId: string,
-    content: string,
-    userUuid: string,
-  ): Promise<Message> {
-    try {
-      const { data, error } = (await this.supabaseService
-        .getClient()
-        .from('messages')
-        .insert({
-          message_id: Date.now().toString(),
-          content: content,
-          created_at: new Date(),
-          chat_id: chatId,
-          user_uuid: userUuid,
-          is_read: false,
-        })
-        .select(
-          `
-          message_id,
-          chat_id, 
-          user_uuid,
-          content, 
-          created_at, 
-          is_read,
-          profiles:user_uuid (
-            name,
-            avatar_url
-          )
-          `,
-        )) as { data: MessageData[]; error: any };
-
-      if (error) {
-        this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
-        throw new HttpException(
-          error.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      const messageData = data[0];
-      const message = {
-        id: messageData.message_id,
-        chatId: messageData.chat_id,
-        userId: messageData.user_uuid,
-        content: messageData.content,
-        createdAt: new Date(messageData.created_at),
-        isRead: messageData.is_read,
-        userName: messageData.profiles.name,
-        avatarUrl: messageData.profiles.avatar_url,
-      };
-
-      return message;
-    } catch (error) {
-      this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
   async sendMessageSub(
     chatId: string,
     userUuid: string,

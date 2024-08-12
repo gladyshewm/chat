@@ -86,6 +86,8 @@ export abstract class IMutation {
 
     abstract sendMessage(chatId: string, content: string): Message | Promise<Message>;
 
+    abstract sendTypingStatus(chatId: string, userName: string, isTyping: boolean): TypingFeedback | Promise<TypingFeedback>;
+
     abstract uploadChatAvatar(image: Upload, chatId: string): string | Promise<string>;
 
     abstract updateChatAvatar(image: Upload, chatId: string): string | Promise<string>;
@@ -133,8 +135,16 @@ export class Message {
     isRead: boolean;
 }
 
+export class TypingFeedback {
+    chatId: string;
+    userName: string;
+    isTyping: boolean;
+}
+
 export abstract class ISubscription {
     abstract messageSent(chatId: string): Message | Promise<Message>;
+
+    abstract userTyping(chatId: string): TypingFeedback | Promise<TypingFeedback>;
 }
 
 export class Info {

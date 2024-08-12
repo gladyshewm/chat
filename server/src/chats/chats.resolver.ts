@@ -83,7 +83,6 @@ export class ChatsResolver {
     @Args('content') content: string,
     @Context('user_uuid') userUuid: string,
   ): Promise<Message> {
-    /* return this.chatsService.sendMessage(chatId, content, userUuid); */
     return this.chatsService.sendMessageSub(chatId, userUuid, content);
   }
 
@@ -95,6 +94,28 @@ export class ChatsResolver {
   })
   messageSent() {
     return this.pubSub.asyncIterator('messageSent');
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('sendTypingStatus')
+  sendTypingStatus(
+    @Args('chatId') chatId: string,
+    @Args('userName') userName: string,
+    @Args('isTyping') isTyping: boolean,
+  ) {
+    const feedback = { chatId, userName, isTyping };
+    this.pubSub.publish('userTyping', { userTyping: feedback });
+    return feedback;
+  }
+
+  @UseGuards(JwtWsAuthGuard)
+  @Subscription('userTyping', {
+    filter: (payload, variables) => {
+      return payload.userTyping.chatId == variables.chatId;
+    },
+  })
+  userTyping() {
+    return this.pubSub.asyncIterator('userTyping');
   }
 
   @UseGuards(JwtHttpAuthGuard)

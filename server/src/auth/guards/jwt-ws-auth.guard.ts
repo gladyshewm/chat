@@ -19,10 +19,16 @@ export class JwtWsAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const gqlContext = ctx.getContext();
-    const req = gqlContext.req;
+    let connectionParams;
+
+    if (gqlContext.req) {
+      connectionParams = gqlContext.req.connectionParams;
+    } else {
+      connectionParams = gqlContext.connectionParams;
+    }
 
     try {
-      const accessToken = this.extractTokenFromHeader(req);
+      const accessToken = this.extractTokenFromHeader(connectionParams);
       if (!accessToken) {
         this.logger.error('Access token not found');
         throw new WsException({ message: 'Access token not found' });
@@ -46,15 +52,13 @@ export class JwtWsAuthGuard implements CanActivate {
     }
   }
 
-  private extractTokenFromHeader(request: any): string | undefined {
-    const { connectionParams } = request;
-
-    if (!connectionParams || !connectionParams.authorization) {
+  private extractTokenFromHeader(connectionParams: any): string | undefined {
+    if (!connectionParams || !connectionParams.Authorization) {
       this.logger.error(`Authorization header is missing`);
       throw new WsException('Authorization header is missing');
     }
 
-    const authHeader = connectionParams.authorization;
+    const authHeader = connectionParams.Authorization;
     const [bearer, accessToken] = authHeader.split(' ');
 
     if (bearer !== 'Bearer' || !accessToken) {
@@ -74,7 +78,7 @@ export class JwtWsAuthGuard implements CanActivate {
 
       context.user = user;
       context['user_uuid'] = user.uuid;
-      context.req.connectionParams.authorization = `Bearer ${newAccessToken}`;
+      context.connectionParams.Authorization = `Bearer ${newAccessToken}`;
 
       this.logger.log('Token refreshed successfully');
     } catch (error) {

@@ -35,6 +35,12 @@ type Message {
   isRead: Boolean!
 }
 
+type TypingFeedback {
+  chatId: ID!
+  userName: String!
+  isTyping: Boolean!
+}
+
 type Query {
   userChats: [ChatWithoutMessages!]!
   "Запрос одиночного чата с указанным пользователем"
@@ -54,6 +60,11 @@ type Mutation {
   """
   deleteChat(chatId: ID!): Boolean!
   sendMessage(chatId: ID!, content: String!): Message!
+  sendTypingStatus(
+    chatId: ID!
+    userName: String!
+    isTyping: Boolean!
+  ): TypingFeedback!
   uploadChatAvatar(image: Upload!, chatId: ID!): String!
   updateChatAvatar(image: Upload!, chatId: ID!): String!
   deleteChatAvatar(chatId: ID!): String
@@ -61,4 +72,5 @@ type Mutation {
 
 type Subscription {
   messageSent(chatId: ID!): Message!
+  userTyping(chatId: ID!): TypingFeedback!
 }
