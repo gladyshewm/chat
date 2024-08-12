@@ -50,6 +50,7 @@
   width: 100%;
 
   & .chat-name {
+    font-size: 14px;
     color: var(--outline-main-color);
     transition: color 0.3s ease;
 

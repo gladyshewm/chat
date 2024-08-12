@@ -3,15 +3,25 @@ import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import './Chat.css';
 import useAuth from '../../hooks/useAuth';
-import { useChatByIdLazyQuery, useSendMessageMutation } from './chat.generated';
-import { ChatWithoutMessages, UserInfo } from '../../types.generated';
+import {
+  useChatByIdLazyQuery,
+  useSendMessageMutation,
+  useSendTypingStatusMutation,
+  useUserTypingSubscription,
+} from './chat.generated';
+import {
+  ChatWithoutMessages,
+  TypingFeedback,
+  UserInfo,
+} from '../../types.generated';
 import Messages from './Messages/Messages';
 import MessageForm from './MessageForm/MessageForm';
 import CustomLoader from '../../components/CustomLoader/CustomLoader';
+import SpaceBackground from '../Main/SpaceBackground/SpaceBackground';
 import DrawOutlineRect from '../../components/DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import DrawOutline from '../../components/DrawOutline/DrawOutline/DrawOutline';
 import UserGroupIcon from '../../icons/UserGroupIcon';
-import SpaceBackground from '../Main/SpaceBackground/SpaceBackground';
+import PencilIcon from '../../icons/PencilIcon';
 
 const Chat = () => {
   const { user } = useAuth();
@@ -19,6 +29,8 @@ const Chat = () => {
   const [chat, setChat] = useState<ChatWithoutMessages | null>(null);
   const [postMessage] = useSendMessageMutation();
   const [chatQuery, { data, loading, error }] = useChatByIdLazyQuery();
+  const [sendTypingStatus] = useSendTypingStatusMutation();
+  const [typingStatus, setTypingStatus] = useState<TypingFeedback | null>(null);
 
   useEffect(() => {
     chatQuery({
@@ -58,6 +70,45 @@ const Chat = () => {
     }
   };
 
+  useUserTypingSubscription({
+    variables: {
+      chatId: chat_id as string,
+    },
+    onData: (userTypingData) => {
+      const typingStatus = userTypingData.data.data
+        ?.userTyping as TypingFeedback;
+      setTypingStatus(typingStatus);
+    },
+  });
+
+  const handleKeyDown = () => {
+    sendTypingStatus({
+      variables: {
+        chatId: chat_id as string,
+        userName: user?.name as string,
+        isTyping: true,
+      },
+    });
+  };
+  const handleBlur = () => {
+    sendTypingStatus({
+      variables: {
+        chatId: chat_id as string,
+        userName: user?.name as string,
+        isTyping: false,
+      },
+    });
+  };
+  const handleFocus = () => {
+    sendTypingStatus({
+      variables: {
+        chatId: chat_id as string,
+        userName: user?.name as string,
+        isTyping: true,
+      },
+    });
+  };
+
   if (error) return <div>{`Ошибка: ${error.message}`}</div>;
 
   return (
@@ -92,15 +143,22 @@ const Chat = () => {
                       </DrawOutlineRect>
                       <div className="chat__info">
                         <span className="chat__name">{chat.name}</span>
-                        <span className="chat__count">
+                        <div className="chat__count">
                           {getParticipants(chat.participants.length)}
-                        </span>
+                        </div>
                       </div>
                     </>
                   ) : (
                     <></>
                   )}
                 </div>
+                {typingStatus?.isTyping &&
+                  typingStatus.userName !== user?.name && (
+                    <div className="feedback">
+                      <span>{typingStatus.userName}...</span>
+                      <PencilIcon />
+                    </div>
+                  )}
                 <div className="buttons">
                   <button>ss</button>
                   <button>ss</button>
@@ -112,7 +170,12 @@ const Chat = () => {
             <div className="chat-separator__wrapper">
               <hr className="chat-separator" />
             </div>
-            <MessageForm sendMessage={sendMessage} />
+            <MessageForm
+              sendMessage={sendMessage}
+              onKeyDown={handleKeyDown}
+              onBlur={handleBlur}
+              onFocus={handleFocus}
+            />
           </>
         )}
       </div>

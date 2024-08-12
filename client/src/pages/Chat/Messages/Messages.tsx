@@ -16,18 +16,32 @@ interface MessagesProps {
 const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
   const [messages, setMessages] = useState<Message[]>([]);
 
-  const { data: messagesContent } = useMessageSentSubscription({
+  useMessageSentSubscription({
     variables: {
       chatId: chat_id,
     },
     onError: (error) => {
       console.error(error);
     },
+    onData: (data) => {
+      if (!data) return;
+
+      setMessages((prevMessages) => {
+        const newMessage = data.data.data?.messageSent;
+        if (!newMessage) return prevMessages;
+        if (!prevMessages.some((msg) => msg.id === newMessage.id)) {
+          return [newMessage, ...prevMessages];
+        }
+        return prevMessages;
+      });
+    },
   });
 
   useChatMessagesQuery({
     variables: {
       chatId: chat_id,
+      offset: 0,
+      limit: 100,
     },
     onCompleted: (data) => {
       if (data) {
@@ -39,17 +53,16 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
     },
   });
 
-  useEffect(() => {
-    if (messagesContent) {
-      setMessages((prevMessages) => {
-        const newMessage = messagesContent.messageSent;
-        if (!prevMessages.some((msg) => msg.id === newMessage.id)) {
-          return [newMessage, ...prevMessages];
-        }
-        return prevMessages;
-      });
+  const scrollToBottom = () => {
+    const messagesContainer = document.querySelector('.message-container');
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
-  }, [messagesContent]);
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const groupedMessages = groupMessagesByDate(messages);
 
@@ -62,6 +75,9 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
           </div>
           <div className="messages-group">
             {groupedMessages[date].map((message, index, messagesArray) => {
+              const isFirst =
+                index === 0 ||
+                messagesArray[index - 1].userId !== message.userId;
               const isLast =
                 index === messagesArray.length - 1 ||
                 messagesArray[index + 1].userId !== message.userId;
@@ -72,7 +88,7 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
                   className={
                     message.userId === user.uuid
                       ? 'message_me-block'
-                      : `message-block ${isLast ? 'last' : ''}`
+                      : `message-block ${isLast ? 'last' : isFirst ? 'first' : ''}`
                   }
                 >
                   {message.userId !== user.uuid && isLast && (
@@ -89,10 +105,15 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
                       message.userId === user.uuid ? 'message_me' : 'message'
                     }
                   >
-                    <p className="message-text">{message.content}</p>
-                    <p className="message-time">
-                      {String(format(new Date(message.createdAt), 'HH:mm'))}
-                    </p>
+                    {message.userId !== user.uuid && isFirst && (
+                      <p className="message-username">{message.userName}</p>
+                    )}
+                    <div className="message-main">
+                      <p className="message-text">{message.content}</p>
+                      <p className="message-time">
+                        {String(format(new Date(message.createdAt), 'HH:mm'))}
+                      </p>
+                    </div>
                   </div>
                 </div>
               );

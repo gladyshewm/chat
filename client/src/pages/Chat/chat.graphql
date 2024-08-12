@@ -47,3 +47,23 @@ subscription messageSent($chatId: ID!) {
     avatarUrl
   }
 }
+
+mutation sendTypingStatus(
+  $chatId: ID!
+  $userName: String!
+  $isTyping: Boolean!
+) {
+  sendTypingStatus(chatId: $chatId, userName: $userName, isTyping: $isTyping) {
+    chatId
+    userName
+    isTyping
+  }
+}
+
+subscription userTyping($chatId: ID!) {
+  userTyping(chatId: $chatId) {
+    chatId
+    userName
+    isTyping
+  }
+}

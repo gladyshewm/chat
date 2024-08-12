@@ -102,6 +102,7 @@ export type Mutation = {
   logOutUser: Scalars['Boolean']['output'];
   refreshToken: AuthPayload;
   sendMessage: Message;
+  sendTypingStatus: TypingFeedback;
   updateChatAvatar: Scalars['String']['output'];
   uploadAvatar: AvatarInfo;
   uploadChatAvatar: Scalars['String']['output'];
@@ -152,6 +153,13 @@ export type MutationRefreshTokenArgs = {
 export type MutationSendMessageArgs = {
   chatId: Scalars['ID']['input'];
   content: Scalars['String']['input'];
+};
+
+
+export type MutationSendTypingStatusArgs = {
+  chatId: Scalars['ID']['input'];
+  isTyping: Scalars['Boolean']['input'];
+  userName: Scalars['String']['input'];
 };
 
 
@@ -222,11 +230,24 @@ export type QueryUserAvatarArgs = {
 export type Subscription = {
   __typename?: 'Subscription';
   messageSent: Message;
+  userTyping: TypingFeedback;
 };
 
 
 export type SubscriptionMessageSentArgs = {
   chatId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionUserTypingArgs = {
+  chatId: Scalars['ID']['input'];
+};
+
+export type TypingFeedback = {
+  __typename?: 'TypingFeedback';
+  chatId: Scalars['ID']['output'];
+  isTyping: Scalars['Boolean']['output'];
+  userName: Scalars['String']['output'];
 };
 
 export type User = {

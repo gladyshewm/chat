@@ -7,9 +7,17 @@ import DrawOutlineRect from '../../../components/DrawOutline/DrawOutlineRect/Dra
 
 interface MessageFormProps {
   sendMessage: (message: string) => void;
+  onKeyDown?: (userName: string) => void;
+  onBlur?: (userName: string) => void;
+  onFocus?: (userName: string) => void;
 }
 
-const MessageForm: FC<MessageFormProps> = ({ sendMessage }) => {
+const MessageForm: FC<MessageFormProps> = ({
+  sendMessage,
+  onKeyDown,
+  onBlur,
+  onFocus,
+}) => {
   return (
     <Formik
       initialValues={{ message: '' }}
@@ -30,6 +38,9 @@ const MessageForm: FC<MessageFormProps> = ({ sendMessage }) => {
               onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) =>
                 e.key === 'Enter' && handleSubmit()
               }
+              onKeyDown={onKeyDown}
+              onBlur={onBlur}
+              onFocus={onFocus}
             />
           </DrawOutlineRect>
           <DrawOutlineRect rx={'50%'} className="send-button-wrapper">
