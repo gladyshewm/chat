@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { Formik, Form } from 'formik';
 import { validationLoginSchema } from '../../utils/validate';
 import CustomInput from '../CustomInput/CustomInput';
-import CustomButton from '../CustomButton/CustomButton';
+import CustomButton from '../buttons/CustomButton/CustomButton';
 import useAuth from '../../hooks/useAuth';
 import { LoginSchema } from '../../utils/validationSchemas';
 import './LogInForm.css';

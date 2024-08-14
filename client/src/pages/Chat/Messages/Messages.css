@@ -13,6 +13,36 @@
   padding: 0 150px;
   overflow-y: auto;
   scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--outline-main-color) var(--base-color);
+
+  & .scroll-bottom {
+    position: fixed;
+    bottom: 15%;
+    right: 5%;
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: var(--base-color);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--outline-main-color);
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--outline-hover-color);
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: var(--message-bg-color);
+  }
 }
 
 .wrapper {

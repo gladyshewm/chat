@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import './Auth.css';
 import { signInVariants, signUpVariants, TWEEN_TRANSITION } from '../../motion';
-import CustomButton from '../../components/CustomButton/CustomButton';
+import CustomButton from '../../components/buttons/CustomButton/CustomButton';
 import Modal from '../../components/Modal/Modal';
 import LogInForm from '../../components/LogInForm/LogInForm';
 import CreateAccForm from '../../components/CreateAccForm/CreateAccForm';

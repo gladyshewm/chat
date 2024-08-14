@@ -39,3 +39,24 @@ export const backButtonVariants = {
     transition: { duration: FAST_ANIMATION_DURATION },
   },
 };
+
+export const scrollButtonVariants = {
+  hidden: {
+    opacity: 0,
+    y: 50,
+    rotate: -180,
+    transition: { duration: FAST_ANIMATION_DURATION },
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    rotate: 0,
+    transition: { duration: FAST_ANIMATION_DURATION },
+  },
+  exit: {
+    opacity: 0,
+    y: 50,
+    rotate: -180,
+    transition: { duration: FAST_ANIMATION_DURATION },
+  },
+};

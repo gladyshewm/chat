@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import './Messages.css';
 import { Message, UserInfo } from '../../../types.generated';
@@ -7,6 +7,7 @@ import {
   useMessageSentSubscription,
 } from '../chat.generated';
 import { groupMessagesByDate } from '../../../utils/messages';
+import ScrollButton from '../../../components/buttons/ScrollButton/ScrollButton';
 
 interface MessagesProps {
   user: UserInfo;
@@ -15,6 +16,8 @@ interface MessagesProps {
 
 const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useMessageSentSubscription({
     variables: {
@@ -54,9 +57,8 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
   });
 
   const scrollToBottom = () => {
-    const messagesContainer = document.querySelector('.message-container');
-    if (messagesContainer) {
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
   };
 
@@ -64,10 +66,36 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
     scrollToBottom();
   }, [messages]);
 
+  const handleScroll = () => {
+    if (containerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+      const isAtBottom =
+        Number((scrollHeight - scrollTop).toFixed(0)) === clientHeight ||
+        Number((scrollHeight - scrollTop).toFixed(0)) === clientHeight + 1;
+
+      setIsScrolled(!isAtBottom);
+    }
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (container) {
+      handleScroll();
+      container.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [messages]);
+
   const groupedMessages = groupMessagesByDate(messages);
 
   return (
-    <div className="message-container">
+    <div className="message-container" ref={containerRef}>
       {Object.keys(groupedMessages).map((date) => (
         <div className="wrapper" key={date}>
           <div className="date-divider">
@@ -121,6 +149,7 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
           </div>
         </div>
       ))}
+      <ScrollButton isScrolled={isScrolled} scrollToBottom={scrollToBottom} />
     </div>
   );
 };

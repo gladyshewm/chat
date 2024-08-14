@@ -2,7 +2,7 @@ import React, { FC, useState } from 'react';
 import { Formik, Form } from 'formik';
 import { validationCreateAccSchema } from '../../utils/validate';
 import CustomInput from '../CustomInput/CustomInput';
-import CustomButton from '../CustomButton/CustomButton';
+import CustomButton from '../buttons/CustomButton/CustomButton';
 import useAuth from '../../hooks/useAuth';
 import { CreateAccSchema } from '../../utils/validationSchemas';
 import DrawOutlineRect from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';

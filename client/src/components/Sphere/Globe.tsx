@@ -19,7 +19,7 @@ import {
 } from '@react-three/postprocessing';
 import * as THREE from 'three';
 import LogoSphere from './LogoSphere';
-import CustomButton from '../CustomButton/CustomButton';
+import CustomButton from '../buttons/CustomButton/CustomButton';
 import PowerIcon from '../../icons/PowerIcon';
 import { motion } from 'framer-motion-3d';
 import { MotionCanvas, LayoutCamera } from 'framer-motion-3d';

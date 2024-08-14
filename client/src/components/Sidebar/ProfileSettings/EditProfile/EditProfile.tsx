@@ -11,7 +11,7 @@ import CameraIcon from '../../../../icons/CameraIcon';
 import XmarkIcon from '../../../../icons/XmarkIcon';
 import CheckIcon from '../../../../icons/CheckIcon';
 import DrawOutline from '../../../DrawOutline/DrawOutline/DrawOutline';
-import CustomButton from '../../../CustomButton/CustomButton';
+import CustomButton from '../../../buttons/CustomButton/CustomButton';
 import CustomInput from '../../../CustomInput/CustomInput';
 import DrawOutlineRect from '../../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import CheckCircleIcon from '../../../../icons/CheckCircleIcon';
@@ -21,6 +21,7 @@ import {
   errorMessageVariants,
 } from '../../../../motion';
 import CustomLoader from '../../../CustomLoader/CustomLoader';
+import OptionButton from '../../../buttons/OptionButton/OptionButton';
 
 interface EditProfileProps {
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
@@ -121,9 +122,9 @@ const EditProfile: FC<EditProfileProps> = ({ setIsProfileInfo }) => {
     <div className="edit-profile">
       <DrawOutline orientation="horizontal" position="bottom">
         <div className="edit-profile__header">
-          <button className="back" onClick={handleBackClick}>
+          <OptionButton className="back" onClick={handleBackClick}>
             <ArrowLeftIcon />
-          </button>
+          </OptionButton>
           <div className="edit-profile__title">
             <p>Редактирование профиля</p>
           </div>
@@ -144,17 +145,17 @@ const EditProfile: FC<EditProfileProps> = ({ setIsProfileInfo }) => {
                 <img src={URL.createObjectURL(avatar)} alt="new avatar" />
               </div>
               <div className="avatar-buttons">
-                <button className="cancel" onClick={handleCancel}>
+                <OptionButton className="cancel" onClick={handleCancel}>
                   <XmarkIcon />
-                </button>
-                <button
+                </OptionButton>
+                <OptionButton
                   className="save"
                   onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
                     handleSave(e)
                   }
                 >
                   <CheckIcon />
-                </button>
+                </OptionButton>
               </div>
             </div>
           ) : errorQueryAvatar || !avatarUrl ? (

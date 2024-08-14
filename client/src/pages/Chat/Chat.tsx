@@ -22,6 +22,9 @@ import DrawOutlineRect from '../../components/DrawOutline/DrawOutlineRect/DrawOu
 import DrawOutline from '../../components/DrawOutline/DrawOutline/DrawOutline';
 import UserGroupIcon from '../../icons/UserGroupIcon';
 import PencilIcon from '../../icons/PencilIcon';
+import OptionButton from '../../components/buttons/OptionButton/OptionButton';
+import SearchIcon from '../../icons/SearchIcon';
+import EllipsisVerticalIcon from '../../icons/EllipsisVerticalIcon';
 
 const Chat = () => {
   const { user } = useAuth();
@@ -160,9 +163,12 @@ const Chat = () => {
                     </div>
                   )}
                 <div className="buttons">
-                  <button>ss</button>
-                  <button>ss</button>
-                  <button>ss</button>
+                  <OptionButton className="search">
+                    <SearchIcon />
+                  </OptionButton>
+                  <OptionButton>
+                    <EllipsisVerticalIcon />
+                  </OptionButton>
                 </div>
               </div>
             </DrawOutline>

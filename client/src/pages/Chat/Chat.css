@@ -98,6 +98,18 @@
 
   & .buttons {
     margin: 20px;
+    display: flex;
+
+    & button {
+      &:first-child {
+        margin-right: 10px;
+      }
+
+      & svg {
+        stroke: #fff;
+        transition: stroke 0.3s ease;
+      }
+    }
   }
 }
 

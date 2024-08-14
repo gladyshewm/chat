@@ -17,6 +17,7 @@ import Slider from '../../../Slider/Slider';
 import DrawOutline from '../../../DrawOutline/DrawOutline/DrawOutline';
 import { logoutButtonVariants } from '../../../../motion';
 import CustomLoader from '../../../CustomLoader/CustomLoader';
+import OptionButton from '../../../buttons/OptionButton/OptionButton';
 
 interface ProfileInfoProps {
   handleBackClick: () => void;
@@ -108,24 +109,21 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
       <div className="profile-settings">
         <DrawOutline orientation="horizontal" position="bottom">
           <div className="profile-settings__header">
-            <button className="back" onClick={handleBackClick}>
+            <OptionButton className="back" onClick={handleBackClick}>
               <ArrowLeftIcon />
-            </button>
+            </OptionButton>
             <div className="settings-title">
               <p>Профиль</p>
               <div className="settings-title_buttons">
-                <button
+                <OptionButton
                   className="edit-button"
-                  onClick={() => handlePencilClick()}
+                  onClick={handlePencilClick}
                 >
                   <PencilIcon />
-                </button>
-                <button
-                  className="exit-button"
-                  onClick={() => handleExitClick()}
-                >
+                </OptionButton>
+                <OptionButton className="exit-button" onClick={handleExitClick}>
                   <EllipsisVerticalIcon />
-                </button>
+                </OptionButton>
               </div>
             </div>
           </div>

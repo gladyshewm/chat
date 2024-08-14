@@ -1,0 +1,17 @@
+.option-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgba(153, 153, 153, 0.3);
+    transition: background-color 0.3s ease;
+  }
+}
