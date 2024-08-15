@@ -19,7 +19,6 @@ import { ChatWithoutMessages, UserWithAvatar } from '../../../types.generated';
 import DrawOutline from '../../DrawOutline/DrawOutline/DrawOutline';
 import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import UserIcon from '../../../icons/UserIcon';
-import SearchIcon from '../../../icons/SearchIcon';
 import ArrowLeftIcon from '../../../icons/ArrowLeftIcon';
 import {
   avatarVariants,
@@ -28,6 +27,7 @@ import {
 } from '../../../motion';
 import renderChats from './Chats/Chats';
 import renderSearchResults from './Search/Search';
+import SearchInput from '../../inputs/SearchInput/SearchInput';
 
 interface MessagesListProps {
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
@@ -153,16 +153,11 @@ const MessagesList: FC<MessagesListProps> = ({ setIsProfileSettings }) => {
               animate={isSearch ? 'visible' : 'hidden'}
             >
               <DrawOutlineRect className="search-input-wrapper" rx={20}>
-                <div className="search-input-container">
-                  <input
-                    ref={inputRef}
-                    className="search-input"
-                    type="text"
-                    placeholder=" "
-                    onClick={() => setIsSearch(true)}
-                  />
-                  <SearchIcon />
-                </div>
+                <SearchInput
+                  ref={inputRef}
+                  className="search-input"
+                  onClick={() => setIsSearch(true)}
+                />
               </DrawOutlineRect>
             </motion.div>
           </AnimatePresence>

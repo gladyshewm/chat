@@ -8,4 +8,5 @@ export * from './animations/sliderAnimations';
 export * from './animations/authAnimations';
 export * from './animations/avatarAnimations';
 export * from './animations/loaderAnimations';
+export * from './animations/searchMessagesAnimations';
 export * from './constants';

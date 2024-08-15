@@ -12,7 +12,7 @@ import XmarkIcon from '../../../../icons/XmarkIcon';
 import CheckIcon from '../../../../icons/CheckIcon';
 import DrawOutline from '../../../DrawOutline/DrawOutline/DrawOutline';
 import CustomButton from '../../../buttons/CustomButton/CustomButton';
-import CustomInput from '../../../CustomInput/CustomInput';
+import CustomInput from '../../../inputs/CustomInput/CustomInput';
 import DrawOutlineRect from '../../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import CheckCircleIcon from '../../../../icons/CheckCircleIcon';
 import ExclamationTriangleIcon from '../../../../icons/ExclamationTriangleIcon';

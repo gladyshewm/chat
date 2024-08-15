@@ -14,17 +14,19 @@ import {
   TypingFeedback,
   UserInfo,
 } from '../../types.generated';
+import { getParticipants } from '../../utils/chat';
 import Messages from './Messages/Messages';
-import MessageForm from './MessageForm/MessageForm';
+import OptionButton from '../../components/buttons/OptionButton/OptionButton';
 import CustomLoader from '../../components/CustomLoader/CustomLoader';
 import SpaceBackground from '../Main/SpaceBackground/SpaceBackground';
 import DrawOutlineRect from '../../components/DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import DrawOutline from '../../components/DrawOutline/DrawOutline/DrawOutline';
 import UserGroupIcon from '../../icons/UserGroupIcon';
 import PencilIcon from '../../icons/PencilIcon';
-import OptionButton from '../../components/buttons/OptionButton/OptionButton';
 import SearchIcon from '../../icons/SearchIcon';
 import EllipsisVerticalIcon from '../../icons/EllipsisVerticalIcon';
+import SearchMessages from './SearchMessages/SearchMessages';
+import MessageForm from '../../components/forms/MessageForm/MessageForm';
 
 const Chat = () => {
   const { user } = useAuth();
@@ -34,6 +36,7 @@ const Chat = () => {
   const [chatQuery, { data, loading, error }] = useChatByIdLazyQuery();
   const [sendTypingStatus] = useSendTypingStatusMutation();
   const [typingStatus, setTypingStatus] = useState<TypingFeedback | null>(null);
+  const [isSearch, setIsSearch] = useState(false);
 
   useEffect(() => {
     chatQuery({
@@ -46,21 +49,6 @@ const Chat = () => {
   useEffect(() => {
     if (data) setChat(data?.chatById as ChatWithoutMessages);
   }, [data]);
-
-  const getParticipants = (count: number) => {
-    const lastDigit = count % 10;
-    const lastTwoDigits = count % 100;
-
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
-      return `${count} участников`;
-    } else if (lastDigit === 1) {
-      return `${count} участник`;
-    } else if (lastDigit >= 2 && lastDigit <= 4) {
-      return `${count} участника`;
-    } else {
-      return `${count} участников`;
-    }
-  };
 
   const sendMessage = (message: string) => {
     if (chat_id && message) {
@@ -163,7 +151,10 @@ const Chat = () => {
                     </div>
                   )}
                 <div className="buttons">
-                  <OptionButton className="search">
+                  <OptionButton
+                    className="search"
+                    onClick={() => setIsSearch(!isSearch)}
+                  >
                     <SearchIcon />
                   </OptionButton>
                   <OptionButton>
@@ -185,6 +176,7 @@ const Chat = () => {
           </>
         )}
       </div>
+      <SearchMessages isSearch={isSearch} setIsSearch={setIsSearch} />
       {loading && <CustomLoader />}
     </motion.div>
   );

@@ -2,6 +2,7 @@
   perspective: 1000px;
   transform-style: preserve-3d;
   background-color: var(--base-color);
+  width: 400px;
   min-width: 400px;
   height: 100vh;
   z-index: 1;

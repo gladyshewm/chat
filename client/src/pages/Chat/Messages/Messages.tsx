@@ -66,18 +66,17 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleScroll = () => {
-    if (containerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-      const isAtBottom =
-        Number((scrollHeight - scrollTop).toFixed(0)) === clientHeight ||
-        Number((scrollHeight - scrollTop).toFixed(0)) === clientHeight + 1;
-
-      setIsScrolled(!isAtBottom);
-    }
-  };
-
   useEffect(() => {
+    const handleScroll = () => {
+      if (containerRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+        const isAtBottom =
+          Math.abs(scrollHeight - scrollTop - clientHeight) < 1;
+
+        setIsScrolled(!isAtBottom);
+      }
+    };
+
     const container = containerRef.current;
 
     if (container) {

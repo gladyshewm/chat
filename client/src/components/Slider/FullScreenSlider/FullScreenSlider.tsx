@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { format } from 'date-fns';
 import './FullScreenSlider.css';
 import { useFullScreen } from '../../../hooks/useFullScreen';
 import {
@@ -8,12 +9,13 @@ import {
   imageVariants,
   sliderVariants,
 } from '../../../motion';
-import DownLoadButton from '../../DownLoadButton/DownLoadButton';
 import ChevronLeft from '../../../icons/ChevronLeftIcon';
 import XmarkIcon from '../../../icons/XmarkIcon';
 import TrashIcon from '../../../icons/TrashIcon';
 import CustomLoader from '../../CustomLoader/CustomLoader';
 import { useProfile } from '../../../hooks/useProfile';
+import DownLoadButton from '../../buttons/DownLoadButton/DownLoadButton';
+import { ru } from 'date-fns/locale';
 
 const FullScreenSlider = () => {
   const [direction, setDirection] = useState(0);
@@ -116,7 +118,13 @@ const FullScreenSlider = () => {
           </button>
           <div className="slider-info">
             <p>Фото загружено</p>
-            <p>{createdAt}</p>
+            <p>
+              {String(
+                format(new Date(Number(createdAt)), 'Pp', {
+                  locale: ru,
+                }),
+              )}
+            </p>
           </div>
         </motion.div>
       </motion.div>

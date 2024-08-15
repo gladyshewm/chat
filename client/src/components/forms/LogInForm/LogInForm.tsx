@@ -1,13 +1,13 @@
 import React, { FC, useState } from 'react';
 import { Formik, Form } from 'formik';
-import { validationLoginSchema } from '../../utils/validate';
-import CustomInput from '../CustomInput/CustomInput';
-import CustomButton from '../buttons/CustomButton/CustomButton';
-import useAuth from '../../hooks/useAuth';
-import { LoginSchema } from '../../utils/validationSchemas';
+import { validationLoginSchema } from '../../../utils/validate';
+import CustomInput from '../../inputs/CustomInput/CustomInput';
+import CustomButton from '../../buttons/CustomButton/CustomButton';
+import useAuth from '../../../hooks/useAuth';
+import { LoginSchema } from '../../../utils/validationSchemas';
 import './LogInForm.css';
-import DrawOutlineRect from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';
-import CustomLoader from '../CustomLoader/CustomLoader';
+import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
+import CustomLoader from '../../CustomLoader/CustomLoader';
 
 interface LogInFormProps {
   handleCreateAccountClick: (e: React.MouseEvent<HTMLButtonElement>) => void;

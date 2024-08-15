@@ -1,12 +1,12 @@
 import React, { FC, useState } from 'react';
 import { Formik, Form } from 'formik';
-import { validationCreateAccSchema } from '../../utils/validate';
-import CustomInput from '../CustomInput/CustomInput';
-import CustomButton from '../buttons/CustomButton/CustomButton';
-import useAuth from '../../hooks/useAuth';
-import { CreateAccSchema } from '../../utils/validationSchemas';
-import DrawOutlineRect from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';
-import CustomLoader from '../CustomLoader/CustomLoader';
+import { validationCreateAccSchema } from '../../../utils/validate';
+import CustomInput from '../../inputs/CustomInput/CustomInput';
+import CustomButton from '../../buttons/CustomButton/CustomButton';
+import useAuth from '../../../hooks/useAuth';
+import { CreateAccSchema } from '../../../utils/validationSchemas';
+import DrawOutlineRect from '../../DrawOutline/DrawOutlineRect/DrawOutlineRect';
+import CustomLoader from '../../CustomLoader/CustomLoader';
 
 const CreateAccForm: FC = () => {
   const { register, loadingStates } = useAuth();

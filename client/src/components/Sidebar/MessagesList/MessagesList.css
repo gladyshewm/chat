@@ -62,32 +62,7 @@
   }
 
   & .search-input-container {
-    position: relative;
     height: 100%;
-
-    & .search-input {
-      box-sizing: border-box;
-      width: 100%;
-      /* height: 45px; */
-      height: 100%;
-      border: none;
-      background-color: transparent;
-      color: #fff;
-      border-radius: 20px;
-      outline: none;
-      padding: 0 15px 0 45px;
-      font-size: 14px;
-    }
-
-    & svg {
-      position: absolute;
-      top: 50%;
-      left: 15px;
-      transform: translateY(-50%);
-      pointer-events: none;
-      stroke: var(--outline-main-color);
-      transition: stroke 0.3s ease;
-    }
   }
 
   &:hover {
@@ -97,16 +72,17 @@
       transition: stroke 0.3s ease;
     }
   }
-}
 
-.search-input-wrapper:focus-within .draw-outline-rect-rect,
-.search-input-wrapper:focus-within .search-input-container svg,
-.search-input-wrapper
-  .search-input:not(:placeholder-shown)
-  ~ .draw-outline-rect-svg
-  .draw-outline-rect-rect,
-.search-input-wrapper .search-input:not(:placeholder-shown) ~ svg {
-  stroke: #fff;
+  &:focus-within {
+    .draw-outline-rect-rect,
+    .search-input-container svg {
+      stroke: #fff;
+    }
+  }
+
+  & .search-input:not(:placeholder-shown) ~ svg {
+    stroke: #fff;
+  }
 }
 
 .message-list {

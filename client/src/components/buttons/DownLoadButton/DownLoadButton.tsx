@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes, FC, ReactNode } from 'react';
 import './DownLoadButton.css';
-import DocumentArrowDownIcon from '../../icons/DocumentArrowDownIcon';
-import { Avatar } from '../../hoc/FullScreen/FullScreenContext';
+import { Avatar } from '../../../hoc/FullScreen/FullScreenContext';
+import DocumentArrowDownIcon from '../../../icons/DocumentArrowDownIcon';
 
 interface DownLoadButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   image: Avatar;

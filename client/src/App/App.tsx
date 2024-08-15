@@ -6,11 +6,13 @@ import { AuthProvider } from '../hoc/Auth/AuthProvider';
 
 const App = () => {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <div className="App">
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </div>
   );
 };
 
