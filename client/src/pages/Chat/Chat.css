@@ -5,15 +5,15 @@
   background-color: var(--base-color);
   width: 100%;
   height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
 
   & .chat-content {
     position: relative;
     z-index: 3;
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    height: 100%;
   }
 
   & .draw-outline-wrapper {
@@ -32,14 +32,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 80px;
+  height: 5.7rem;
   width: 100%;
   background-color: var(--base-color);
 
   & .main {
     display: flex;
     align-items: center;
-    margin: 20px;
+    margin: 0 20px;
 
     & .chat__avatar {
       height: 50px;
@@ -85,10 +85,10 @@
   & .feedback {
     position: absolute;
     left: 50%;
-    bottom: 10px;
+    bottom: 1rem;
     transform: translateX(-50%);
     color: var(--col3);
-    font-size: 14px;
+    font-size: 1rem;
 
     & svg {
       width: 12px;
@@ -101,8 +101,10 @@
     display: flex;
 
     & button {
-      &:first-child {
-        margin-right: 10px;
+      margin-right: 10px;
+
+      &:last-child {
+        margin-right: 0;
       }
 
       & svg {
@@ -120,5 +122,17 @@
   & .chat-separator {
     border-color: rgba(112, 112, 112, 0.3);
     margin: 0 150px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .chat {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 }

@@ -55,34 +55,35 @@ const Modal: FC<ModalProps> = ({
           <motion.div
             variants={modalVariants}
             transition={modalTransition}
-            className="modal__content"
             ref={contentRef}
           >
-            <div className="modal__buttons">
-              {showBackButton && (
-                <DrawOutline rx="50%">
+            <div className="modal__main">
+              <div className="modal__buttons">
+                {showBackButton && (
+                  <DrawOutline className="modal__back" rx="50%">
+                    <button
+                      onClick={handleBackClick}
+                      title="Назад"
+                      type="button"
+                      className="modal__close"
+                    >
+                      <ChevronLeftIcon />
+                    </button>
+                  </DrawOutline>
+                )}
+                <DrawOutline className="modal__back" rx="50%">
                   <button
-                    onClick={handleBackClick}
-                    title="Назад"
+                    title="Закрыть"
                     type="button"
                     className="modal__close"
+                    onClick={() => setActive(false)}
                   >
-                    <ChevronLeftIcon />
+                    <XmarkIcon />
                   </button>
                 </DrawOutline>
-              )}
-              <DrawOutline rx="50%">
-                <button
-                  title="Закрыть"
-                  type="button"
-                  className="modal__close"
-                  onClick={() => setActive(false)}
-                >
-                  <XmarkIcon />
-                </button>
-              </DrawOutline>
+              </div>
+              <div className="modal__content">{children}</div>
             </div>
-            {children}
           </motion.div>
         </DrawOutline>
       </motion.div>

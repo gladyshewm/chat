@@ -1,7 +1,6 @@
 export const searchVariants = {
   hidden: {
     x: '100%',
-    // opacity: 0,
     transition: {
       type: 'spring',
       stiffness: 300,
@@ -10,7 +9,6 @@ export const searchVariants = {
   },
   visible: {
     x: 0,
-    // opacity: 1,
     transition: {
       type: 'spring',
       stiffness: 300,

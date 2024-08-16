@@ -1,5 +1,6 @@
 .custom-button {
-    padding: 10px 20px;
+    box-sizing: border-box;
+    padding: 0.7rem 1.4rem;
     border-radius: 15px;
     border: none;
     /* background-image: linear-gradient(160deg, var(--col1) 0%, var(--col2) 100%); */
@@ -7,9 +8,9 @@
     transition: background-color 0.3s ease;
     /* transition: --col1 0.7s ease, --col2 0.7s ease; */
     color: #fff;
-    width: 200px;
-    height: 40px;
-    font-size: 14px;
+    width: 14.3rem;
+    height: 2.85rem;
+    font-size: 1rem;
 
     &:hover {
         cursor: pointer;

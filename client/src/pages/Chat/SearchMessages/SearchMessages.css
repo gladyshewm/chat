@@ -1,8 +1,7 @@
 .search-messages {
   background-color: var(--base-color);
   height: 100%;
-  width: 400px;
-  min-width: 400px;
+  min-width: 28rem;
 
   & .search-messages__wrapper {
     height: 100%;
@@ -16,46 +15,8 @@
 .search-messages__header {
   display: flex;
   align-items: center;
-  height: 80px;
+  height: 5.7rem;
   width: 100%;
-
-  & .close-button-wrapper {
-    margin-left: 15px;
-  }
-
-  & .close-button {
-    box-sizing: border-box;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 50px;
-    width: 50px;
-    border-radius: 50%;
-    font-size: 18px;
-
-    & svg {
-      stroke: var(--outline-main-color);
-      transition: stroke 0.3s ease;
-    }
-
-    & ~ .draw-outline-rect-svg > .draw-outline-rect-rect {
-      transition: stroke 0.3s ease;
-    }
-
-    &:hover {
-      cursor: pointer;
-
-      & ~ .draw-outline-rect-svg > .draw-outline-rect-rect {
-        stroke: #fff;
-        transition: stroke 0.3s ease;
-      }
-
-      & svg {
-        stroke: #fff;
-        transition: stroke 0.3s ease;
-      }
-    }
-  }
 
   & .search-input-wrapper {
     flex-grow: 1;

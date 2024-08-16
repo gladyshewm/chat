@@ -5,12 +5,7 @@ import DrawOutline from '../../../components/DrawOutline/DrawOutline/DrawOutline
 import SearchInput from '../../../components/inputs/SearchInput/SearchInput';
 import DrawOutlineRect from '../../../components/DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import SearchIllustration from '../../../components/Sidebar/MessagesList/Search/SearchIllustration/SearchIllustration';
-import {
-  backButtonVariants,
-  contentVariants,
-  searchVariants,
-} from '../../../motion';
-import XmarkIcon from '../../../icons/XmarkIcon';
+import { contentVariants, searchVariants } from '../../../motion';
 
 interface SearchMessagesProps {
   isSearch: boolean;
@@ -22,6 +17,7 @@ const SearchMessages: FC<SearchMessagesProps> = ({ isSearch, setIsSearch }) => {
     <AnimatePresence>
       {isSearch && (
         <motion.div
+          key={'search'}
           className="search-messages"
           variants={searchVariants}
           initial="hidden"
@@ -40,19 +36,6 @@ const SearchMessages: FC<SearchMessagesProps> = ({ isSearch, setIsSearch }) => {
                 initial="hidden"
                 animate="visible"
               >
-                <DrawOutlineRect className="close-button-wrapper" rx={'50%'}>
-                  <motion.div
-                    key="closeButton"
-                    className="close-button"
-                    onClick={() => setIsSearch(false)}
-                    variants={backButtonVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit="exit"
-                  >
-                    <XmarkIcon />
-                  </motion.div>
-                </DrawOutlineRect>
                 <DrawOutlineRect className="search-input-wrapper" rx={20}>
                   <SearchInput />
                 </DrawOutlineRect>

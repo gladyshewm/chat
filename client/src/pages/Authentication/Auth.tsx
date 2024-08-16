@@ -33,7 +33,11 @@ const Auth = () => {
       ) : (
         <>
           <DrawOutline strokeWidth={2} rx="15px">
-            <CustomButton onClick={() => setModalActive(true)} type="button">
+            <CustomButton
+              className="login-button"
+              onClick={() => setModalActive(true)}
+              type="button"
+            >
               Войти
             </CustomButton>
           </DrawOutline>
@@ -45,6 +49,7 @@ const Auth = () => {
           >
             {isLoginForm ? (
               <motion.div
+                className="auth-form"
                 key="signIn"
                 initial="hidden"
                 animate="visible"

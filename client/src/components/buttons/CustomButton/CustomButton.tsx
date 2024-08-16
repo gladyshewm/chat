@@ -3,11 +3,16 @@ import './CustomButton.css';
 
 interface CustomButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
+  className?: string;
 }
 
-const CustomButton: FC<CustomButtonProps> = ({ children, ...props }) => {
+const CustomButton: FC<CustomButtonProps> = ({
+  children,
+  className,
+  ...props
+}) => {
   return (
-    <button className="custom-button" {...props}>
+    <button className={`custom-button ${className}`} {...props}>
       {children}
     </button>
   );

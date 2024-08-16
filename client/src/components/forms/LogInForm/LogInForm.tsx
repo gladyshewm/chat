@@ -51,19 +51,21 @@ const LogInForm: FC<LogInFormProps> = ({ handleCreateAccountClick }) => {
                 label="Пароль"
               />
             </DrawOutlineRect>
-            <DrawOutlineRect className="button-wrapper" rx="15px">
-              <CustomButton type="submit">Войти</CustomButton>
-            </DrawOutlineRect>
-            <DrawOutlineRect className="button-wrapper" rx="15px">
-              <CustomButton
-                type="button"
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                  handleCreateAccountClick(e)
-                }
-              >
-                Создать аккаунт
-              </CustomButton>
-            </DrawOutlineRect>
+            <div className="buttons">
+              <DrawOutlineRect className="button-wrapper" rx="15px">
+                <CustomButton type="submit">Войти</CustomButton>
+              </DrawOutlineRect>
+              <DrawOutlineRect className="button-wrapper" rx="15px">
+                <CustomButton
+                  type="button"
+                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+                    handleCreateAccountClick(e)
+                  }
+                >
+                  Создать аккаунт
+                </CustomButton>
+              </DrawOutlineRect>
+            </div>
           </Form>
         </Formik>
         {errorMessage && <div className="error-message">{errorMessage}</div>}

@@ -1,4 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import './Messages.css';
 import { Message, UserInfo } from '../../../types.generated';
@@ -94,13 +95,13 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
   const groupedMessages = groupMessagesByDate(messages);
 
   return (
-    <div className="message-container" ref={containerRef}>
+    <motion.div className="message-container" ref={containerRef}>
       {Object.keys(groupedMessages).map((date) => (
-        <div className="wrapper" key={date}>
-          <div className="date-divider">
+        <motion.div className="wrapper" key={date}>
+          <motion.div className="date-divider">
             <span>{date}</span>
-          </div>
-          <div className="messages-group">
+          </motion.div>
+          <motion.div className="messages-group">
             {groupedMessages[date].map((message, index, messagesArray) => {
               const isFirst =
                 index === 0 ||
@@ -110,7 +111,7 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
                 messagesArray[index + 1].userId !== message.userId;
 
               return (
-                <div
+                <motion.div
                   key={message.id}
                   className={
                     message.userId === user.uuid
@@ -119,15 +120,15 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
                   }
                 >
                   {message.userId !== user.uuid && isLast && (
-                    <div className="message-avatar">
+                    <motion.div className="message-avatar">
                       {message.avatarUrl ? (
                         <img src={message.avatarUrl} alt="avatar" />
                       ) : (
                         <p>{message.userName.slice(0, 1).toUpperCase()}</p>
                       )}
-                    </div>
+                    </motion.div>
                   )}
-                  <div
+                  <motion.div
                     className={
                       message.userId === user.uuid ? 'message_me' : 'message'
                     }
@@ -135,21 +136,21 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
                     {message.userId !== user.uuid && isFirst && (
                       <p className="message-username">{message.userName}</p>
                     )}
-                    <div className="message-main">
+                    <motion.div className="message-main">
                       <p className="message-text">{message.content}</p>
                       <p className="message-time">
                         {String(format(new Date(message.createdAt), 'HH:mm'))}
                       </p>
-                    </div>
-                  </div>
-                </div>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
               );
             })}
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       ))}
       <ScrollButton isScrolled={isScrolled} scrollToBottom={scrollToBottom} />
-    </div>
+    </motion.div>
   );
 };
 

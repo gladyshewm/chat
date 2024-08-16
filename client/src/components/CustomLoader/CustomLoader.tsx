@@ -30,7 +30,7 @@ const CustomLoader: React.FC<CustomLoaderProps> = ({
         >
           {[0, 1, 2].map((index) => (
             <motion.span
-              key={crypto.randomUUID()}
+              key={Math.random().toString()}
               className="loader-circle"
               style={{
                 backgroundColor: color,
