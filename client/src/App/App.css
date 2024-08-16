@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
 
 :root {
+  --small-font-size: 0.8rem;
+  --default-font-size: 1rem;
+  --large-font-size: 1.2rem;
+
   --base-color: #212121; /* rgba(33, 33, 33, 1); */
   --col1: #48dd93; /* rgba(72, 221, 147, 1); */
   --col2: #258770; /* rgba(37, 135, 112, 1); */
@@ -16,6 +20,10 @@
   font-family: 'Comfortaa';
 }
 
-.App {
-  background-color: var(--base-color);
+html {
+  font-size: 14px;
+
+  & body {
+    background-color: var(--base-color);
+  }
 }
