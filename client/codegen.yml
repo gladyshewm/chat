@@ -4,14 +4,16 @@ documents: 'src/**/*.graphql'
 debug: true
 watch: true
 generates:
-  ./src/types.generated.ts:
+  ./src/shared/types/types.generated.ts:
     plugins:
       - typescript
   ./src/:
     preset: near-operation-file
     presetConfig:
       extension: .generated.tsx
-      baseTypesPath: types.generated.ts
+      baseTypesPath: '~@shared/types'
     plugins:
       - typescript-operations
       - typescript-react-apollo
+    config:
+      withHooks: true

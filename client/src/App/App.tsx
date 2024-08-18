@@ -1,15 +1,19 @@
 import React from 'react';
 import './App.css';
-import AppRouter from './AppRouter';
-import { AuthProvider } from '../hoc/Auth/AuthProvider';
+import AppRouter from './routes/AppRouter';
+import { AuthProvider } from './providers/AuthProvider/AuthProvider';
+import { ApolloProvider } from '@apollo/client';
+import { apolloClient } from './apolloClient';
 
 const App = () => {
   return (
-    <div className="App">
+    <ApolloProvider client={apolloClient}>
       <AuthProvider>
-        <AppRouter />
+        <div className="App">
+          <AppRouter />
+        </div>
       </AuthProvider>
-    </div>
+    </ApolloProvider>
   );
 };
 
