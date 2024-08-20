@@ -97,6 +97,18 @@ export class ChatsResolver {
   }
 
   @UseGuards(JwtHttpAuthGuard)
+  @Query('findMessages')
+  async findMessages(
+    @Args('chatId') chatId: string,
+    @Args('query') query: string,
+  ): Promise<Message[]> {
+    return this.chatsService.findMessages(chatId, query);
+  }
+
+  //TODO: добавить удаление сообщений (у всех, только у себя)
+  //TODO: добавить изменение сообщения
+
+  @UseGuards(JwtHttpAuthGuard)
   @Mutation('sendTypingStatus')
   sendTypingStatus(
     @Args('chatId') chatId: string,

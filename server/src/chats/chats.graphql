@@ -48,6 +48,8 @@ type Query {
   "Запрос чата по ID (участники чата включают текущего пользователя)"
   chatById(chatId: ID!): ChatWithoutMessages
   chatMessages(chatId: ID!, limit: Int, offset: Int): [Message!]
+  "Поиск сообщения в чате по строке query"
+  findMessages(chatId: ID!, query: String!): [Message!]
 }
 
 type Mutation {

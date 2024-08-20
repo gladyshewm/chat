@@ -670,6 +670,59 @@ export class ChatsService {
     }
   }
 
+  async findMessages(chatId: string, query: string): Promise<Message[]> {
+    try {
+      const { data, error } = (await this.supabaseService
+        .getClient()
+        .from('messages')
+        .select(
+          `
+          message_id,
+          content,
+          created_at,
+          chat_id,
+          user_uuid,
+          is_read,
+          profiles:user_uuid (
+            name,
+            avatar_url
+          )
+          `,
+        )
+        .eq('chat_id', chatId)
+        .ilike('content', `%${query}%`)) as unknown as {
+        data: MessageData[];
+        error: any;
+      };
+
+      if (error) {
+        this.logger.error(`Ошибка при поиске сообщений: ${error.message}`);
+        throw new HttpException(
+          error.message,
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      if (!data) return [];
+
+      const messages: Message[] = data.map((message) => ({
+        id: message.message_id,
+        chatId: message.chat_id,
+        userId: message.user_uuid,
+        userName: message.profiles.name,
+        avatarUrl: message.profiles.avatar_url,
+        content: message.content,
+        createdAt: new Date(message.created_at),
+        isRead: message.is_read,
+      }));
+
+      return messages;
+    } catch (error) {
+      this.logger.error(`Ошибка при поиске сообщений: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async uploadChatAvatar(file: FileUpload, chatId: string): Promise<string> {
     const buffer = await this.readFile(file);
     const uniqueFilename = this.generateUniqueFilename(file.filename);
