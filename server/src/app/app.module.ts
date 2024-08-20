@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { ConfigModule } from '@nestjs/config';
+import { Request, Response } from 'express';
 import { join } from 'path';
 import { AppService } from './app.service';
+import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from '../users/users.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { AuthModule } from '../auth/auth.module';
-import { UploadScalar } from '../common/scalars/upload.scalar';
 import { ChatsModule } from '../chats/chats.module';
+import { MessagesModule } from 'messages/messages.module';
+import { UploadScalar } from '../common/scalars/upload.scalar';
 import { DateScalar } from '../common/scalars/date.scalar';
-import { Request, Response } from 'express';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Request, Response } from 'express';
     SupabaseModule,
     UsersModule,
     ChatsModule,
+    MessagesModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),

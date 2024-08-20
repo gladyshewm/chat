@@ -86,15 +86,15 @@ export abstract class IMutation {
 
     abstract deleteChat(chatId: string): boolean | Promise<boolean>;
 
-    abstract sendMessage(chatId: string, content: string): Message | Promise<Message>;
-
-    abstract sendTypingStatus(chatId: string, userName: string, isTyping: boolean): TypingFeedback | Promise<TypingFeedback>;
-
     abstract uploadChatAvatar(image: Upload, chatId: string): string | Promise<string>;
 
     abstract updateChatAvatar(image: Upload, chatId: string): string | Promise<string>;
 
     abstract deleteChatAvatar(chatId: string): Nullable<string> | Promise<Nullable<string>>;
+
+    abstract sendMessage(chatId: string, content: string): Message | Promise<Message>;
+
+    abstract sendTypingStatus(chatId: string, userName: string, isTyping: boolean): TypingFeedback | Promise<TypingFeedback>;
 
     abstract uploadAvatar(image: Upload): AvatarInfo | Promise<AvatarInfo>;
 

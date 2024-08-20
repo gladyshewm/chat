@@ -1,0 +1,39 @@
+scalar Date
+
+type Message {
+  id: ID!
+  chatId: ID!
+  userId: ID!
+  userName: String!
+  avatarUrl: String
+  content: String!
+  createdAt: Date!
+  isRead: Boolean!
+}
+
+type TypingFeedback {
+  chatId: ID!
+  userName: String!
+  isTyping: Boolean!
+}
+
+type Query {
+  "Список сообщений для определённого чата"
+  chatMessages(chatId: ID!, limit: Int, offset: Int): [Message!]
+  "Поиск сообщения в чате по строке query"
+  findMessages(chatId: ID!, query: String!): [Message!]
+}
+
+type Mutation {
+  sendMessage(chatId: ID!, content: String!): Message!
+  sendTypingStatus(
+    chatId: ID!
+    userName: String!
+    isTyping: Boolean!
+  ): TypingFeedback!
+}
+
+type Subscription {
+  messageSent(chatId: ID!): Message!
+  userTyping(chatId: ID!): TypingFeedback!
+}

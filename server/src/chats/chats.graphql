@@ -24,32 +24,13 @@ type UserWithAvatar {
   avatarUrl: String
 }
 
-type Message {
-  id: ID!
-  chatId: ID!
-  userId: ID!
-  userName: String!
-  avatarUrl: String
-  content: String!
-  createdAt: Date!
-  isRead: Boolean!
-}
-
-type TypingFeedback {
-  chatId: ID!
-  userName: String!
-  isTyping: Boolean!
-}
-
 type Query {
+  "Список чатов пользователя (без сообщений)"
   userChats: [ChatWithoutMessages!]!
   "Запрос одиночного чата с указанным пользователем"
   chatWithUser(userUuid: String!): ChatWithoutMessages
   "Запрос чата по ID (участники чата включают текущего пользователя)"
   chatById(chatId: ID!): ChatWithoutMessages
-  chatMessages(chatId: ID!, limit: Int, offset: Int): [Message!]
-  "Поиск сообщения в чате по строке query"
-  findMessages(chatId: ID!, query: String!): [Message!]
 }
 
 type Mutation {
@@ -61,18 +42,7 @@ type Mutation {
   у пользователя, который удалил чат.
   """
   deleteChat(chatId: ID!): Boolean!
-  sendMessage(chatId: ID!, content: String!): Message!
-  sendTypingStatus(
-    chatId: ID!
-    userName: String!
-    isTyping: Boolean!
-  ): TypingFeedback!
   uploadChatAvatar(image: Upload!, chatId: ID!): String!
   updateChatAvatar(image: Upload!, chatId: ID!): String!
   deleteChatAvatar(chatId: ID!): String
-}
-
-type Subscription {
-  messageSent(chatId: ID!): Message!
-  userTyping(chatId: ID!): TypingFeedback!
 }
