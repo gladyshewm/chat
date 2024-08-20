@@ -1,4 +1,3 @@
-import React, { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ApolloError } from '@apollo/client';
 import { motion } from 'framer-motion';
@@ -82,12 +81,12 @@ interface SearchProps {
   searchError: ApolloError | undefined;
 }
 
-const renderSearchResults: FC<SearchProps> = ({
+const renderSearchResults = ({
   searchValue,
   searchData,
   searchLoading,
   searchError,
-}) => {
+}: SearchProps) => {
   if (searchValue !== '' && searchLoading) {
     return (
       <div className="search-block">

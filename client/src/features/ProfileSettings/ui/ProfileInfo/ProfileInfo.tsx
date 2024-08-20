@@ -110,7 +110,9 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
         <DrawOutline orientation="horizontal" position="bottom">
           <div className="profile-settings__header">
             <OptionButton className="back" onClick={handleBackClick}>
-              <ArrowLeftIcon />
+              <abbr title="Назад">
+                <ArrowLeftIcon />
+              </abbr>
             </OptionButton>
             <div className="settings-title">
               <p>Профиль</p>
@@ -119,10 +121,14 @@ const ProfileInfo: FC<ProfileInfoProps> = ({
                   className="edit-button"
                   onClick={handlePencilClick}
                 >
-                  <PencilIcon />
+                  <abbr title="Редактировать профиль">
+                    <PencilIcon />
+                  </abbr>
                 </OptionButton>
                 <OptionButton className="exit-button" onClick={handleExitClick}>
-                  <EllipsisVerticalIcon />
+                  <abbr title="Действия">
+                    <EllipsisVerticalIcon />
+                  </abbr>
                 </OptionButton>
               </div>
             </div>

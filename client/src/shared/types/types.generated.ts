@@ -186,6 +186,8 @@ export type Query = {
   chatMessages?: Maybe<Array<Message>>;
   /** Запрос одиночного чата с указанным пользователем */
   chatWithUser?: Maybe<ChatWithoutMessages>;
+  /** Поиск сообщения в чате по строке query */
+  findMessages?: Maybe<Array<Message>>;
   /** Поиск пользователей (не включая текущего пользователя) */
   findUsers: Array<Maybe<UserWithAvatar>>;
   user?: Maybe<UserWithToken>;
@@ -210,6 +212,12 @@ export type QueryChatMessagesArgs = {
 
 export type QueryChatWithUserArgs = {
   userUuid: Scalars['String']['input'];
+};
+
+
+export type QueryFindMessagesArgs = {
+  chatId: Scalars['ID']['input'];
+  query: Scalars['String']['input'];
 };
 
 

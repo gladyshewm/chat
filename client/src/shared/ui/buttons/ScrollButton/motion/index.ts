@@ -8,7 +8,7 @@ export const scrollButtonVariants = {
     transition: { duration: FAST_ANIMATION_DURATION },
   },
   animate: {
-    opacity: 1,
+    opacity: 0.8,
     y: 0,
     rotate: 0,
     transition: { duration: FAST_ANIMATION_DURATION },

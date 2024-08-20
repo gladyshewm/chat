@@ -124,7 +124,9 @@ const EditProfile: FC<EditProfileProps> = ({ setIsProfileInfo }) => {
       <DrawOutline orientation="horizontal" position="bottom">
         <div className="edit-profile__header">
           <OptionButton className="back" onClick={handleBackClick}>
-            <ArrowLeftIcon />
+            <abbr title="Назад">
+              <ArrowLeftIcon />
+            </abbr>
           </OptionButton>
           <div className="edit-profile__title">
             <p>Редактирование профиля</p>

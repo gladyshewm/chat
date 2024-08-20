@@ -8,8 +8,6 @@ import {
   useSendTypingStatusMutation,
   useUserTypingSubscription,
 } from './chat.generated';
-import Messages from './Messages/Messages';
-import SearchMessages from './SearchMessages/SearchMessages';
 import { ChatWithoutMessages, TypingFeedback, UserInfo } from '@shared/types';
 import {
   DrawOutline,
@@ -24,8 +22,8 @@ import {
   XmarkIcon,
 } from '@shared/ui';
 import { useAuth } from '@app/providers/hooks/useAuth';
-import { MessageForm } from '@features';
-import { getParticipants } from '../utils';
+import { MessageForm, Messages, SearchMessages } from '@features';
+import { formatParticipants } from '../utils';
 
 const Chat = () => {
   const { user } = useAuth();
@@ -106,90 +104,106 @@ const Chat = () => {
 
   if (error) return <div>{`Ошибка: ${error.message}`}</div>;
 
+  const chatVariants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 },
+  };
+
+  const chatContentVariants = {
+    fullWidth: { width: '100%' },
+    partialWidth: { width: 'calc(100% - 28rem)' },
+  };
+
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="chat"
-    >
+    <motion.div className="chat" {...chatVariants}>
       <SpaceBackground />
-      <AnimatePresence mode="wait">
-        <motion.div layout className="chat-content">
-          {!chat ? (
-            <Loader />
-          ) : (
-            <>
-              <DrawOutline orientation="horizontal" position="bottom">
-                <motion.div className="chat__header">
-                  <motion.div className="main">
-                    {chat.isGroupChat ? (
-                      <>
-                        <DrawOutlineRect className="avatar-wrapper" rx="50%">
-                          <motion.div className="chat__avatar">
-                            {chat.groupAvatarUrl ? (
-                              <img
-                                src={`${chat.groupAvatarUrl}`}
-                                alt="chat-avatar"
-                              />
-                            ) : (
-                              <UserGroupIcon />
-                            )}
-                          </motion.div>
-                        </DrawOutlineRect>
-                        <motion.div className="chat__info">
-                          <span className="chat__name">{chat.name}</span>
-                          <motion.div className="chat__count">
-                            {getParticipants(chat.participants.length)}
-                          </motion.div>
+      <AnimatePresence initial={false}>
+        {!chat ? (
+          <Loader />
+        ) : (
+          <motion.div
+            key={chat.id}
+            className={`chat-content ${isSearch ? 'reduced' : ''}`}
+            variants={chatContentVariants}
+            initial="fullWidth"
+            animate={isSearch ? 'partialWidth' : 'fullWidth'}
+          >
+            <DrawOutline orientation="horizontal" position="bottom">
+              <motion.div className="chat__header">
+                <motion.div className="main">
+                  {chat.isGroupChat ? (
+                    <>
+                      <DrawOutlineRect className="avatar-wrapper" rx="50%">
+                        <motion.div className="chat__avatar">
+                          {chat.groupAvatarUrl ? (
+                            <img
+                              src={`${chat.groupAvatarUrl}`}
+                              alt="chat-avatar"
+                            />
+                          ) : (
+                            <UserGroupIcon />
+                          )}
                         </motion.div>
-                      </>
-                    ) : (
-                      <></>
-                    )}
-                  </motion.div>
-                  {typingStatus?.isTyping &&
-                    typingStatus.userName !== user?.name && (
-                      <motion.div className="feedback">
-                        <span>{typingStatus.userName}...</span>
-                        <PencilIcon />
+                      </DrawOutlineRect>
+                      <motion.div className="chat__info">
+                        <span className="chat__name">{chat.name}</span>
+                        <motion.div className="chat__count">
+                          {formatParticipants(chat.participants.length)}
+                        </motion.div>
                       </motion.div>
-                    )}
-                  <motion.div className="buttons">
-                    <OptionButton
-                      className="search"
-                      onClick={() => setIsSearch(!isSearch)}
-                    >
-                      <SearchIcon />
-                    </OptionButton>
-                    <OptionButton>
-                      <EllipsisVerticalIcon />
-                    </OptionButton>
-                    <OptionButton
-                      className="close-button"
-                      onClick={handleCloseButton}
-                    >
-                      <XmarkIcon />
-                    </OptionButton>
-                  </motion.div>
+                    </>
+                  ) : (
+                    <></> // TODO: add user avatar
+                  )}
                 </motion.div>
-              </DrawOutline>
-              <Messages user={user as UserInfo} chat_id={chat_id as string} />
-              <motion.div className="chat-separator__wrapper">
-                <hr className="chat-separator" />
+                {typingStatus?.isTyping &&
+                  typingStatus.userName !== user?.name && (
+                    <motion.div className="feedback">
+                      <span>{typingStatus.userName}...</span>
+                      <PencilIcon />
+                    </motion.div>
+                  )}
+                <motion.div className="buttons">
+                  <OptionButton
+                    className="search"
+                    onClick={() => setIsSearch(!isSearch)}
+                  >
+                    <abbr title="Поиск сообщений">
+                      <SearchIcon />
+                    </abbr>
+                  </OptionButton>
+                  <OptionButton>
+                    <abbr title="Настройки">
+                      <EllipsisVerticalIcon />
+                    </abbr>
+                  </OptionButton>
+                  <OptionButton
+                    className="close-button"
+                    onClick={handleCloseButton}
+                  >
+                    <abbr title="Закрыть чат">
+                      <XmarkIcon />
+                    </abbr>
+                  </OptionButton>
+                </motion.div>
               </motion.div>
+            </DrawOutline>
+            <motion.div className="chat__body">
+              <Messages user={user as UserInfo} chat_id={chat_id as string} />
+            </motion.div>
+            <motion.div className="chat__footer">
               <MessageForm
                 sendMessage={sendMessage}
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
               />
-            </>
-          )}
-        </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
-      <SearchMessages isSearch={isSearch} setIsSearch={setIsSearch} />
+      {isSearch && <SearchMessages chatId={chat_id as string} />}
       {loading && <Loader />}
     </motion.div>
   );

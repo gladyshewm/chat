@@ -1,0 +1,95 @@
+.search-messages {
+  z-index: 3;
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--base-color);
+  height: 100vh;
+  width: 28rem;
+  overflow-y: hidden;
+
+  & .search-messages__wrapper {
+    height: 100%;
+
+    & .search-input-wrapper {
+      height: 45px;
+    }
+  }
+}
+
+.search-messages__header {
+  display: flex;
+  align-items: center;
+  height: 5.7rem;
+  width: 100%;
+
+  & .search-input-wrapper {
+    flex-grow: 1;
+    margin: 0 15px;
+  }
+}
+
+.search-messages__main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(100% - 80px);
+
+  & .count {
+    width: 100%;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0.6rem 0;
+
+    & span {
+      margin-left: 1rem;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--outline-main-color);
+    }
+  }
+
+  & .search-list-block {
+    & .user-result__content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      color: var(--outline-main-color);
+
+      & .top {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        & .user-name {
+          color: #fff;
+        }
+
+        & .message-date {
+          font-size: 0.8rem;
+        }
+      }
+
+      & .message-content p {
+        width: 100%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .chat {
+    width: 100%;
+  }
+}

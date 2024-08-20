@@ -93,13 +93,13 @@ interface ChatsProps {
   activeChatId: string | undefined;
 }
 
-const renderChats: FC<ChatsProps> = ({
+const renderChats = ({
   user,
   chats,
   chatsLoading,
   chatsError,
   activeChatId,
-}) => {
+}: ChatsProps) => {
   if (chatsLoading) return <Loader />;
   if (chatsError) return <p>Error</p>;
   if (!chats) return <p>No messages</p>;

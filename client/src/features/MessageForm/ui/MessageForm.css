@@ -2,12 +2,14 @@
   box-sizing: border-box;
   display: flex;
   justify-content: space-between;
-  padding: 10px 150px;
   width: 100%;
 
   & .message-input-wrapper {
     width: 100%;
-    margin-right: 10px;
+    min-width: 21.5rem;
+    max-width: 80rem;
+    /* width: clamp(21.5rem, 100%, 80rem); */
+    margin-right: 0.8rem;
   }
 
   & .message-input {
@@ -15,7 +17,6 @@
     flex-grow: 1;
     width: 100%;
     height: 50px;
-    font-size: 14px;
     border: none;
     border-radius: 15px;
     outline: none;
@@ -53,11 +54,19 @@
   background-color: var(--base-color);
   transition: background-color 0.3s ease;
 
-  & svg {
-    stroke: var(--outline-main-color);
-    transition: stroke 0.3s ease;
-    width: 50%;
-    height: 50%;
+  & abbr {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & svg {
+      stroke: var(--outline-main-color);
+      transition: stroke 0.3s ease;
+      width: 50%;
+      height: 50%;
+    }
   }
 
   &:hover {

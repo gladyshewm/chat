@@ -44,7 +44,9 @@ const MessageForm: FC<MessageFormProps> = ({
           </DrawOutlineRect>
           <DrawOutlineRect rx={'50%'} className="send-button-wrapper">
             <button type="submit" className="send-button">
-              <SendIcon />
+              <abbr title="Отправить сообщение">
+                <SendIcon />
+              </abbr>
             </button>
           </DrawOutlineRect>
         </Form>

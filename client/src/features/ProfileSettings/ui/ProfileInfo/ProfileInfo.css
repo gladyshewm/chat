@@ -9,11 +9,20 @@
     height: 80px;
 
     & .back {
-      margin-left: 15px;
+      margin-left: 1.5rem;
 
-      & svg {
-        stroke: #fff;
-        transition: stroke 0.3s ease;
+      & abbr {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        width: 100%;
+        height: 100%;
+
+        & svg {
+          stroke: #fff;
+          transition: stroke 0.3s ease;
+        }
       }
     }
 
@@ -23,26 +32,37 @@
       align-items: center;
       justify-content: space-between;
       height: 40px;
-      padding-left: 10px;
+      padding-left: 0.7rem;
 
       & p {
-        font-size: 20px;
-        font-weight: 800;
+        font-size: 1.3rem;
+        font-weight: bold;
         color: #fff;
       }
 
       & .settings-title_buttons {
         display: flex;
         align-items: center;
-        padding-right: 5px;
+        margin-right: 1.5rem;
 
         & .edit-button,
         .exit-button {
-          margin-right: 10px;
+          &:first-child {
+            margin-right: 0.8rem;
+          }
 
-          & svg {
-            stroke: #fff;
-            transition: stroke 0.3s ease;
+          & abbr {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 100%;
+            height: 100%;
+
+            & svg {
+              stroke: #fff;
+              transition: stroke 0.3s ease;
+            }
           }
         }
       }

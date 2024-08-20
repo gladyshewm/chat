@@ -1,0 +1,12 @@
+query findMessages($chatId: ID!, $query: String!) {
+  findMessages(chatId: $chatId, query: $query) {
+    id
+    chatId
+    userId
+    userName
+    avatarUrl
+    content
+    createdAt
+    isRead
+  }
+}

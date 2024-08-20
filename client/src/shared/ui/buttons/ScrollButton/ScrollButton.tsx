@@ -21,7 +21,11 @@ export const ScrollButton: FC<ScrollButtonProps> = ({
           className="scroll-bottom"
           onClick={scrollToBottom}
           variants={scrollButtonVariants}
-          whileHover={{ scale: 1.1, transition: { duration: 0.01 } }}
+          whileHover={{
+            opacity: 1,
+            scale: 1.1,
+            transition: { duration: 0.01 },
+          }}
           initial="hidden"
           animate="animate"
           exit="exit"
