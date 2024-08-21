@@ -19,6 +19,7 @@ input ChangeCredentialsInput {
 }
 
 type Query {
+  "Список всех пользователей"
   users: [UserWithAvatar!]!
   "Поиск пользователей (не включая текущего пользователя)"
   findUsers(input: String!): [UserWithAvatar]!

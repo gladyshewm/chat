@@ -1,5 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { SupabaseService } from '../supabase/supabase.service';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { FileUpload } from 'graphql-upload-ts';
 import {
   UserWithAvatar,
@@ -7,75 +12,71 @@ import {
   ChangeCredentialsInput,
   UserInfo,
 } from '../graphql';
-import { AvatarInfoData } from './types/users.types';
+import { UserWithAvatarData } from './models/users.model';
+import { USER_REPOSITORY, UserRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(private supabaseService: SupabaseService) {}
+  constructor(
+    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
+  ) {}
 
-  async getAllUsers(): Promise<UserWithAvatar[]> {
-    const { data: users, error } = await this.supabaseService
-      .getClient()
-      .from('profiles')
-      .select('uuid, name, avatar_url');
+  async getUser(userUuid: string): Promise<UserWithAvatarData> {
+    const user = await this.userRepository.getUser(userUuid);
 
-    if (error) {
-      this.logger.error('Ошибка получения пользователей:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    if (!user) {
+      throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
     }
 
-    const allUsers = users.map((user) => {
-      return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
-    });
+    return user;
+  }
 
-    return allUsers;
+  async getAllUsers(): Promise<UserWithAvatar[]> {
+    const users = await this.userRepository.getAllUsers();
+
+    return users.map((user) => ({
+      id: user.uuid,
+      name: user.name,
+      avatarUrl: user.avatar_url,
+    }));
   }
 
   async findUsers(input: string, userUuid: string): Promise<UserWithAvatar[]> {
-    const { data, error } = await this.supabaseService
-      .getClient()
-      .from('profiles')
-      .select('uuid, name, avatar_url')
-      .ilike('name', `%${input}%`);
+    const foundUsers = await this.userRepository.findUsers(input, userUuid);
 
-    if (error) {
-      this.logger.error('Ошибка поиска пользователей:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    const allUsers = data
-      .map((user) => {
-        return { id: user.uuid, name: user.name, avatarUrl: user.avatar_url };
-      })
-      .filter((user) => user.id !== userUuid);
-
-    return allUsers;
+    return foundUsers.map((user) => ({
+      id: user.uuid,
+      name: user.name,
+      avatarUrl: user.avatar_url,
+    }));
   }
 
   async uploadAvatar(file: FileUpload, userUuid: string): Promise<AvatarInfo> {
     const buffer = await this.readFile(file);
     const uniqueFilename = this.generateUniqueFilename(file.filename);
+    const filePath = `profiles/${userUuid}/${uniqueFilename}`;
 
-    await this.uploadAvatarToUserStorage(
+    await this.userRepository.uploadAvatarToUserStorage(
       buffer,
-      uniqueFilename,
+      filePath,
       file.mimetype,
-      userUuid,
     );
 
-    const publicURL = await this.getAvatarPublicUrl(uniqueFilename, userUuid);
+    const publicURL = await this.userRepository.getAvatarPublicUrl(
+      userUuid,
+      uniqueFilename,
+    );
 
-    await this.updateProfileAvatar(userUuid, publicURL);
+    await this.userRepository.updateProfileAvatar(userUuid, publicURL);
 
-    const createdAt = await this.getUserAvatarMetadata(
+    const createdAt = await this.userRepository.getUserAvatarMetadata(
       uniqueFilename,
       userUuid,
     );
 
     if (!createdAt) {
-      this.logger.error('Не удалось получить метаданные файла');
       throw new HttpException(
         'Не удалось получить метаданные файла',
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -89,6 +90,7 @@ export class UsersService {
     };
   }
 
+  // FIXME: create FileService?
   private async readFile(file: FileUpload): Promise<Buffer> {
     const { createReadStream } = file;
     const stream = createReadStream();
@@ -101,168 +103,33 @@ export class UsersService {
     return Buffer.concat(chunks);
   }
 
+  //FIXME: повторяется (в chatService)
   private generateUniqueFilename(filename: string): string {
     const fileExtension = filename.split('.').pop();
     return `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
   }
 
-  private async uploadAvatarToUserStorage(
-    buffer: Buffer,
-    filename: string,
-    mimetype: string,
-    userUuid: string,
-  ): Promise<void> {
-    const { error } = await this.supabaseService
-      .getClient()
-      .storage.from('avatars')
-      .upload(`profiles/${userUuid}/${filename}`, buffer, {
-        contentType: mimetype,
-        upsert: true,
-      });
-
-    if (error) {
-      this.logger.error('Ошибка загрузки аватара:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  private async getAvatarPublicUrl(
-    filename: string,
-    userUuid: string,
-  ): Promise<string> {
-    try {
-      const { data } = await this.supabaseService
-        .getClient()
-        .storage.from('avatars')
-        .getPublicUrl(`profiles/${userUuid}/${filename}`);
-
-      return data.publicUrl;
-    } catch (error) {
-      this.logger.error('Ошибка получения публичного URL:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  private async updateProfileAvatar(
-    userId: string,
-    publicURL: string | null,
-  ): Promise<void> {
-    const { error: updateError } = await this.supabaseService
-      .getClient()
-      .from('profiles')
-      .update({ avatar_url: publicURL })
-      .eq('uuid', userId);
-
-    if (updateError) {
-      this.logger.error('Ошибка обновления аватара:', updateError.message);
-      throw new HttpException(
-        updateError.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  private async getUserAvatarMetadata(
-    filename: string,
-    userUuid: string,
-  ): Promise<string | null> {
-    const filePath = `profiles/${userUuid}/${filename}`;
-
-    const { data: fileMetadata, error: metadataError } =
-      await this.supabaseService
-        .getClient()
-        .schema('storage')
-        .from('objects')
-        .select('created_at')
-        .eq('name', filePath);
-
-    if (metadataError) {
-      this.logger.error('Ошибка получения метаданных:', metadataError.message);
-      throw new HttpException(
-        metadataError.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    if (!fileMetadata[0]) {
-      this.logger.warn('Не удалось получить метаданные аватара пользователя');
-      return null;
-    }
-
-    return fileMetadata[0].created_at;
-  }
-
   async getUserAvatar(userUuid: string): Promise<AvatarInfo | null> {
-    const { data: profile, error } = await this.supabaseService
-      .getClient()
-      .from('profiles')
-      .select('avatar_url')
-      .eq('uuid', userUuid)
-      .single();
+    const profile = await this.userRepository.getCurrentUserAvatar(userUuid);
 
-    if (error) {
-      this.logger.warn('Ошибка получения аватара:', error.message);
-      return null;
-    }
-
-    if (!profile.avatar_url) return null;
-
-    const fileName = profile.avatar_url.split('/').pop();
-
-    if (!fileName) {
-      this.logger.error('Не удалось извлечь имя файла из URL аватара');
-      throw new HttpException(
-        'Не удалось извлечь имя файла из URL аватара',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    const createdAt = await this.getUserAvatarMetadata(fileName, userUuid);
-
-    if (!createdAt) return null;
+    if (!profile)
+      throw new HttpException('Аватар не найден', HttpStatus.NOT_FOUND);
 
     return {
-      url: profile.avatar_url,
-      name: fileName,
-      createdAt: new Date(createdAt),
+      url: profile.url,
+      name: profile.name,
+      createdAt: profile.created_at,
     };
   }
 
   async getUserAllAvatars(userUuid: string): Promise<AvatarInfo[]> {
-    try {
-      const { data, error } = (await this.supabaseService
-        .getClient()
-        .storage.from('avatars')
-        .list(`profiles/${userUuid}`, {
-          limit: 100,
-          offset: 0,
-          sortBy: { column: 'name', order: 'asc' },
-        })) as unknown as { data: AvatarInfoData[]; error: any };
+    const avatars = await this.userRepository.getUserAvatars(userUuid);
 
-      if (error) {
-        this.logger.error('Ошибка получения аватаров:', error.message);
-        throw new HttpException(
-          error.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      const avatarsInfo = await Promise.all(
-        data.map(async (file) => {
-          const publicUrl = await this.getAvatarPublicUrl(file.name, userUuid);
-          return {
-            url: publicUrl,
-            name: file.name,
-            createdAt: file.created_at,
-          };
-        }),
-      );
-
-      return avatarsInfo;
-    } catch (error) {
-      this.logger.error('Ошибка получения публичных URL:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return avatars.map((avatar) => ({
+      url: avatar.url,
+      name: avatar.name,
+      createdAt: avatar.created_at,
+    }));
   }
 
   async deleteAvatar(
@@ -270,31 +137,33 @@ export class UsersService {
     avatarUrl: string,
   ): Promise<string | null> {
     try {
-      const currentAvatar = await this.getCurrentProfileAvatar(userUuid);
+      const currentAvatar =
+        await this.userRepository.getCurrentUserAvatar(userUuid);
 
       if (!currentAvatar) {
         this.logger.error('Не удалось получить текущий аватар');
         return null;
       }
 
-      const isActiveAvatar = currentAvatar?.avatar_url === avatarUrl;
-      if (!isActiveAvatar) return currentAvatar.avatar_url;
+      const isActiveAvatar = currentAvatar.url === avatarUrl;
+      if (!isActiveAvatar) return currentAvatar.url;
 
       const avatarPathToDelete = avatarUrl.split('/').slice(-3).join('/');
-      await this.removeAvatarFromStorage(avatarPathToDelete);
+      await this.userRepository.removeAvatarFromStorage(avatarPathToDelete);
 
-      const files = await this.listUserAvatars(userUuid);
+      const files = await this.userRepository.getUserAvatars(userUuid);
 
       let newAvatarUrl: string;
 
       if (files && files.length > 0) {
-        const lastFile = files.sort((a, b) =>
+        /* const lastFile = files.sort((a, b) =>
           String(b.created_at).localeCompare(String(a.created_at)),
-        )[0];
+        )[0]; */
+        const lastFile = files[0];
 
-        const publicUrlData = await this.getAvatarPublicUrl(
-          lastFile.name,
+        const publicUrlData = await this.userRepository.getAvatarPublicUrl(
           userUuid,
+          lastFile.name,
         );
 
         newAvatarUrl = publicUrlData;
@@ -304,12 +173,12 @@ export class UsersService {
           return null;
         }
 
-        await this.updateProfileAvatar(userUuid, newAvatarUrl);
+        await this.userRepository.updateProfileAvatar(userUuid, newAvatarUrl);
 
         return newAvatarUrl;
       } else {
-        await this.updateProfileAvatar(userUuid, null);
-        return currentAvatar.avatar_url;
+        await this.userRepository.updateProfileAvatar(userUuid, null);
+        return currentAvatar.url;
       }
     } catch (error) {
       this.logger.error('Ошибка удаления аватара:', error.message);
@@ -317,104 +186,10 @@ export class UsersService {
     }
   }
 
-  private async getCurrentProfileAvatar(
-    userUuid: string,
-  ): Promise<{ avatar_url: string } | null> {
-    const { data: currentAvatar, error: fetchError } =
-      await this.supabaseService
-        .getClient()
-        .from('profiles')
-        .select('avatar_url')
-        .eq('uuid', userUuid)
-        .single();
-
-    if (fetchError) {
-      this.logger.error(`Ошибка получения аватара: ${fetchError.message}`);
-      throw new HttpException(
-        fetchError.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    if (!currentAvatar) {
-      return null;
-    }
-
-    return currentAvatar;
-  }
-
-  private async removeAvatarFromStorage(avatarPath: string): Promise<void> {
-    const { error: deleteError } = await this.supabaseService
-      .getClient()
-      .storage.from('avatars')
-      .remove([avatarPath]);
-
-    if (deleteError) {
-      this.logger.error(`Ошибка удаления аватара: ${deleteError.message}`);
-      throw new HttpException(
-        deleteError.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  private async listUserAvatars(userUuid: string): Promise<AvatarInfoData[]> {
-    const { data: files, error: listError } = (await this.supabaseService
-      .getClient()
-      .storage.from('avatars')
-      .list(`profiles/${userUuid}`)) as unknown as {
-      data: AvatarInfoData[];
-      error: any;
-    };
-
-    if (listError) {
-      this.logger.error(`Ошибка получения списка файлов: ${listError.message}`);
-      throw new HttpException(
-        listError.message,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-
-    return files;
-  }
-
   async changeCredentials(
     userUuid: string,
     credentials: ChangeCredentialsInput,
   ): Promise<UserInfo> {
-    try {
-      const { data, error } = await this.supabaseService
-        .getClient()
-        .rpc('change_user_credentials', {
-          p_user_uuid: userUuid,
-          p_name: credentials.name,
-          p_email: credentials.email,
-          p_password: credentials.password,
-        });
-
-      if (error) {
-        this.logger.error('Ошибка обновления учетных данных:', error.message);
-        throw new HttpException(
-          error.message,
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
-
-      if (!data) {
-        throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
-      }
-
-      return {
-        uuid: data.uuid,
-        name: data.name,
-        email: data.email,
-      };
-    } catch (error) {
-      this.logger.error(
-        'Ошибка вызова функции обновления учетных данных:',
-        error.message,
-      );
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return this.userRepository.changeCredentials(userUuid, credentials);
   }
 }

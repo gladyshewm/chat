@@ -50,7 +50,7 @@ export class UsersResolver {
 
   @UseGuards(JwtHttpAuthGuard)
   @Mutation('deleteAvatar')
-  async deleteChatAvatar(
+  async deleteAvatar(
     @Context('user_uuid') userUuid: string,
     @Args('avatarUrl') avatarUrl: string,
   ): Promise<string | null> {

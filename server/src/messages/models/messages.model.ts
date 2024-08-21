@@ -1,9 +1,9 @@
-export class Profile {
+export type Profile = {
   name: string;
   avatar_url: string;
-}
+};
 
-export class MessageData {
+export type MessageData = {
   message_id: string;
   chat_id: string;
   user_uuid: string;
@@ -11,4 +11,4 @@ export class MessageData {
   created_at: Date;
   is_read: boolean;
   profiles: Profile;
-}
+};
