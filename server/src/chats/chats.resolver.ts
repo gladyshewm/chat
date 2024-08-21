@@ -68,15 +68,6 @@ export class ChatsResolver {
   }
 
   @UseGuards(JwtHttpAuthGuard)
-  @Mutation('updateChatAvatar')
-  async updateChatAvatar(
-    @Args('image', { type: () => GraphQLUpload }) image: FileUpload,
-    @Args('chatId') chatId: string,
-  ): Promise<string | null> {
-    return this.chatsService.updateChatAvatar(image, chatId);
-  }
-
-  @UseGuards(JwtHttpAuthGuard)
   @Mutation('deleteChatAvatar')
   async deleteChatAvatar(
     @Args('chatId') chatId: string,

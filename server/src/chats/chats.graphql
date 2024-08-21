@@ -34,6 +34,10 @@ type Query {
 }
 
 type Mutation {
+  """
+  Создание чата.
+  Возвращаемый список участников содержит ID текущего пользователя (создателя).
+  """
   createChat(participantsIds: [ID!]!, name: String): ChatWithoutMessages!
   """
   Групповой чат удаляет создатель для всех.
@@ -43,6 +47,9 @@ type Mutation {
   """
   deleteChat(chatId: ID!): Boolean!
   uploadChatAvatar(image: Upload!, chatId: ID!): String!
-  updateChatAvatar(image: Upload!, chatId: ID!): String!
+  """
+  Удаление аватара чата.
+  Возвращаемая строка содержит URL нового аватара.
+  """
   deleteChatAvatar(chatId: ID!): String
 }
