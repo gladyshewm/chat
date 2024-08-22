@@ -97,8 +97,10 @@ export class UsersService {
   async getUserAvatar(userUuid: string): Promise<AvatarInfo | null> {
     const profile = await this.userRepository.getCurrentUserAvatar(userUuid);
 
-    if (!profile)
-      throw new HttpException('Аватар не найден', HttpStatus.NOT_FOUND);
+    if (!profile || !profile.url) {
+      this.logger.warn('Аватар пользователя не найден');
+      return null;
+    }
 
     return {
       url: profile.url,

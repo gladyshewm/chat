@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthMiddleware } from './middlewares/auth.middleware';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { AUTH_STRATEGY } from './strategies/auth-strategy.token';
+import { AUTH_REPOSITORY, SupabaseAuthRepository } from './auth.repository';
 
 @Module({
   imports: [
@@ -24,6 +25,10 @@ import { AUTH_STRATEGY } from './strategies/auth-strategy.token';
     {
       provide: AUTH_STRATEGY,
       useClass: JwtAuthStrategy,
+    },
+    {
+      provide: AUTH_REPOSITORY,
+      useClass: SupabaseAuthRepository,
     },
   ],
   exports: [AuthService, JwtModule, AUTH_STRATEGY],

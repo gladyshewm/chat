@@ -121,8 +121,8 @@ export class SupabaseChatRepository implements ChatRepository {
       );
 
     if (!userChats || userChats.length === 0) {
-      this.logger.warn(`Чаты не найдены`);
-      throw new HttpException('Chats not found', HttpStatus.NOT_FOUND);
+      this.logger.warn(`Чаты пользователя не найдены`);
+      return [];
     }
 
     const chatIds = userChats.map((chat) => chat.chat_id);

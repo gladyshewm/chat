@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
+  AuthError,
   createClient,
   PostgrestError,
   SupabaseClient,
@@ -9,6 +10,11 @@ import { ConfigService } from '@nestjs/config';
 export type SupabaseResponse<T> = {
   data: T | null;
   error: PostgrestError | null;
+};
+
+export type SupabaseAuthResponse<T> = {
+  data: T | null;
+  error: AuthError | null;
 };
 
 @Injectable()
@@ -38,6 +44,19 @@ export class SupabaseService {
     if (response.error) {
       this.logger.error(
         `Ошибка при обработке ответа от Supabase: ${response.error.message}`,
+      );
+      throw new Error(response.error.message);
+    }
+
+    return response.data;
+  }
+
+  public handleSupabaseAuthResponse<T>(
+    response: SupabaseAuthResponse<T>,
+  ): T | null {
+    if (response.error) {
+      this.logger.error(
+        `Ошибка при обработке ответа от Supabase auth: ${response.error.message}`,
       );
       throw new Error(response.error.message);
     }

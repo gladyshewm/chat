@@ -1,21 +1,23 @@
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   Logger,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { SupabaseService } from '../supabase/supabase.service';
-import { AuthPayload, UserInfo, UserWithToken } from '../graphql';
+import { AuthPayload, UserWithToken } from '../graphql';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Response } from 'express';
 import { LoginUserDto } from './dto/login-user.dto';
+import { AUTH_REPOSITORY, AuthRepository } from './auth.repository';
 
 @Injectable()
 export class AuthService {
-  constructor(private supabaseService: SupabaseService) {}
-
   private readonly logger = new Logger(AuthService.name);
+
+  constructor(
+    @Inject(AUTH_REPOSITORY) private authRepository: AuthRepository,
+  ) {}
 
   setRefreshTokenCookie(res: Response, refreshToken: string) {
     res.cookie('refreshToken', refreshToken, {
@@ -27,164 +29,35 @@ export class AuthService {
   }
 
   async refreshToken(): Promise<AuthPayload> {
-    try {
-      const { data, error } = await this.supabaseService
-        .getClient()
-        .auth.refreshSession();
-
-      if (error) {
-        this.logger.error('Ошибка обновления сессии:', error.message);
-        throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-      }
-
-      if (!data.user) {
-        this.logger.error('Ошибка обновления токена: пользователь не найден');
-        throw new UnauthorizedException();
-      }
-
-      if (!data.session) {
-        this.logger.error('Ошибка обновления токена: сессия не найдена');
-        throw new UnauthorizedException();
-      }
-
-      const user = {
-        uuid: data.user.id,
-        name: data.user.user_metadata.name,
-        email: data.user.email as string,
-      };
-
-      this.logger.log('Токен успешно обновлён');
-
-      return {
-        user,
-        accessToken: data.session.access_token,
-        refreshToken: data.session.refresh_token,
-      };
-    } catch (error) {
-      this.logger.error('Ошибка обновления токена:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return this.authRepository.refreshToken();
   }
 
   async getUser(token: string): Promise<UserWithToken | null> {
-    try {
-      const { data: userData } = await this.supabaseService
-        .getClient()
-        .auth.getUser(token);
-
-      if (!userData || userData.user === null) {
-        return null;
-      }
-
-      return {
-        user: {
-          uuid: userData.user.id,
-          name: userData.user.user_metadata.name,
-          email: userData.user.email as string,
-        },
-        token: token,
-      };
-    } catch (error) {
-      this.logger.error('Ошибка получения пользователя:', error.message);
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return this.authRepository.getUser(token);
   }
 
   async createUser(userInput: CreateUserDto): Promise<AuthPayload> {
-    const profile_id: string = Date.now().toString();
-    const { data, error: authError } = await this.supabaseService
-      .getClient()
-      .auth.signUp({
-        email: userInput.email,
-        password: userInput.password,
-        options: {
-          data: {
-            name: userInput.name,
-            profile_id: profile_id,
-          },
-        },
-      });
-
-    if (authError) {
-      this.logger.error('Ошибка при регистрации:', authError.message);
-      throw new HttpException(authError.message, HttpStatus.BAD_REQUEST);
-    }
-
-    if (!data.user) {
-      this.logger.error('Ошибка при регистрации: пользователь не создан');
-      throw new HttpException('Пользователь не создан', HttpStatus.BAD_REQUEST);
-    }
-
-    if (!data.session) {
-      this.logger.error('Ошибка при регистрации: сессия не создана');
-      throw new HttpException('Сессия не создана', HttpStatus.BAD_REQUEST);
-    }
-
-    await this.createUserProfile(data.user.id, profile_id, userInput.name);
-
-    const user: UserInfo = {
-      uuid: profile_id,
-      name: userInput.name,
-      email: userInput.email,
-    };
-
-    return {
-      user,
-      accessToken: data.session.access_token,
-      refreshToken: data.session.refresh_token,
-    };
+    const { name, email, password } = userInput;
+    return this.authRepository.createUser(name, email, password);
   }
 
-  private async createUserProfile(
-    userUuid: string,
-    profileId: string,
-    userName: string,
-  ): Promise<void> {
-    const { error: profileError } = await this.supabaseService
-      .getClient()
-      .from('profiles')
-      .insert({
-        id: profileId,
-        name: userName,
-        uuid: userUuid,
-      });
-
-    if (profileError) {
-      this.logger.error('Ошибка при регистрации:', profileError.message);
-      throw new HttpException(profileError.message, HttpStatus.BAD_REQUEST);
-    }
-  }
+  //TODO: add delete user
 
   async logInUser(
     loginData: LoginUserDto,
     res: Response,
   ): Promise<AuthPayload> {
     try {
-      const { data, error } = await this.supabaseService
-        .getClient()
-        .auth.signInWithPassword({
-          email: loginData.email,
-          password: loginData.password,
-        });
+      const { email, password } = loginData;
+      const data = await this.authRepository.logInUser(email, password);
+      const { user, accessToken, refreshToken } = data;
 
-      if (error) {
-        this.logger.error('Ошибка при входе в систему:', error.message);
-        throw new UnauthorizedException({ message: error.message });
-      }
-
-      const user = {
-        uuid: data.user.id,
-        name: data.user.user_metadata.name,
-        email: data.user.email as string,
-      };
-      const { access_token, refresh_token } = data.session;
-
-      this.setRefreshTokenCookie(res, refresh_token);
+      this.setRefreshTokenCookie(res, refreshToken);
 
       return {
         user,
-        accessToken: access_token,
-        refreshToken: refresh_token,
+        accessToken,
+        refreshToken,
       };
     } catch (error) {
       this.logger.error('Ошибка при входе в систему:', error.message);
@@ -193,24 +66,6 @@ export class AuthService {
   }
 
   async logOutUser(): Promise<boolean> {
-    const { data: session } = await this.supabaseService
-      .getClient()
-      .auth.getSession();
-
-    if (!session.session) {
-      this.logger.warn('Попытка выхода не авторизованного пользователя');
-      return false;
-    }
-
-    const { error } = await this.supabaseService
-      .getClient()
-      .auth.signOut({ scope: 'local' });
-
-    if (error) {
-      this.logger.error('Ошибка при выходе из системы:', error.message);
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
-    }
-
-    return true;
+    return this.authRepository.logOutUser();
   }
 }
