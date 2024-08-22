@@ -14,6 +14,7 @@ import {
 } from '../graphql';
 import { UserWithAvatarData } from './models/users.model';
 import { USER_REPOSITORY, UserRepository } from './users.repository';
+import { FilesService } from 'files/files.service';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +22,7 @@ export class UsersService {
 
   constructor(
     @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
+    private readonly filesService: FilesService,
   ) {}
 
   async getUser(userUuid: string): Promise<UserWithAvatarData> {
@@ -54,8 +56,10 @@ export class UsersService {
   }
 
   async uploadAvatar(file: FileUpload, userUuid: string): Promise<AvatarInfo> {
-    const buffer = await this.readFile(file);
-    const uniqueFilename = this.generateUniqueFilename(file.filename);
+    const buffer = await this.filesService.readFile(file);
+    const uniqueFilename = this.filesService.generateUniqueFilename(
+      file.filename,
+    );
     const filePath = `profiles/${userUuid}/${uniqueFilename}`;
 
     await this.userRepository.uploadAvatarToUserStorage(
@@ -88,25 +92,6 @@ export class UsersService {
       name: uniqueFilename,
       createdAt: new Date(createdAt),
     };
-  }
-
-  // FIXME: create FileService?
-  private async readFile(file: FileUpload): Promise<Buffer> {
-    const { createReadStream } = file;
-    const stream = createReadStream();
-    const chunks: Buffer[] = [];
-
-    for await (const chunk of stream) {
-      chunks.push(chunk);
-    }
-
-    return Buffer.concat(chunks);
-  }
-
-  //FIXME: повторяется (в chatService)
-  private generateUniqueFilename(filename: string): string {
-    const fileExtension = filename.split('.').pop();
-    return `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
   }
 
   async getUserAvatar(userUuid: string): Promise<AvatarInfo | null> {

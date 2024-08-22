@@ -10,6 +10,7 @@ import { FileUpload } from 'graphql-upload-ts';
 import { CHAT_REPOSITORY, ChatRepository } from './chats.repository';
 import { UsersService } from 'users/users.service';
 import { ChatWithParticipantsData } from './models/chats.model';
+import { FilesService } from 'files/files.service';
 
 @Injectable()
 export class ChatsService {
@@ -17,6 +18,7 @@ export class ChatsService {
 
   constructor(
     private usersService: UsersService,
+    private readonly filesService: FilesService,
     @Inject(CHAT_REPOSITORY) private chatRepository: ChatRepository,
   ) {}
 
@@ -202,8 +204,10 @@ export class ChatsService {
 
   async uploadChatAvatar(file: FileUpload, chatId: string): Promise<string> {
     try {
-      const buffer = await this.readFile(file);
-      const uniqueFilename = this.generateUniqueFilename(file.filename);
+      const buffer = await this.filesService.readFile(file);
+      const uniqueFilename = this.filesService.generateUniqueFilename(
+        file.filename,
+      );
       const filePath = `chats/${chatId}/${uniqueFilename}`;
 
       await this.chatRepository.uploadAvatarToChatStorage(
@@ -224,23 +228,6 @@ export class ChatsService {
       this.logger.error(`Ошибка загрузки аватара: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-  }
-
-  private async readFile(file: FileUpload): Promise<Buffer> {
-    const { createReadStream } = file;
-    const stream = createReadStream();
-    const chunks: Buffer[] = [];
-
-    for await (const chunk of stream) {
-      chunks.push(chunk);
-    }
-
-    return Buffer.concat(chunks);
-  }
-
-  private generateUniqueFilename(filename: string): string {
-    const fileExtension = filename.split('.').pop();
-    return `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
   }
 
   async deleteChatAvatar(chatId: string): Promise<string | null> {
