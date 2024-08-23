@@ -21,6 +21,7 @@ export interface AuthRepository {
   ): Promise<AuthPayload>;
   logInUser(email: string, password: string): Promise<AuthPayload>;
   logOutUser(): Promise<boolean>;
+  deleteUser(uuid: string): Promise<boolean>;
 }
 
 @Injectable()
@@ -224,5 +225,20 @@ export class SupabaseAuthRepository implements AuthRepository {
     }
 
     return true;
+  }
+
+  async deleteUser(uuid: string): Promise<boolean> {
+    const shouldSoftDelete = true;
+
+    const { data, error } = await this.supabaseService
+      .getAdminClient()
+      .auth.admin.deleteUser(uuid, shouldSoftDelete);
+
+    if (error) {
+      this.logger.error('Ошибка при удалении пользователя:', error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+
+    return !!data;
   }
 }

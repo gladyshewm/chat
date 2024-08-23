@@ -4,6 +4,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { AuthPayload, UserWithToken } from '../graphql';
 import { Request, Response } from 'express';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UseGuards } from '@nestjs/common';
+import { JwtHttpAuthGuard } from './guards/jwt-http-auth.guard';
 
 @Resolver('Auth')
 export class AuthResolver {
@@ -28,6 +30,12 @@ export class AuthResolver {
     @Args('createInput') createInput: CreateUserDto,
   ): Promise<AuthPayload> {
     return this.authService.createUser(createInput);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('deleteUser')
+  async deleteUser(@Context('user_uuid') uuid: string): Promise<boolean> {
+    return this.authService.deleteUser(uuid);
   }
 
   @Mutation('logInUser')

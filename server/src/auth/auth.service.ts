@@ -10,6 +10,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Response } from 'express';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AUTH_REPOSITORY, AuthRepository } from './auth.repository';
+import { USER_REPOSITORY, UserRepository } from 'users/users.repository';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
 
   constructor(
     @Inject(AUTH_REPOSITORY) private authRepository: AuthRepository,
+    @Inject(USER_REPOSITORY) private readonly userRepository: UserRepository,
   ) {}
 
   setRefreshTokenCookie(res: Response, refreshToken: string) {
@@ -41,7 +43,35 @@ export class AuthService {
     return this.authRepository.createUser(name, email, password);
   }
 
-  //TODO: add delete user
+  // TODO: тут в идеале транзакция
+  async deleteUser(uuid: string): Promise<boolean> {
+    try {
+      const avatars = await this.userRepository.getUserAvatars(uuid);
+
+      if (avatars && avatars.length > 0) {
+        await Promise.all(
+          avatars.map(async (file) => {
+            const isRemoved = await this.userRepository.removeAvatarFromStorage(
+              `profiles/${uuid}/${file.name}`,
+            );
+
+            if (!isRemoved) {
+              throw new Error(
+                `Не удалось удалить аватар из хранилища: ${file.name}`,
+              );
+            }
+          }),
+        );
+      }
+
+      await this.userRepository.deleteUserProfile(uuid);
+
+      return this.authRepository.deleteUser(uuid);
+    } catch (error) {
+      this.logger.error('Ошибка при удалении пользователя:', error.message);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
 
   async logInUser(
     loginData: LoginUserDto,

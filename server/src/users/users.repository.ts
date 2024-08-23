@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { SupabaseResponse, SupabaseService } from 'supabase/supabase.service';
 import { AvatarInfoData, UserWithAvatarData } from './models/users.model';
 import { ChangeCredentialsInput, UserInfo } from 'graphql';
+import { FileObject } from '@supabase/storage-js';
 
 export const USER_REPOSITORY = 'USER_REPOSITORY';
 
@@ -14,6 +15,7 @@ export interface UserRepository {
     userUuid: string,
     credentials: ChangeCredentialsInput,
   ): Promise<UserInfo>;
+  deleteUserProfile(userUuid: string): Promise<void>;
   // avatars
   uploadAvatarToUserStorage(
     buffer: Buffer,
@@ -27,8 +29,8 @@ export interface UserRepository {
   ): Promise<string | null>;
   updateProfileAvatar(userId: string, publicURL: string | null): Promise<void>;
   getCurrentUserAvatar(userUuid: string): Promise<AvatarInfoData | null>;
-  getUserAvatars(userUuid: string): Promise<AvatarInfoData[]>;
-  removeAvatarFromStorage(avatarPath: string): Promise<void>;
+  getUserAvatars(userUuid: string): Promise<FileObject[]>;
+  removeAvatarFromStorage(avatarPath: string): Promise<boolean>;
 }
 
 @Injectable()
@@ -92,6 +94,49 @@ export class SupabaseUserRepository implements UserRepository {
     return foundUsers.filter((user) => user.uuid !== userUuid);
   }
 
+  async changeCredentials(
+    userUuid: string,
+    credentials: ChangeCredentialsInput,
+  ): Promise<UserInfo> {
+    try {
+      const response = (await this.supabaseService
+        .getClient()
+        .rpc('change_user_credentials', {
+          p_user_uuid: userUuid,
+          p_name: credentials.name,
+          p_email: credentials.email,
+          p_password: credentials.password,
+        })) as SupabaseResponse<UserInfo>;
+
+      const data = this.supabaseService.handleSupabaseResponse(response);
+
+      if (!data) {
+        throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
+      }
+
+      return data;
+    } catch (error) {
+      this.logger.error(
+        'Ошибка вызова функции обновления учетных данных:',
+        error.message,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteUserProfile(userUuid: string): Promise<void> {
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('profiles')
+      .update({ is_deleted: true })
+      .eq('uuid', userUuid);
+
+    if (error) {
+      this.logger.error('Ошибка удаления профиля:', error.message);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async uploadAvatarToUserStorage(
     buffer: Buffer,
     filePath: string,
@@ -135,24 +180,38 @@ export class SupabaseUserRepository implements UserRepository {
     filename: string,
     userUuid: string,
   ): Promise<string | null> {
-    const filePath = `profiles/${userUuid}/${filename}`;
+    try {
+      const filePath = `profiles/${userUuid}/${filename}`;
 
-    const response = (await this.supabaseService
-      .getClient()
-      .schema('storage')
-      .from('objects')
-      .select('created_at')
-      .eq('name', filePath)
-      .single()) as SupabaseResponse<{ created_at: string }>;
+      const { data: fileMetadata, error } = (await this.supabaseService
+        .getClient()
+        .schema('storage')
+        .from('objects')
+        .select('created_at')
+        .eq('name', filePath)
+        .single()) as SupabaseResponse<{ created_at: string }>;
 
-    const fileMetadata = this.supabaseService.handleSupabaseResponse(response);
+      if (error) {
+        this.logger.error(
+          'Ошибка получения метаданных для аватара из хранилища:',
+          error.message,
+        );
+        return null;
+      }
 
-    if (!fileMetadata) {
-      this.logger.warn('Не удалось найти метаданные аватара пользователя');
-      return null;
+      if (!fileMetadata) {
+        this.logger.warn('Не удалось найти метаданные аватара пользователя');
+        return null;
+      }
+
+      return fileMetadata.created_at;
+    } catch (error) {
+      this.logger.error(
+        'Ошибка получения метаданных для аватара пользователя:',
+        error.message,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    return fileMetadata.created_at;
   }
 
   async updateProfileAvatar(
@@ -175,14 +234,20 @@ export class SupabaseUserRepository implements UserRepository {
   }
 
   async getCurrentUserAvatar(userUuid: string): Promise<AvatarInfoData | null> {
-    const response = (await this.supabaseService
+    const { data: profile, error } = (await this.supabaseService
       .getClient()
       .from('profiles')
       .select('avatar_url')
       .eq('uuid', userUuid)
       .single()) as SupabaseResponse<{ avatar_url: string }>;
 
-    const profile = this.supabaseService.handleSupabaseResponse(response);
+    if (error) {
+      this.logger.error(
+        'Ошибка получения аватара пользователя:',
+        error.message,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
     if (!profile || !profile.avatar_url) return null;
 
@@ -207,7 +272,7 @@ export class SupabaseUserRepository implements UserRepository {
     };
   }
 
-  async getUserAvatars(userUuid: string): Promise<AvatarInfoData[]> {
+  async getUserAvatars(userUuid: string): Promise<FileObject[]> {
     try {
       const { data, error } = await this.supabaseService
         .getClient()
@@ -226,18 +291,7 @@ export class SupabaseUserRepository implements UserRepository {
         );
       }
 
-      const avatarsInfo = await Promise.all(
-        data.map(async (file) => {
-          const publicUrl = await this.getAvatarPublicUrl(userUuid, file.name);
-          return {
-            url: publicUrl,
-            name: file.name,
-            created_at: new Date(file.created_at),
-          };
-        }),
-      );
-
-      return avatarsInfo;
+      return data;
     } catch (error) {
       this.logger.error(
         'Ошибка получения списка аватаров пользователя:',
@@ -247,8 +301,8 @@ export class SupabaseUserRepository implements UserRepository {
     }
   }
 
-  async removeAvatarFromStorage(avatarPath: string): Promise<void> {
-    const { error: deleteError } = await this.supabaseService
+  async removeAvatarFromStorage(avatarPath: string): Promise<boolean> {
+    const { data, error: deleteError } = await this.supabaseService
       .getClient()
       .storage.from('avatars')
       .remove([avatarPath]);
@@ -260,35 +314,7 @@ export class SupabaseUserRepository implements UserRepository {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
 
-  async changeCredentials(
-    userUuid: string,
-    credentials: ChangeCredentialsInput,
-  ): Promise<UserInfo> {
-    try {
-      const response = (await this.supabaseService
-        .getClient()
-        .rpc('change_user_credentials', {
-          p_user_uuid: userUuid,
-          p_name: credentials.name,
-          p_email: credentials.email,
-          p_password: credentials.password,
-        })) as SupabaseResponse<UserInfo>;
-
-      const data = this.supabaseService.handleSupabaseResponse(response);
-
-      if (!data) {
-        throw new HttpException('Пользователь не найден', HttpStatus.NOT_FOUND);
-      }
-
-      return data;
-    } catch (error) {
-      this.logger.error(
-        'Ошибка вызова функции обновления учетных данных:',
-        error.message,
-      );
-      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    return !!data;
   }
 }

@@ -112,11 +112,21 @@ export class UsersService {
   async getUserAllAvatars(userUuid: string): Promise<AvatarInfo[]> {
     const avatars = await this.userRepository.getUserAvatars(userUuid);
 
-    return avatars.map((avatar) => ({
-      url: avatar.url,
-      name: avatar.name,
-      createdAt: avatar.created_at,
-    }));
+    const avatarsInfo = await Promise.all(
+      avatars.map(async (file) => {
+        const publicUrl = await this.userRepository.getAvatarPublicUrl(
+          userUuid,
+          file.name,
+        );
+        return {
+          url: publicUrl,
+          name: file.name,
+          createdAt: new Date(file.created_at),
+        };
+      }),
+    );
+
+    return avatarsInfo;
   }
 
   async deleteAvatar(

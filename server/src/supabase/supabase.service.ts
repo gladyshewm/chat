@@ -20,11 +20,15 @@ export type SupabaseAuthResponse<T> = {
 @Injectable()
 export class SupabaseService {
   private client: SupabaseClient;
+  private adminClient: SupabaseClient;
   private readonly logger = new Logger(SupabaseService.name);
 
   constructor(private configService: ConfigService) {
     const supabaseUrl = this.configService.get<string>('SUPABASE_URL');
     const supabaseKey = this.configService.get<string>('SUPABASE_KEY');
+    const supabaseServiceRoleKey = this.configService.get<string>(
+      'SUPABASE_SERVICE_ROLE_KEY',
+    );
 
     if (!supabaseUrl || !supabaseKey) {
       this.logger.error(
@@ -34,10 +38,26 @@ export class SupabaseService {
     }
 
     this.client = createClient(supabaseUrl, supabaseKey);
+
+    if (supabaseServiceRoleKey) {
+      this.adminClient = createClient(supabaseUrl, supabaseServiceRoleKey);
+    } else {
+      this.logger.warn(
+        'Service Role Key не найден, операции администратора будут недоступны',
+      );
+    }
   }
 
   public getClient(): SupabaseClient {
     return this.client;
+  }
+
+  public getAdminClient(): SupabaseClient {
+    if (!this.adminClient) {
+      this.logger.error('Admin client не инициализирован');
+      throw new Error('Admin client не инициализирован');
+    }
+    return this.adminClient;
   }
 
   public handleSupabaseResponse<T>(response: SupabaseResponse<T>): T | null {

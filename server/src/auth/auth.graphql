@@ -40,7 +40,7 @@ type Query {
 type Mutation {
   refreshToken(refreshToken: String): AuthPayload!
   createUser(createInput: CreateUserInput!): AuthPayload!
-  # logInUser(email: String!, password: String!): AuthPayload!
+  deleteUser: Boolean!
   logInUser(loginInput: LoginUserInput!): AuthPayload!
   logOutUser: Boolean!
 }

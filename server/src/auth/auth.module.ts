@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  forwardRef,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
 import { JwtModule } from '@nestjs/jwt';
@@ -7,9 +12,15 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { AUTH_STRATEGY } from './strategies/auth-strategy.token';
 import { AUTH_REPOSITORY, SupabaseAuthRepository } from './auth.repository';
+import { UsersModule } from 'users/users.module';
+import {
+  SupabaseUserRepository,
+  USER_REPOSITORY,
+} from 'users/users.repository';
 
 @Module({
   imports: [
+    forwardRef(() => UsersModule),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -29,6 +40,10 @@ import { AUTH_REPOSITORY, SupabaseAuthRepository } from './auth.repository';
     {
       provide: AUTH_REPOSITORY,
       useClass: SupabaseAuthRepository,
+    },
+    {
+      provide: USER_REPOSITORY,
+      useClass: SupabaseUserRepository,
     },
   ],
   exports: [AuthService, JwtModule, AUTH_STRATEGY],
