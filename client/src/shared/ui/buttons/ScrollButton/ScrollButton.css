@@ -6,7 +6,7 @@
   align-items: center;
   border-radius: 50%;
   border: none;
-  transition: 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
   background-color: var(--message-bg-color);
 
   &:hover {

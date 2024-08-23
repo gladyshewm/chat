@@ -114,7 +114,10 @@ const renderChats = ({
         showOnHover={true}
         isActive={chat.id === activeChatId}
       >
-        <Link to={`/chat/${chat.id}`} className="message-list-block">
+        <Link
+          to={`/chat/${chat.id}`}
+          className={`message-list-block ${chat.id === activeChatId ? 'active' : ''}`}
+        >
           {chat.isGroupChat ? (
             <GroupChat chat={chat} activeChatId={activeChatId} />
           ) : (

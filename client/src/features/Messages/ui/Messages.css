@@ -6,16 +6,20 @@
   position: relative;
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: center;
   width: 100%;
-  padding: 0 10.7rem;
-  overflow-y: auto;
+  overflow: hidden auto;
 
   & .scroll-bottom {
     position: fixed;
     bottom: 15%;
     right: 5%;
+    transition: right 0.3s ease;
+  }
+
+  & * {
+    box-sizing: border-box;
   }
 }
 
@@ -31,10 +35,11 @@
     text-align: center;
     width: 100%;
     margin: 1.3rem 0;
+    font-size: 0.9rem;
     font-weight: bold;
     color: #fff;
 
-    & span {
+    & time {
       background-color: rgba(0, 0, 0, 0.3);
       border-radius: 15px;
       padding: 0.55rem;
@@ -51,24 +56,18 @@
 
 .message-block,
 .message_me-block {
-  margin-top: 5px;
-  max-width: 60%;
-  min-width: 3rem;
-}
-
-.message-block {
-  align-self: flex-start;
+  position: relative;
   display: flex;
   align-items: flex-end;
-  margin-left: calc(35px + 5px + 2px);
+  padding: 0.1rem 0;
+  height: fit-content;
+  width: fit-content;
+  min-width: 5rem;
+  width: 100%;
 
-  &.last {
-    margin-left: 0;
+  &.highlighted {
+    background-color: rgba(153, 153, 153, 0.3);
   }
-}
-
-.message_me-block {
-  align-self: flex-end;
 }
 
 .message,
@@ -77,11 +76,13 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  border-radius: 15px;
-  padding: 0.7rem;
+  padding: 0.5rem 0.7rem;
   word-break: break-all;
+  width: fit-content;
   min-width: 2.5rem;
-  max-width: 100%;
+  max-width: 30rem;
+  min-height: 2.42rem;
+  border-radius: 1rem;
 
   & .message-main {
     display: flex;
@@ -106,25 +107,39 @@
 }
 
 .message {
+  margin-left: calc(2.42rem + 0.3rem);
+  margin-right: auto;
   background-color: var(--outline-hover-color);
   color: var(--message-bg-color);
+
+  &.last {
+    border-radius: 1rem 1rem 1rem 0;
+  }
 }
 
 .message_me {
+  margin-left: auto;
   background-color: var(--message-bg-color);
   color: var(--base-color);
+
+  &.last {
+    border-radius: 1rem 1rem 0 1rem;
+  }
 }
 
 .message-avatar {
+  position: absolute;
+  bottom: 0.1rem;
+  left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 2.5rem;
-  min-width: 2.5rem;
-  max-width: 2.5rem;
+  height: 2.42rem;
+  min-width: 2.42rem;
+  max-width: 2.42rem;
   border: 2px solid var(--outline-main-color);
   border-radius: 50%;
-  margin-right: 5px;
+  margin-right: 0.3rem;
   font-size: 1.2rem;
 
   & img {

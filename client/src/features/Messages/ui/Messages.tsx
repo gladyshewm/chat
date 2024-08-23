@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll } from 'framer-motion';
 import { format } from 'date-fns';
 import './Messages.css';
@@ -9,19 +9,47 @@ import {
   useMessageSentSubscription,
 } from './messages.generated';
 import { groupMessagesByDate } from '../utils';
+import { containerVariants } from './motion';
 
 interface MessagesProps {
   user: UserInfo;
   chat_id: string;
+  isSearch: boolean;
+  selectedMessageId: string | null;
 }
 
-const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
+const Messages = ({
+  user,
+  chat_id,
+  isSearch,
+  selectedMessageId,
+}: MessagesProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     container: containerRef,
   });
+
+  useEffect(() => {
+    if (selectedMessageId) {
+      const selectedMessageElement = document.getElementById(
+        `message-${selectedMessageId}`,
+      );
+
+      if (!selectedMessageElement) return;
+
+      selectedMessageElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      selectedMessageElement.classList.add('highlighted');
+
+      setTimeout(() => {
+        selectedMessageElement.classList.remove('highlighted');
+      }, 2000);
+    }
+  }, [selectedMessageId]);
 
   useMessageSentSubscription({
     variables: {
@@ -72,7 +100,7 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
 
   useEffect(() => {
     scrollYProgress.on('change', (progress) => {
-      const isAtBottom = progress >= 0.99;
+      const isAtBottom = progress === 0;
       setIsScrolled(!isAtBottom);
     });
   }, [scrollYProgress]);
@@ -80,12 +108,19 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
   const groupedMessages = groupMessagesByDate(messages);
 
   return (
-    <>
-      <motion.div className="message-container" ref={containerRef}>
-        {Object.keys(groupedMessages).map((date) => (
+    <motion.div
+      className="message-container"
+      ref={containerRef}
+      initial="full"
+      animate={isSearch ? 'reduced' : 'full'}
+      variants={containerVariants}
+    >
+      {Object.keys(groupedMessages)
+        .reverse()
+        .map((date) => (
           <motion.div className="wrapper" key={date}>
             <motion.div className="date-divider">
-              <span>{date}</span>
+              <time>{date}</time>
             </motion.div>
             <motion.div className="messages-group">
               {groupedMessages[date].map((message, index, messagesArray) => {
@@ -99,6 +134,7 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
                 return (
                   <motion.div
                     key={message.id}
+                    id={`message-${message.id}`}
                     className={
                       message.userId === user.uuid
                         ? 'message_me-block'
@@ -116,7 +152,9 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
                     )}
                     <motion.div
                       className={
-                        message.userId === user.uuid ? 'message_me' : 'message'
+                        message.userId === user.uuid
+                          ? `message_me ${isLast ? 'last' : isFirst ? 'first' : ''}`
+                          : `message ${isLast ? 'last' : isFirst ? 'first' : ''}`
                       }
                     >
                       {message.userId !== user.uuid && isFirst && (
@@ -124,9 +162,9 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
                       )}
                       <motion.div className="message-main">
                         <p className="message-text">{message.content}</p>
-                        <p className="message-time">
+                        <time className="message-time">
                           {String(format(new Date(message.createdAt), 'HH:mm'))}
-                        </p>
+                        </time>
                       </motion.div>
                     </motion.div>
                   </motion.div>
@@ -135,9 +173,8 @@ const Messages: FC<MessagesProps> = ({ user, chat_id }) => {
             </motion.div>
           </motion.div>
         ))}
-        <ScrollButton isScrolled={isScrolled} scrollToBottom={scrollToBottom} />
-      </motion.div>
-    </>
+      <ScrollButton isScrolled={isScrolled} scrollToBottom={scrollToBottom} />
+    </motion.div>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './SearchMessages.css';
 import { ApolloError } from '@apollo/client';
@@ -19,7 +19,7 @@ import {
   UserIcon,
 } from '@shared/ui';
 import { Message } from '@shared/types';
-import { contentVariants, searchVariants } from './motion';
+import { contentVariants } from './motion';
 import { useFindMessagesLazyQuery } from './searchMessages.generated';
 import { formatMessages } from '../utils';
 import { format } from 'date-fns';
@@ -65,6 +65,7 @@ interface SearchProps {
   searchData: Message[] | null;
   searchLoading: boolean;
   searchError: ApolloError | undefined;
+  onMessageSelect: (messageId: string) => void;
 }
 
 const renderSearchResults = ({
@@ -72,7 +73,12 @@ const renderSearchResults = ({
   searchData,
   searchLoading,
   searchError,
+  onMessageSelect,
 }: SearchProps) => {
+  const handleMessageClick = (messageId: string) => {
+    onMessageSelect(messageId);
+  };
+
   if (searchValue !== '' && searchLoading) {
     return (
       <div className="search-block">
@@ -119,6 +125,7 @@ const renderSearchResults = ({
                   key={msg.id}
                   className="search-result"
                   whileTap={{ scale: 0.95 }}
+                  onClick={() => handleMessageClick(msg.id)}
                 >
                   <DrawOutlineRect
                     className="search-result-wrapper"
@@ -141,9 +148,10 @@ const renderSearchResults = ({
 
 interface SearchMessagesProps {
   chatId: string;
+  onMessageSelect: (messageId: string) => void;
 }
 
-const SearchMessages: FC<SearchMessagesProps> = ({ chatId }) => {
+const SearchMessages = ({ chatId, onMessageSelect }: SearchMessagesProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchValue, setSearchValue] = useState('');
   const [searchData, setSearchData] = useState<Message[] | null>(null);
@@ -191,41 +199,33 @@ const SearchMessages: FC<SearchMessagesProps> = ({ chatId }) => {
 
   return (
     <AnimatePresence>
-      <motion.div
-        key={'search'}
-        className="search-messages"
-        variants={searchVariants}
-        initial="hidden"
-        animate="visible"
-        exit="hidden"
+      <DrawOutline
+        className="search-messages__wrapper"
+        orientation="vertical"
+        position="left"
       >
-        <DrawOutline
-          className="search-messages__wrapper"
-          orientation="vertical"
-          position="left"
-        >
-          <DrawOutline orientation="horizontal" position="bottom">
-            <motion.div
-              className="search-messages__header"
-              variants={contentVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <DrawOutlineRect className="search-input-wrapper" rx={20}>
-                <SearchInput ref={inputRef} />
-              </DrawOutlineRect>
-            </motion.div>
-          </DrawOutline>
-          <div className="search-messages__main">
-            {renderSearchResults({
-              searchValue,
-              searchData,
-              searchLoading: loading,
-              searchError: error,
-            })}
-          </div>
+        <DrawOutline orientation="horizontal" position="bottom">
+          <motion.header
+            className="search-messages__header"
+            variants={contentVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <DrawOutlineRect className="search-input-wrapper" rx={20}>
+              <SearchInput ref={inputRef} />
+            </DrawOutlineRect>
+          </motion.header>
         </DrawOutline>
-      </motion.div>
+        <main className="search-messages__main">
+          {renderSearchResults({
+            searchValue,
+            searchData,
+            searchLoading: loading,
+            searchError: error,
+            onMessageSelect,
+          })}
+        </main>
+      </DrawOutline>
     </AnimatePresence>
   );
 };

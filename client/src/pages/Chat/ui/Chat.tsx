@@ -24,6 +24,12 @@ import {
 import { useAuth } from '@app/providers/hooks/useAuth';
 import { MessageForm, Messages, SearchMessages } from '@features';
 import { formatParticipants } from '../utils';
+import { searchVariants } from 'features/SearchMessages/ui/motion';
+import {
+  chatContentVariants,
+  chatFooterVariants,
+  chatVariants,
+} from './motion';
 
 const Chat = () => {
   const { user } = useAuth();
@@ -34,6 +40,9 @@ const Chat = () => {
   const [sendTypingStatus] = useSendTypingStatusMutation();
   const [typingStatus, setTypingStatus] = useState<TypingFeedback | null>(null);
   const [isSearch, setIsSearch] = useState(false);
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
+    null,
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,6 +88,7 @@ const Chat = () => {
       },
     });
   };
+
   const handleBlur = () => {
     sendTypingStatus({
       variables: {
@@ -88,6 +98,7 @@ const Chat = () => {
       },
     });
   };
+
   const handleFocus = () => {
     sendTypingStatus({
       variables: {
@@ -102,23 +113,16 @@ const Chat = () => {
     navigate('/');
   };
 
+  const handleMessageSelect = (messageId: string) => {
+    setSelectedMessageId(messageId);
+  };
+
   if (error) return <div>{`Ошибка: ${error.message}`}</div>;
 
-  const chatVariants = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    exit: { opacity: 0 },
-  };
-
-  const chatContentVariants = {
-    fullWidth: { width: '100%' },
-    partialWidth: { width: 'calc(100% - 28rem)' },
-  };
-
   return (
-    <motion.div className="chat" {...chatVariants}>
-      <SpaceBackground />
-      <AnimatePresence initial={false}>
+    <AnimatePresence mode="wait">
+      <motion.div className="chat" key={chat_id} {...chatVariants}>
+        <SpaceBackground />
         {!chat ? (
           <Loader />
         ) : (
@@ -127,10 +131,11 @@ const Chat = () => {
             className={`chat-content ${isSearch ? 'reduced' : ''}`}
             variants={chatContentVariants}
             initial="fullWidth"
-            animate={isSearch ? 'partialWidth' : 'fullWidth'}
+            animate={isSearch ? 'reduced' : 'full'}
+            transition={{ duration: 0.3 }}
           >
             <DrawOutline orientation="horizontal" position="bottom">
-              <motion.div className="chat__header">
+              <motion.header className="chat__header">
                 <motion.div className="main">
                   {chat.isGroupChat ? (
                     <>
@@ -187,25 +192,53 @@ const Chat = () => {
                     </abbr>
                   </OptionButton>
                 </motion.div>
-              </motion.div>
+              </motion.header>
             </DrawOutline>
-            <motion.div className="chat__body">
-              <Messages user={user as UserInfo} chat_id={chat_id as string} />
-            </motion.div>
-            <motion.div className="chat__footer">
+            <motion.main className="chat__body">
+              <Messages
+                user={user as UserInfo}
+                chat_id={chat_id as string}
+                isSearch={isSearch}
+                selectedMessageId={selectedMessageId}
+              />
+            </motion.main>
+            <motion.footer
+              layoutId="chat__footer"
+              className="chat__footer"
+              variants={chatFooterVariants}
+              initial="full"
+              animate={isSearch ? 'reduced' : 'full'}
+              transition={{ duration: 0.3 }}
+            >
               <MessageForm
                 sendMessage={sendMessage}
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
               />
-            </motion.div>
+            </motion.footer>
           </motion.div>
         )}
-      </AnimatePresence>
-      {isSearch && <SearchMessages chatId={chat_id as string} />}
-      {loading && <Loader />}
-    </motion.div>
+        <AnimatePresence>
+          {isSearch && (
+            <motion.div
+              className="search-messages"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={searchVariants}
+              transition={{ duration: 0.3 }}
+            >
+              <SearchMessages
+                chatId={chat_id as string}
+                onMessageSelect={handleMessageSelect}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {loading && <Loader />}
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

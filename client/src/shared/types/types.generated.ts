@@ -87,6 +87,10 @@ export type Message = {
 export type Mutation = {
   __typename?: 'Mutation';
   changeCredentials: UserInfo;
+  /**
+   * Создание чата.
+   * Возвращаемый список участников содержит ID текущего пользователя (создателя).
+   */
   createChat: ChatWithoutMessages;
   createUser: AuthPayload;
   deleteAvatar?: Maybe<Scalars['String']['output']>;
@@ -97,13 +101,17 @@ export type Mutation = {
    * у пользователя, который удалил чат.
    */
   deleteChat: Scalars['Boolean']['output'];
+  /**
+   * Удаление аватара чата.
+   * Возвращаемая строка содержит URL нового аватара.
+   */
   deleteChatAvatar?: Maybe<Scalars['String']['output']>;
+  deleteUser: Scalars['Boolean']['output'];
   logInUser: AuthPayload;
   logOutUser: Scalars['Boolean']['output'];
   refreshToken: AuthPayload;
   sendMessage: Message;
   sendTypingStatus: TypingFeedback;
-  updateChatAvatar: Scalars['String']['output'];
   uploadAvatar: AvatarInfo;
   uploadChatAvatar: Scalars['String']['output'];
 };
@@ -163,12 +171,6 @@ export type MutationSendTypingStatusArgs = {
 };
 
 
-export type MutationUpdateChatAvatarArgs = {
-  chatId: Scalars['ID']['input'];
-  image: Scalars['Upload']['input'];
-};
-
-
 export type MutationUploadAvatarArgs = {
   image: Scalars['Upload']['input'];
 };
@@ -183,6 +185,7 @@ export type Query = {
   __typename?: 'Query';
   /** Запрос чата по ID (участники чата включают текущего пользователя) */
   chatById?: Maybe<ChatWithoutMessages>;
+  /** Список сообщений для определённого чата */
   chatMessages?: Maybe<Array<Message>>;
   /** Запрос одиночного чата с указанным пользователем */
   chatWithUser?: Maybe<ChatWithoutMessages>;
@@ -193,7 +196,9 @@ export type Query = {
   user?: Maybe<UserWithToken>;
   userAllAvatars: Array<Maybe<AvatarInfo>>;
   userAvatar?: Maybe<AvatarInfo>;
+  /** Список чатов пользователя (без сообщений) */
   userChats: Array<ChatWithoutMessages>;
+  /** Список всех пользователей */
   users: Array<UserWithAvatar>;
 };
 

@@ -160,6 +160,9 @@ export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
       setLoading('profileData', true);
       const { data: dataQueryAvatar } = await userAvatarQuery({
         variables: { userUuid: user?.uuid },
+        onError: () => {
+          setAvatarUrl(null);
+        },
       });
 
       if (dataQueryAvatar && dataQueryAvatar.userAvatar) {
@@ -187,16 +190,7 @@ export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
     };
 
     fetchProfileData();
-  }, [
-    user,
-    userAvatarQuery,
-    loadingQueryAvatar,
-    errorQueryAvatar,
-    userAllAvatarsQuery,
-    loadingQueryAllAvatars,
-    errorQueryAllAvatars,
-    setLoading,
-  ]);
+  }, [user, userAvatarQuery, userAllAvatarsQuery, setLoading]);
 
   useEffect(() => {
     if (allAvatars && allAvatars.length > 0) {

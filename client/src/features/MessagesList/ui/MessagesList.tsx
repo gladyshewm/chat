@@ -55,10 +55,13 @@ const MessagesList: FC<MessagesListProps> = ({ setIsProfileSettings }) => {
       const { data: chatsData } = await userChatsQuery({});
 
       if (chatsError) {
+        setChats(null);
         console.error(chatsError);
+        return;
       }
 
-      if (!chatsData) {
+      if (!chatsData || chatsData.userChats.length === 0) {
+        setChats(null);
         return;
       }
 

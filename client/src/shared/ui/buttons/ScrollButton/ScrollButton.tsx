@@ -23,8 +23,7 @@ export const ScrollButton: FC<ScrollButtonProps> = ({
           variants={scrollButtonVariants}
           whileHover={{
             opacity: 1,
-            scale: 1.1,
-            transition: { duration: 0.01 },
+            transition: { duration: 0.3 },
           }}
           initial="hidden"
           animate="animate"

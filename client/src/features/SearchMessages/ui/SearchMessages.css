@@ -1,22 +1,3 @@
-.search-messages {
-  z-index: 3;
-  position: absolute;
-  top: 0;
-  right: 0;
-  background-color: var(--base-color);
-  height: 100vh;
-  width: 28rem;
-  overflow-y: hidden;
-
-  & .search-messages__wrapper {
-    height: 100%;
-
-    & .search-input-wrapper {
-      height: 45px;
-    }
-  }
-}
-
 .search-messages__header {
   display: flex;
   align-items: center;
