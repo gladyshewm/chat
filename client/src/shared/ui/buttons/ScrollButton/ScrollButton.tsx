@@ -1,18 +1,17 @@
-import { FC } from 'react';
 import './ScrollButton.css';
 import { AnimatePresence, motion } from 'framer-motion';
 import { scrollButtonVariants } from './motion';
-import { ArrowLeftIcon } from '@shared/ui/icons';
+import { ArrowLeftIcon } from '@shared/assets';
 
 interface ScrollButtonProps {
   isScrolled: boolean;
   scrollToBottom: () => void;
 }
 
-export const ScrollButton: FC<ScrollButtonProps> = ({
+export const ScrollButton = ({
   isScrolled,
   scrollToBottom,
-}) => {
+}: ScrollButtonProps) => {
   return (
     <AnimatePresence mode="wait">
       {isScrolled && (

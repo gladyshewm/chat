@@ -13,10 +13,8 @@ import {
   Cross,
   DrawOutline,
   DrawOutlineRect,
-  ExclamationTriangleIcon,
   SearchIllustration,
   SearchInput,
-  UserIcon,
 } from '@shared/ui';
 import { Message } from '@shared/types';
 import { contentVariants } from './motion';
@@ -24,6 +22,7 @@ import { useFindMessagesLazyQuery } from './searchMessages.generated';
 import { formatMessages } from '../utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { ExclamationTriangleIcon, UserIcon } from '@shared/assets';
 
 const SearchResultItem = ({ message }: { message: Message }) => {
   return (

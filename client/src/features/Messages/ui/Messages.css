@@ -30,6 +30,7 @@
   align-items: center;
 
   & .date-divider {
+    z-index: 3;
     position: sticky;
     top: 1.3rem;
     text-align: center;
@@ -64,9 +65,12 @@
   width: fit-content;
   min-width: 5rem;
   width: 100%;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
 
   &.highlighted {
     background-color: rgba(153, 153, 153, 0.3);
+    transition: background-color 0.3s ease;
   }
 }
 

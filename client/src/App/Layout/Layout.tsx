@@ -4,7 +4,7 @@ import { Outlet } from 'react-router-dom';
 import { Loader } from '../../shared/ui';
 import { FullScreenProvider, ProfileProvider } from '../providers';
 import Sidebar from 'widgets/Sidebar/ui/Sidebar';
-import { FullScreenSlider } from '@features';
+import { FullScreenSlider } from '@shared/ui/Slider';
 
 const Layout = () => {
   return (

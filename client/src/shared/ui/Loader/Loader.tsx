@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './Loader.css';
 import {
@@ -13,10 +12,7 @@ interface CustomLoaderProps {
   color?: string;
 }
 
-export const Loader: FC<CustomLoaderProps> = ({
-  size = 100,
-  color = '#fff',
-}) => {
+export const Loader = ({ size = 100, color = '#fff' }: CustomLoaderProps) => {
   return (
     <AnimatePresence>
       <motion.div className="custom-loader-wrapper">

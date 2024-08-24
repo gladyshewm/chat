@@ -1,17 +1,17 @@
-import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ApolloError } from '@apollo/client';
 import './Chats.css';
 import { motion } from 'framer-motion';
 import { ChatWithoutMessages, UserInfo } from '@shared/types';
-import { DrawOutlineRect, Loader, UserGroupIcon, UserIcon } from '@shared/ui';
+import { DrawOutlineRect, Loader } from '@shared/ui';
+import { UserGroupIcon, UserIcon } from '@shared/assets';
 
 interface GroupChatProps {
   chat: ChatWithoutMessages;
   activeChatId: string | undefined;
 }
 
-const GroupChat: FC<GroupChatProps> = ({ chat, activeChatId }) => (
+const GroupChat = ({ chat, activeChatId }: GroupChatProps) => (
   <div className="group-chat">
     {chat.groupAvatarUrl ? (
       <DrawOutlineRect
@@ -48,7 +48,7 @@ interface UserChatProps {
   activeChatId: string | undefined;
 }
 
-const UserChat: FC<UserChatProps> = ({ chat, currentUserId, activeChatId }) => {
+const UserChat = ({ chat, currentUserId, activeChatId }: UserChatProps) => {
   const otherParticipant = chat.participants.find(
     (participant) => participant.id !== currentUserId,
   );

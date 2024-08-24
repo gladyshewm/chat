@@ -31,26 +31,6 @@ const Messages = ({
     container: containerRef,
   });
 
-  useEffect(() => {
-    if (selectedMessageId) {
-      const selectedMessageElement = document.getElementById(
-        `message-${selectedMessageId}`,
-      );
-
-      if (!selectedMessageElement) return;
-
-      selectedMessageElement.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-      selectedMessageElement.classList.add('highlighted');
-
-      setTimeout(() => {
-        selectedMessageElement.classList.remove('highlighted');
-      }, 2000);
-    }
-  }, [selectedMessageId]);
-
   useMessageSentSubscription({
     variables: {
       chatId: chat_id,
@@ -87,6 +67,26 @@ const Messages = ({
       console.error(error);
     },
   });
+
+  useEffect(() => {
+    if (selectedMessageId) {
+      const selectedMessageElement = document.getElementById(
+        `message-${selectedMessageId}`,
+      );
+
+      if (!selectedMessageElement) return;
+
+      selectedMessageElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+      selectedMessageElement.classList.add('highlighted');
+
+      setTimeout(() => {
+        selectedMessageElement.classList.remove('highlighted');
+      }, 2000);
+    }
+  }, [selectedMessageId]);
 
   const scrollToBottom = () => {
     if (containerRef.current) {

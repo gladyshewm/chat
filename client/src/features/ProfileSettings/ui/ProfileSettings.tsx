@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './ProfileSettings.css';
 import EditProfile from './EditProfile/EditProfile';
@@ -10,9 +10,7 @@ interface ProfileSettingsProps {
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ProfileSettings: FC<ProfileSettingsProps> = ({
-  setIsProfileSettings,
-}) => {
+const ProfileSettings = ({ setIsProfileSettings }: ProfileSettingsProps) => {
   const [isProfileInfo, setIsProfileInfo] = useState(true);
 
   const handleBackClick = () => {

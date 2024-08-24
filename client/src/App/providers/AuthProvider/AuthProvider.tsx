@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useApolloClient } from '@apollo/client';
 import { AuthContext } from './AuthContext';
 import {
@@ -19,7 +19,7 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const client = useApolloClient();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);

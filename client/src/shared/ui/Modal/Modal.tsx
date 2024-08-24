@@ -1,9 +1,9 @@
-import React, { SetStateAction, FC, useState, useRef, useEffect } from 'react';
+import React, { SetStateAction, useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './Modal.css';
-import { ChevronLeftIcon, XmarkIcon } from '../icons';
 import { DrawOutlineRect } from '../DrawOutline/DrawOutlineRect/DrawOutlineRect';
 import { modalContentVariants, modalTransition, modalVariants } from './motion';
+import { ChevronLeftIcon, XmarkIcon } from '@shared/assets';
 
 interface ModalProps {
   active: boolean;
@@ -13,13 +13,13 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
-const Modal: FC<ModalProps> = ({
+const Modal = ({
   active,
   setActive,
   showBackButton,
   handleBackClick,
   children,
-}) => {
+}: ModalProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const contentRef = useRef<HTMLDivElement>(null);
 

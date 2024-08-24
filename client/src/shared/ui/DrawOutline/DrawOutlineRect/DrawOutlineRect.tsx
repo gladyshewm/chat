@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './DrawOutlineRect.css';
 import { createDrawVariants } from '../motion';
@@ -14,7 +14,7 @@ interface DrawOutlineRectProps {
   isActive?: boolean;
 }
 
-export const DrawOutlineRect: FC<DrawOutlineRectProps> = ({
+export const DrawOutlineRect = ({
   children,
   className,
   stroke = 'var(--outline-main-color)',
@@ -22,7 +22,7 @@ export const DrawOutlineRect: FC<DrawOutlineRectProps> = ({
   rx = 0,
   showOnHover = false,
   isActive = false,
-}) => {
+}: DrawOutlineRectProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const [isHovered, setIsHovered] = useState(false);

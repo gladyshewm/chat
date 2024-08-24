@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './MessagesList.css';
 import { useParams } from 'react-router-dom';
 import {
@@ -16,13 +16,7 @@ import {
 import renderChats from './Chats/Chats';
 import renderSearchResults from './Search/Search';
 import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
-import {
-  ArrowLeftIcon,
-  DrawOutline,
-  DrawOutlineRect,
-  SearchInput,
-  UserIcon,
-} from '@shared/ui';
+import { DrawOutline, DrawOutlineRect, SearchInput } from '@shared/ui';
 import {
   avatarVariants,
   backButtonVariants,
@@ -30,12 +24,13 @@ import {
 } from './motion';
 import { useProfile } from '@app/providers/hooks/useProfile';
 import { useAuth } from '@app/providers/hooks/useAuth';
+import { ArrowLeftIcon, UserIcon } from '@shared/assets';
 
 interface MessagesListProps {
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MessagesList: FC<MessagesListProps> = ({ setIsProfileSettings }) => {
+const MessagesList = ({ setIsProfileSettings }: MessagesListProps) => {
   const [chats, setChats] = useState<ChatWithoutMessages[] | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [isSearch, setIsSearch] = useState(false);

@@ -1,4 +1,4 @@
-import React, { ButtonHTMLAttributes, FC } from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 import './OptionButton.css';
 
 interface OptionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -6,11 +6,11 @@ interface OptionButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }
 
-export const OptionButton: FC<OptionButtonProps> = ({
+export const OptionButton = ({
   children,
   className = '',
   ...props
-}) => {
+}: OptionButtonProps) => {
   return (
     <button className={`option-button ${className}`} {...props}>
       {children}

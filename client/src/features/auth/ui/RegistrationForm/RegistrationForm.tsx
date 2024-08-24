@@ -1,11 +1,11 @@
-import React, { FC, useState } from 'react';
+import { useState } from 'react';
 import { Formik, Form } from 'formik';
 import { CustomButton, CustomInput, DrawOutlineRect, Loader } from '@shared/ui';
 import { RegistrationSchema } from '../../model/validation/validationSchemas';
 import { validationRegistrationSchema } from '../../model/validation/validate';
 import { useAuth } from '@app/providers/hooks/useAuth';
 
-const RegistrationForm: FC = () => {
+const RegistrationForm = () => {
   const { register, loadingStates } = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
   const initialValues: RegistrationSchema = {

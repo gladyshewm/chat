@@ -1,16 +1,16 @@
-import { FC, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { wrap } from 'popmotion';
 import './Slider.css';
-import { ChevronLeftIcon } from '@shared/ui';
 import { imageTransition, imageVariants } from './motion';
+import { ChevronLeftIcon } from '@shared/assets';
 
 interface SliderProps {
   images: string[];
   onImageClick: (index: number) => void;
 }
 
-const Slider: FC<SliderProps> = ({ images, onImageClick }) => {
+const Slider = ({ images, onImageClick }: SliderProps) => {
   const [[page, direction], setPage] = useState([0, 0]);
   const imageIndex = wrap(0, images.length, page);
 

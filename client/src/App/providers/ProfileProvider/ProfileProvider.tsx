@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useEffect, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { ProfileContext } from './ProfileContext';
 import { Avatar } from '../FullScreenProvider/FullScreenContext';
 import {
@@ -15,7 +15,7 @@ interface ProfileProviderProps {
   children: ReactNode;
 }
 
-export const ProfileProvider: FC<ProfileProviderProps> = ({ children }) => {
+export const ProfileProvider = ({ children }: ProfileProviderProps) => {
   const { user, setUser } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [allAvatars, setAllAvatars] = useState<Avatar[] | []>([]);

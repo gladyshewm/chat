@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import './DrawOutline.css';
 import { createDrawVariants } from '../motion';
@@ -12,14 +12,14 @@ interface DrawOutlineRectProps {
   position?: 'left' | 'right' | 'bottom' | 'top';
 }
 
-export const DrawOutline: FC<DrawOutlineRectProps> = ({
+export const DrawOutline = ({
   children,
   className,
   stroke = '#999999',
   strokeWidth = 2,
   orientation = 'vertical',
   position = 'right',
-}) => {
+}: DrawOutlineRectProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isVisible, setIsVisible] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);

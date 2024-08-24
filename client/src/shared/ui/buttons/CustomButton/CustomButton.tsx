@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes, FC, ReactNode } from 'react';
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 import './CustomButton.css';
 
 interface CustomButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -6,11 +6,11 @@ interface CustomButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
 }
 
-export const CustomButton: FC<CustomButtonProps> = ({
+export const CustomButton = ({
   children,
   className,
   ...props
-}) => {
+}: CustomButtonProps) => {
   return (
     <button className={`custom-button ${className}`} {...props}>
       {children}

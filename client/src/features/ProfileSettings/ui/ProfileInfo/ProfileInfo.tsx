@@ -1,35 +1,32 @@
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import './ProfileInfo.css';
-import { Slider } from '@features';
-import {
-  ArrowLeftIcon,
-  AtSymbolIcon,
-  DrawOutline,
-  EllipsisVerticalIcon,
-  ExclamationCircleIcon,
-  ExitIcon,
-  IdentificationIcon,
-  Loader,
-  OptionButton,
-  PencilIcon,
-  UserIcon,
-} from '@shared/ui';
+import { DrawOutline, Loader, OptionButton, Slider } from '@shared/ui';
 import { logoutButtonVariants } from '../motion';
 import { useFullScreen } from '@app/providers/hooks/useFullScreen';
 import { useProfile } from '@app/providers/hooks/useProfile';
 import { useAuth } from '@app/providers/hooks/useAuth';
+import {
+  ArrowLeftIcon,
+  AtSymbolIcon,
+  EllipsisVerticalIcon,
+  ExclamationCircleIcon,
+  ExitIcon,
+  IdentificationIcon,
+  PencilIcon,
+  UserIcon,
+} from '@shared/assets';
 
 interface ProfileInfoProps {
   handleBackClick: () => void;
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ProfileInfo: FC<ProfileInfoProps> = ({
+const ProfileInfo = ({
   handleBackClick,
   setIsProfileInfo,
-}) => {
+}: ProfileInfoProps) => {
   const [copyMessage, setCopyMessage] = useState('');
   const [isExitClicked, setIsExitClicked] = useState(false);
   const navigate = useNavigate();

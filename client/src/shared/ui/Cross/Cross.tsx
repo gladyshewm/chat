@@ -1,6 +1,6 @@
-import { FC } from 'react';
 import './Cross.css';
 import { AnimatePresence, motion } from 'framer-motion';
+import { circleVariants, crossLineVariants } from './motion';
 
 interface CrossProps {
   className?: string;
@@ -8,28 +8,11 @@ interface CrossProps {
   strokeWidth?: number;
 }
 
-const crossLineVariants = {
-  hidden: { pathLength: 0, opacity: 0 },
-  visible: {
-    pathLength: 1,
-    opacity: 1,
-    transition: { duration: 0.5, ease: 'easeInOut', delay: 0.5 },
-  },
-};
-
-const circleVariants = {
-  hidden: { scale: 0 },
-  visible: {
-    scale: 1,
-    transition: { duration: 0.5, ease: 'easeInOut', delay: 1 },
-  },
-};
-
-const Cross: FC<CrossProps> = ({
+const Cross = ({
   className,
   stroke = 'var(--outline-main-color)',
   strokeWidth = 2,
-}) => {
+}: CrossProps) => {
   return (
     <div className={`cross ${className ? className : ''}`}>
       <AnimatePresence>

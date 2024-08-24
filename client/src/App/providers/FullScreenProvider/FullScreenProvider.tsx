@@ -1,11 +1,11 @@
-import React, { useState, ReactNode, FC } from 'react';
+import { useState, ReactNode } from 'react';
 import { Avatar, FullScreenContext } from './FullScreenContext';
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
-export const FullScreenProvider: FC<AuthProviderProps> = ({ children }) => {
+export const FullScreenProvider = ({ children }: AuthProviderProps) => {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentImage, setCurrentImage] = useState<Avatar | null>(null);
   const [images, setImages] = useState<Array<Avatar>>([]);

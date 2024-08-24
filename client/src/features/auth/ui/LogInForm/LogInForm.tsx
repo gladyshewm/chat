@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { Formik, Form } from 'formik';
 import './LogInForm.css';
 import { CustomButton, CustomInput, DrawOutlineRect, Loader } from '@shared/ui';
@@ -10,7 +10,7 @@ interface LogInFormProps {
   handleCreateAccountClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
-const LogInForm: FC<LogInFormProps> = ({ handleCreateAccountClick }) => {
+const LogInForm = ({ handleCreateAccountClick }: LogInFormProps) => {
   const { login, loadingStates } = useAuth();
   const [errorMessage, setErrorMessage] = useState<string>('');
   const initialValues: LoginSchema = {

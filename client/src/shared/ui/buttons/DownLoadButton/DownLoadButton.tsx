@@ -1,7 +1,7 @@
-import React, { ButtonHTMLAttributes, FC, ReactNode } from 'react';
+import { ButtonHTMLAttributes, ReactNode } from 'react';
 import './DownLoadButton.css';
-import { DocumentArrowDownIcon } from '../../icons';
 import { Avatar } from '@app/providers/FullScreenProvider/FullScreenContext';
+import { DocumentArrowDownIcon } from '@shared/assets';
 
 interface DownLoadButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   image: Avatar;
@@ -9,12 +9,12 @@ interface DownLoadButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children?: ReactNode;
 }
 
-export const DownLoadButton: FC<DownLoadButtonProps> = ({
+export const DownLoadButton = ({
   image,
   className,
   children,
   ...props
-}) => {
+}: DownLoadButtonProps) => {
   const handleDownload = async () => {
     try {
       const response = await fetch(image.url);

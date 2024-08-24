@@ -1,8 +1,9 @@
-import React, { FC } from 'react';
+import React from 'react';
 import { Field, Form, Formik } from 'formik';
 import './MessageForm.css';
 import { validationMessageFormSchema } from '../model/validate';
-import { DrawOutlineRect, SendIcon } from '@shared/ui';
+import { DrawOutlineRect } from '@shared/ui';
+import { SendIcon } from '@shared/assets';
 
 interface MessageFormProps {
   sendMessage: (message: string) => void;
@@ -11,12 +12,12 @@ interface MessageFormProps {
   onFocus?: (userName: string) => void;
 }
 
-const MessageForm: FC<MessageFormProps> = ({
+const MessageForm = ({
   sendMessage,
   onKeyDown,
   onBlur,
   onFocus,
-}) => {
+}: MessageFormProps) => {
   return (
     <Formik
       initialValues={{ message: '' }}

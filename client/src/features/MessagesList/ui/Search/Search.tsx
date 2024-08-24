@@ -7,14 +7,8 @@ import {
   useCreateChatMutation,
 } from './search.generated';
 import { UserWithAvatar } from '@shared/types';
-import {
-  Cross,
-  DrawOutlineRect,
-  ExclamationTriangleIcon,
-  Loader,
-  SearchIllustration,
-  UserIcon,
-} from '@shared/ui';
+import { Cross, DrawOutlineRect, Loader, SearchIllustration } from '@shared/ui';
+import { ExclamationTriangleIcon, UserIcon } from '@shared/assets';
 
 const SearchResultItem = ({ user }: { user: UserWithAvatar }) => {
   const navigate = useNavigate();

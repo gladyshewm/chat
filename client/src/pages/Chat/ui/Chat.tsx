@@ -12,15 +12,17 @@ import { ChatWithoutMessages, TypingFeedback, UserInfo } from '@shared/types';
 import {
   DrawOutline,
   DrawOutlineRect,
-  EllipsisVerticalIcon,
   Loader,
   OptionButton,
+  SpaceBackground,
+} from '@shared/ui';
+import {
+  EllipsisVerticalIcon,
   PencilIcon,
   SearchIcon,
-  SpaceBackground,
   UserGroupIcon,
   XmarkIcon,
-} from '@shared/ui';
+} from '@shared/assets';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import { MessageForm, Messages, SearchMessages } from '@features';
 import { formatParticipants } from '../utils';

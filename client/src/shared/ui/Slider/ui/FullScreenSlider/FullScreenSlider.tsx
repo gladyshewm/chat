@@ -4,16 +4,11 @@ import { format } from 'date-fns';
 import './FullScreenSlider.css';
 import { ru } from 'date-fns/locale';
 import { imageTransition, imageVariants, sliderVariants } from '../motion';
-import { MID_ANIMATION_DURATION } from '@shared/constants/motion';
-import {
-  ChevronLeftIcon,
-  DownLoadButton,
-  Loader,
-  TrashIcon,
-  XmarkIcon,
-} from '@shared/ui';
 import { useFullScreen } from '@app/providers/hooks/useFullScreen';
 import { useProfile } from '@app/providers/hooks/useProfile';
+import { DownLoadButton, Loader } from '@shared/ui';
+import { MID_ANIMATION_DURATION } from '@shared/constants/motion';
+import { ChevronLeftIcon, TrashIcon, XmarkIcon } from '@shared/assets';
 
 const FullScreenSlider = () => {
   const [direction, setDirection] = useState(0);

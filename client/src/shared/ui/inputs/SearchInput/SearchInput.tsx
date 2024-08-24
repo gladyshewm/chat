@@ -1,6 +1,6 @@
 import { forwardRef, InputHTMLAttributes } from 'react';
 import './SearchInput.css';
-import { SearchIcon } from '../../icons';
+import { SearchIcon } from '@shared/assets';
 
 interface SearchInputProps extends InputHTMLAttributes<HTMLInputElement> {
   className?: string;

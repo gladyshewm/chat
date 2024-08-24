@@ -1,34 +1,36 @@
-import React, { FC, useState } from 'react';
+import React, { useState } from 'react';
 import { Formik, Form } from 'formik';
 import { AnimatePresence, motion } from 'framer-motion';
 import './EditProfile.css';
 import { errorMessageVariants, successMessageVariants } from '../motion';
-import {
-  ArrowLeftIcon,
-  CameraIcon,
-  CheckCircleIcon,
-  CheckIcon,
-  CustomButton,
-  CustomInput,
-  DrawOutline,
-  DrawOutlineRect,
-  ExclamationTriangleIcon,
-  Loader,
-  OptionButton,
-  XmarkIcon,
-} from '@shared/ui';
 import { useProfile } from '@app/providers/hooks/useProfile';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import {
   ChangeCredentialsSchema,
   validationChangeCredentialsSchema,
 } from '@features';
+import {
+  CustomButton,
+  CustomInput,
+  DrawOutline,
+  DrawOutlineRect,
+  Loader,
+  OptionButton,
+} from '@shared/ui';
+import {
+  ArrowLeftIcon,
+  CameraIcon,
+  CheckCircleIcon,
+  CheckIcon,
+  ExclamationTriangleIcon,
+  XmarkIcon,
+} from '@shared/assets';
 
 interface EditProfileProps {
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const EditProfile: FC<EditProfileProps> = ({ setIsProfileInfo }) => {
+const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
   const [avatar, setAvatar] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>();
