@@ -1,8 +1,8 @@
 import React from 'react';
 import { Field, Form, Formik } from 'formik';
 import './MessageForm.css';
-import { validationMessageFormSchema } from '../model/validate';
-import { DrawOutlineRect } from '@shared/ui';
+import { validationMessageFormSchema } from '../../model/validate';
+import { DrawOutlineRect, Emoji } from '@shared/ui';
 import { SendIcon } from '@shared/assets';
 
 interface MessageFormProps {
@@ -27,9 +27,14 @@ const MessageForm = ({
         resetForm();
       }}
     >
-      {({ values, handleChange, handleSubmit }) => (
+      {({ values, handleChange, handleSubmit, setFieldValue }) => (
         <Form className="message-form" id="message-form">
           <DrawOutlineRect rx={'15px'} className={'message-input-wrapper'}>
+            <Emoji
+              onEmojiSelect={(emoji) => {
+                setFieldValue('message', values.message + emoji);
+              }}
+            />
             <Field
               type="text"
               name="message"

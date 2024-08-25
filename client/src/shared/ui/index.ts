@@ -7,3 +7,4 @@ export { default as Cross } from './Cross/Cross';
 export { default as SearchIllustration } from './SearchIllustration/SearchIllustration';
 export { default as SpaceBackground } from './SpaceBackground/SpaceBackground';
 export { Slider } from './Slider';
+export { default as Emoji } from './Emoji/Emoji';

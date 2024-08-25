@@ -6,6 +6,8 @@ import ProfileInfo from './ProfileInfo/ProfileInfo';
 import { editProfileVariants, profileInfoVariants } from './motion';
 import { TWEEN_TRANSITION } from '@shared/constants/motion';
 
+//TODO: move to sidebar
+
 interface ProfileSettingsProps {
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
 }

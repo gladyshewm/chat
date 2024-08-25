@@ -1,1 +1,1 @@
-export { default as MessageForm } from './ui/MessageForm';
+export * from './ui';

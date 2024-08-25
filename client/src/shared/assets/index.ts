@@ -18,3 +18,4 @@ export { TrashIcon } from './icons/TrashIcon';
 export { UserGroupIcon } from './icons/UserGroupIcon';
 export { UserIcon } from './icons/UserIcon';
 export { XmarkIcon } from './icons/XmarkIcon';
+export { FaceFrownIcon } from './icons/FaceFrownIcon';

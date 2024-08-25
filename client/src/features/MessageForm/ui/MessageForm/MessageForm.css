@@ -8,11 +8,13 @@
     width: 100%;
     min-width: 21.5rem;
     max-width: 80rem;
-    /* width: clamp(21.5rem, 100%, 80rem); */
     margin-right: 0.8rem;
+    display: flex;
+    align-items: center;
   }
 
   & .message-input {
+    position: relative;
     box-sizing: border-box;
     flex-grow: 1;
     width: 100%;
@@ -20,10 +22,17 @@
     border: none;
     border-radius: 15px;
     outline: none;
-    padding: 0 20px;
-    /* background-color: rgba(153, 153, 153, 0.3); */
+    padding: 0 0.8rem;
     background-color: var(--base-color);
     color: #fff;
+  }
+
+  & .emoji-input-container {
+    margin-left: 0.5rem;
+
+    & .emoji-picker-container {
+      left: -0.5rem;
+    }
   }
 }
 
