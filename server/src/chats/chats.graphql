@@ -31,6 +31,7 @@ type Query {
   chatWithUser(userUuid: String!): ChatWithoutMessages
   "Запрос чата по ID (участники чата включают текущего пользователя)"
   chatById(chatId: ID!): ChatWithoutMessages
+  chatAllAvatars(chatId: ID!): [AvatarInfo]!
 }
 
 type Mutation {

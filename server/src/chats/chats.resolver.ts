@@ -2,7 +2,7 @@ import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ChatsService } from './chats.service';
 import { Inject, UseGuards } from '@nestjs/common';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
-import { ChatWithoutMessages } from '../graphql';
+import { AvatarInfo, ChatWithoutMessages } from '../graphql';
 import { PUB_SUB } from '../common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
 import { JwtHttpAuthGuard } from '../auth/guards/jwt-http-auth.guard';
@@ -48,6 +48,14 @@ export class ChatsResolver {
     @Context('user_uuid') userUuid: string,
   ): Promise<ChatWithoutMessages | null> {
     return this.chatsService.getChatWithUser(userUuid, withUser);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Query('chatAllAvatars')
+  async getChatAllAvatars(
+    @Args('chatId') chatId: string,
+  ): Promise<AvatarInfo[]> {
+    return this.chatsService.getChatAllAvatars(chatId);
   }
 
   @UseGuards(JwtHttpAuthGuard)

@@ -5,7 +5,7 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { ChatWithoutMessages } from '../graphql';
+import { AvatarInfo, ChatWithoutMessages } from '../graphql';
 import { FileUpload } from 'graphql-upload-ts';
 import { CHAT_REPOSITORY, ChatRepository } from './chats.repository';
 import { UsersService } from 'users/users.service';
@@ -155,6 +155,28 @@ export class ChatsService {
       this.logger.error(
         `Ошибка при получении чата с пользователем: ${error.message}`,
       );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getChatAllAvatars(chatId: string): Promise<AvatarInfo[]> {
+    try {
+      const res = await this.chatRepository.getChatAvatars(chatId);
+
+      const avatars = await Promise.all(
+        res.map(async (avatar) => ({
+          url: await this.chatRepository.getAvatarPublicUrl(
+            chatId,
+            avatar.name,
+          ),
+          name: avatar.name,
+          createdAt: avatar.created_at,
+        })),
+      );
+
+      return avatars;
+    } catch (error) {
+      this.logger.error(`Ошибка при получении аватаров чата: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
