@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll } from 'framer-motion';
 import { format } from 'date-fns';
 import './Messages.css';
-import { Message, UserInfo } from '@shared/types';
+import { ChatWithoutMessages, Message, UserInfo } from '@shared/types';
 import { ScrollButton } from '@shared/ui';
 import {
   useChatMessagesQuery,
@@ -13,16 +13,18 @@ import { containerVariants } from './motion';
 
 interface MessagesProps {
   user: UserInfo;
-  chat_id: string;
+  chat: ChatWithoutMessages;
   isSearch: boolean;
   selectedMessageId: string | null;
+  isChatInfo: boolean;
 }
 
 const Messages = ({
   user,
-  chat_id,
+  chat,
   isSearch,
   selectedMessageId,
+  isChatInfo,
 }: MessagesProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,7 +35,7 @@ const Messages = ({
 
   useMessageSentSubscription({
     variables: {
-      chatId: chat_id,
+      chatId: chat.id,
     },
     onError: (error) => {
       console.error(error);
@@ -54,7 +56,7 @@ const Messages = ({
 
   useChatMessagesQuery({
     variables: {
-      chatId: chat_id,
+      chatId: chat.id,
       offset: 0,
       limit: 100,
     },
@@ -112,7 +114,7 @@ const Messages = ({
       className="message-container"
       ref={containerRef}
       initial="full"
-      animate={isSearch ? 'reduced' : 'full'}
+      animate={isSearch || isChatInfo ? 'reduced' : 'full'}
       variants={containerVariants}
     >
       {Object.keys(groupedMessages)
@@ -141,15 +143,17 @@ const Messages = ({
                         : `message-block ${isLast ? 'last' : isFirst ? 'first' : ''}`
                     }
                   >
-                    {message.userId !== user.uuid && isLast && (
-                      <motion.div className="message-avatar">
-                        {message.avatarUrl ? (
-                          <img src={message.avatarUrl} alt="avatar" />
-                        ) : (
-                          <p>{message.userName.slice(0, 1).toUpperCase()}</p>
-                        )}
-                      </motion.div>
-                    )}
+                    {chat.isGroupChat &&
+                      message.userId !== user.uuid &&
+                      isLast && (
+                        <motion.div className="message-avatar">
+                          {message.avatarUrl ? (
+                            <img src={message.avatarUrl} alt="avatar" />
+                          ) : (
+                            <p>{message.userName.slice(0, 1).toUpperCase()}</p>
+                          )}
+                        </motion.div>
+                      )}
                     <motion.div
                       className={
                         message.userId === user.uuid
@@ -157,9 +161,11 @@ const Messages = ({
                           : `message ${isLast ? 'last' : isFirst ? 'first' : ''}`
                       }
                     >
-                      {message.userId !== user.uuid && isFirst && (
-                        <p className="message-username">{message.userName}</p>
-                      )}
+                      {chat.isGroupChat &&
+                        message.userId !== user.uuid &&
+                        isFirst && (
+                          <p className="message-username">{message.userName}</p>
+                        )}
                       <motion.div className="message-main">
                         <p className="message-text">{message.content}</p>
                         <time className="message-time">

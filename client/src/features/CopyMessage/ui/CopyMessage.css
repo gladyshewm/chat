@@ -1,0 +1,19 @@
+.copy-message {
+  position: fixed;
+  bottom: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(153, 153, 153, 0.3);
+  color: #fff;
+  padding: 0.7rem;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+
+  & svg {
+    margin-right: 0.8rem;
+  }
+}

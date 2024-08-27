@@ -13,6 +13,7 @@ import {
   Cross,
   DrawOutline,
   DrawOutlineRect,
+  OptionButton,
   SearchIllustration,
   SearchInput,
 } from '@shared/ui';
@@ -22,7 +23,7 @@ import { useFindMessagesLazyQuery } from './searchMessages.generated';
 import { formatMessages } from '../utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { ExclamationTriangleIcon, UserIcon } from '@shared/assets';
+import { ExclamationTriangleIcon, UserIcon, XmarkIcon } from '@shared/assets';
 
 const SearchResultItem = ({ message }: { message: Message }) => {
   return (
@@ -148,9 +149,14 @@ const renderSearchResults = ({
 interface SearchMessagesProps {
   chatId: string;
   onMessageSelect: (messageId: string) => void;
+  setIsSearch: (isSearch: boolean) => void;
 }
 
-const SearchMessages = ({ chatId, onMessageSelect }: SearchMessagesProps) => {
+const SearchMessages = ({
+  chatId,
+  onMessageSelect,
+  setIsSearch,
+}: SearchMessagesProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchValue, setSearchValue] = useState('');
   const [searchData, setSearchData] = useState<Message[] | null>(null);
@@ -205,11 +211,19 @@ const SearchMessages = ({ chatId, onMessageSelect }: SearchMessagesProps) => {
       >
         <DrawOutline orientation="horizontal" position="bottom">
           <motion.header
-            className="search-messages__header"
+            id="search-messages__header"
             variants={contentVariants}
             initial="hidden"
             animate="visible"
           >
+            <OptionButton
+              className="close-button"
+              onClick={() => setIsSearch(false)}
+            >
+              <abbr title="Закрыть">
+                <XmarkIcon />
+              </abbr>
+            </OptionButton>
             <DrawOutlineRect className="search-input-wrapper" rx={20}>
               <SearchInput ref={inputRef} />
             </DrawOutlineRect>

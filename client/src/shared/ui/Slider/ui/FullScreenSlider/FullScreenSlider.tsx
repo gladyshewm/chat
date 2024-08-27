@@ -52,7 +52,7 @@ const FullScreenSlider = () => {
 
   return (
     <AnimatePresence custom={direction}>
-      {profileLoadingStates.deleteAvatar && <Loader />}
+      {profileLoadingStates?.deleteAvatar && <Loader />}
       <motion.div
         className="full-screen-slider"
         variants={sliderVariants}

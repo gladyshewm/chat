@@ -3,8 +3,8 @@ import './Layout.css';
 import { Outlet } from 'react-router-dom';
 import { Loader } from '../../shared/ui';
 import { FullScreenProvider, ProfileProvider } from '../providers';
-import Sidebar from 'widgets/Sidebar/ui/Sidebar';
 import { FullScreenSlider } from '@shared/ui/Slider';
+import { Sidebar } from '@widgets';
 
 const Layout = () => {
   return (

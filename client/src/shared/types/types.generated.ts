@@ -183,6 +183,7 @@ export type MutationUploadChatAvatarArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  chatAllAvatars: Array<Maybe<AvatarInfo>>;
   /** Запрос чата по ID (участники чата включают текущего пользователя) */
   chatById?: Maybe<ChatWithoutMessages>;
   /** Список сообщений для определённого чата */
@@ -200,6 +201,11 @@ export type Query = {
   userChats: Array<ChatWithoutMessages>;
   /** Список всех пользователей */
   users: Array<UserWithAvatar>;
+};
+
+
+export type QueryChatAllAvatarsArgs = {
+  chatId: Scalars['ID']['input'];
 };
 
 

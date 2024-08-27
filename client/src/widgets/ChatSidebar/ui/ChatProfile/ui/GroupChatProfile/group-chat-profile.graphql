@@ -1,0 +1,11 @@
+query chatAllAvatars($chatId: ID!) {
+  chatAllAvatars(chatId: $chatId) {
+    url
+    name
+    createdAt
+  }
+}
+
+mutation deleteChatAvatar($chatId: ID!) {
+  deleteChatAvatar(chatId: $chatId)
+}

@@ -11,12 +11,12 @@ import {
   ArrowLeftIcon,
   AtSymbolIcon,
   EllipsisVerticalIcon,
-  ExclamationCircleIcon,
   ExitIcon,
   IdentificationIcon,
   PencilIcon,
   UserIcon,
 } from '@shared/assets';
+import { CopyMessage, useCopyMessage } from '@features';
 
 interface ProfileInfoProps {
   handleBackClick: () => void;
@@ -27,7 +27,6 @@ const ProfileInfo = ({
   handleBackClick,
   setIsProfileInfo,
 }: ProfileInfoProps) => {
-  const [copyMessage, setCopyMessage] = useState('');
   const [isExitClicked, setIsExitClicked] = useState(false);
   const navigate = useNavigate();
   const { openFullScreen } = useFullScreen();
@@ -40,6 +39,7 @@ const ProfileInfo = ({
     profileLoadingStates,
   } = useProfile();
   const { user, logout, loadingStates } = useAuth();
+  const { copyMessage, handleCopy } = useCopyMessage();
 
   const handleImageClick = (index: number) => {
     const headerContent = (
@@ -81,28 +81,14 @@ const ProfileInfo = ({
       navigate('/auth');
     } catch (error) {
       console.log(error);
+      throw new Error(`Logout error: ${error}`);
     }
-  };
-
-  const handleCopy = (text: string) => {
-    navigator.clipboard
-      .writeText(text)
-      .then(() => {
-        setCopyMessage('Содержимое скопировано!');
-        setTimeout(() => setCopyMessage(''), 3000);
-      })
-      .catch((err) => console.error('Ошибка копирования текста:', err));
   };
 
   return (
     <>
       {(loadingStates.logOut || profileLoadingStates.profileData) && <Loader />}
-      {copyMessage && (
-        <div className="copy-message">
-          <ExclamationCircleIcon />
-          <p>{copyMessage}</p>
-        </div>
-      )}
+      <CopyMessage copyMessage={copyMessage} />
       <div className="profile-settings">
         <DrawOutline orientation="horizontal" position="bottom">
           <div className="profile-settings__header">
@@ -172,7 +158,7 @@ const ProfileInfo = ({
           </DrawOutline>
           <div className="credentials">
             <motion.div
-              whileTap={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className="name"
               onClick={() => handleCopy(user?.name as string)}
             >
@@ -183,7 +169,7 @@ const ProfileInfo = ({
               </div>
             </motion.div>
             <motion.div
-              whileTap={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               className="email"
               onClick={() => handleCopy(user?.email as string)}
             >

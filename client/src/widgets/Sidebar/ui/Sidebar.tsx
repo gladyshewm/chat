@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './Sidebar.css';
 import { DrawOutline } from '@shared/ui';
-import { MessagesList, ProfileSettings } from '@features';
 import { messagesListVariants, profileSettingsVariants } from './motion';
 import { TWEEN_TRANSITION } from '@shared/constants/motion';
+import { ProfileSettings } from './ProfileSettings';
+import { MessagesList } from './MessagesList';
 
 const Sidebar = () => {
   const [isProfileSettings, setIsProfileSettings] = useState(false);

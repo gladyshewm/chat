@@ -1,3 +1,4 @@
+import { AvatarInfo } from '@shared/types';
 import { createContext, ReactNode } from 'react';
 
 export interface Avatar {
@@ -8,21 +9,21 @@ export interface Avatar {
 
 interface FullScreenContextType {
   isFullScreen: boolean;
-  currentImage: Avatar | null;
-  images: Array<Avatar>;
+  currentImage: AvatarInfo | null;
+  images: Array<AvatarInfo>;
   headerContent: ReactNode | null;
   openFullScreen: (
-    images: Array<Avatar>,
-    currentImage: Avatar,
+    images: Array<AvatarInfo>,
+    currentImage: AvatarInfo,
     headerContent: ReactNode,
     canDeleteImage: boolean,
-    deleteImage: (url: string) => void,
+    deleteImage?: (url: string) => void,
   ) => void;
   canDeleteImage: boolean;
   deleteImage: (url: string) => void;
   removeImage: (url: string) => void;
   closeFullScreen: () => void;
-  setCurrentImage: (image: Avatar) => void;
+  setCurrentImage: (image: AvatarInfo) => void;
 }
 
 export const FullScreenContext = createContext<FullScreenContextType>(
