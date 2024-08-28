@@ -142,11 +142,11 @@ export class UsersService {
         return null;
       }
 
-      const isActiveAvatar = currentAvatar.url === avatarUrl;
-      if (!isActiveAvatar) return currentAvatar.url;
-
       const avatarPathToDelete = avatarUrl.split('/').slice(-3).join('/');
       await this.userRepository.removeAvatarFromStorage(avatarPathToDelete);
+
+      const isActiveAvatar = currentAvatar.url === avatarUrl;
+      if (!isActiveAvatar) return currentAvatar.url;
 
       const files = await this.userRepository.getUserAvatars(userUuid);
 

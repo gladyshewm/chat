@@ -52,5 +52,5 @@ type Mutation {
   Удаление аватара чата.
   Возвращаемая строка содержит URL нового аватара.
   """
-  deleteChatAvatar(chatId: ID!): String
+  deleteChatAvatar(chatId: ID!, avatarUrl: String!): String
 }

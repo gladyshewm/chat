@@ -92,7 +92,7 @@ export abstract class IMutation {
 
     abstract uploadChatAvatar(image: Upload, chatId: string): string | Promise<string>;
 
-    abstract deleteChatAvatar(chatId: string): Nullable<string> | Promise<Nullable<string>>;
+    abstract deleteChatAvatar(chatId: string, avatarUrl: string): Nullable<string> | Promise<Nullable<string>>;
 
     abstract sendMessage(chatId: string, content: string): Message | Promise<Message>;
 

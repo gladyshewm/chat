@@ -170,7 +170,7 @@ export class ChatsService {
             avatar.name,
           ),
           name: avatar.name,
-          createdAt: avatar.created_at,
+          createdAt: new Date(avatar.created_at),
         })),
       );
 
@@ -252,22 +252,23 @@ export class ChatsService {
     }
   }
 
-  async deleteChatAvatar(chatId: string): Promise<string | null> {
+  async deleteChatAvatar(
+    chatId: string,
+    avatarUrl: string,
+  ): Promise<string | null> {
     try {
       const currentChat =
         await this.chatRepository.getCurrentChatAvatar(chatId);
 
       if (!currentChat?.avatar_url) {
-        throw new HttpException('Аватар не найден', HttpStatus.NOT_FOUND);
+        this.logger.error(`Не удалось получить текущий аватар чата`);
+        return null;
       }
 
-      const currentAvatarPath = currentChat.avatar_url
-        .split('/')
-        .slice(-3)
-        .join('/');
+      const avatarPathToDelete = avatarUrl.split('/').slice(-3).join('/');
 
       const hasAccess =
-        await this.chatRepository.checkDeleteAccess(currentAvatarPath);
+        await this.chatRepository.checkDeleteAccess(avatarPathToDelete);
 
       if (!hasAccess) {
         throw new HttpException(
@@ -276,16 +277,16 @@ export class ChatsService {
         );
       }
 
-      await this.chatRepository.removeAvatarFromStorage(currentAvatarPath);
+      await this.chatRepository.removeAvatarFromStorage(avatarPathToDelete);
+
+      const isActiveAvatar = currentChat.avatar_url === avatarUrl;
+      if (!isActiveAvatar) return currentChat.avatar_url;
 
       const files = await this.chatRepository.getChatAvatars(chatId);
       let newAvatarUrl: string | null = null;
 
       if (files && files.length > 0) {
-        const lastFile = files.sort((a, b) =>
-          String(b.created_at).localeCompare(String(a.created_at)),
-        )[0];
-
+        const lastFile = files[0];
         const publicUrlData = await this.chatRepository.getAvatarPublicUrl(
           chatId,
           lastFile.name,

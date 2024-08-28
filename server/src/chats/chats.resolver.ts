@@ -79,7 +79,8 @@ export class ChatsResolver {
   @Mutation('deleteChatAvatar')
   async deleteChatAvatar(
     @Args('chatId') chatId: string,
+    @Args('avatarUrl') avatarUrl: string,
   ): Promise<string | null> {
-    return this.chatsService.deleteChatAvatar(chatId);
+    return this.chatsService.deleteChatAvatar(chatId, avatarUrl);
   }
 }

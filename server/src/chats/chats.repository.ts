@@ -6,7 +6,7 @@ import {
   GroupAvatarData,
   PartyItem,
 } from './models/chats.model';
-import { AvatarInfoData } from 'users/models/users.model';
+import { FileObject } from '@supabase/storage-js';
 
 export const CHAT_REPOSITORY = 'CHAT_REPOSITORY';
 
@@ -40,7 +40,7 @@ export interface ChatRepository {
   getCurrentChatAvatar(chatId: string): Promise<{ avatar_url: string } | null>;
   checkDeleteAccess(file_path: string): Promise<boolean>;
   removeAvatarFromStorage(avatarPath: string): Promise<void>;
-  getChatAvatars(chatId: string): Promise<AvatarInfoData[]>;
+  getChatAvatars(chatId: string): Promise<FileObject[]>;
 }
 
 @Injectable()
@@ -446,14 +446,15 @@ export class SupabaseChatRepository implements ChatRepository {
     }
   }
 
-  async getChatAvatars(chatId: string): Promise<AvatarInfoData[]> {
-    const { data: files, error: listError } = (await this.supabaseService
+  async getChatAvatars(chatId: string): Promise<FileObject[]> {
+    const { data: files, error: listError } = await this.supabaseService
       .getClient()
       .storage.from('avatars')
-      .list(`chats/${chatId}`)) as unknown as {
-      data: AvatarInfoData[];
-      error: any;
-    };
+      .list(`chats/${chatId}`, {
+        limit: 100,
+        offset: 0,
+        sortBy: { column: 'created_at', order: 'desc' },
+      });
 
     if (listError) {
       this.logger.error(
