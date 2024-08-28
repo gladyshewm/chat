@@ -12,6 +12,7 @@ export type ChatAllAvatarsQuery = { __typename?: 'Query', chatAllAvatars: Array<
 
 export type DeleteChatAvatarMutationVariables = Types.Exact<{
   chatId: Types.Scalars['ID']['input'];
+  avatarUrl: Types.Scalars['String']['input'];
 }>;
 
 
@@ -61,8 +62,8 @@ export type ChatAllAvatarsLazyQueryHookResult = ReturnType<typeof useChatAllAvat
 export type ChatAllAvatarsSuspenseQueryHookResult = ReturnType<typeof useChatAllAvatarsSuspenseQuery>;
 export type ChatAllAvatarsQueryResult = Apollo.QueryResult<ChatAllAvatarsQuery, ChatAllAvatarsQueryVariables>;
 export const DeleteChatAvatarDocument = gql`
-    mutation deleteChatAvatar($chatId: ID!) {
-  deleteChatAvatar(chatId: $chatId)
+    mutation deleteChatAvatar($chatId: ID!, $avatarUrl: String!) {
+  deleteChatAvatar(chatId: $chatId, avatarUrl: $avatarUrl)
 }
     `;
 export type DeleteChatAvatarMutationFn = Apollo.MutationFunction<DeleteChatAvatarMutation, DeleteChatAvatarMutationVariables>;
@@ -81,6 +82,7 @@ export type DeleteChatAvatarMutationFn = Apollo.MutationFunction<DeleteChatAvata
  * const [deleteChatAvatarMutation, { data, loading, error }] = useDeleteChatAvatarMutation({
  *   variables: {
  *      chatId: // value for 'chatId'
+ *      avatarUrl: // value for 'avatarUrl'
  *   },
  * });
  */

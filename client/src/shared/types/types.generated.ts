@@ -144,6 +144,7 @@ export type MutationDeleteChatArgs = {
 
 
 export type MutationDeleteChatAvatarArgs = {
+  avatarUrl: Scalars['String']['input'];
   chatId: Scalars['ID']['input'];
 };
 

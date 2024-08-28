@@ -1,19 +1,15 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import './Layout.css';
 import { Outlet } from 'react-router-dom';
 import { Loader } from '../../shared/ui';
-import { FullScreenProvider, ProfileProvider } from '../providers';
-import { FullScreenSlider } from '@shared/ui/Slider';
+import { ProfileProvider } from '../providers';
 import { Sidebar } from '@widgets';
 
 const Layout = () => {
   return (
     <div className="layout">
       <ProfileProvider>
-        <FullScreenProvider>
-          <Sidebar />
-          <FullScreenSlider />
-        </FullScreenProvider>
+        <Sidebar />
       </ProfileProvider>
       <Suspense fallback={<Loader />}>
         <Outlet />

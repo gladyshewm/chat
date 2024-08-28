@@ -8,26 +8,34 @@ import { CopyMessage, useCopyMessage } from '@features';
 import { DrawOutline, Loader, Slider } from '@shared/ui';
 import { IdentificationIcon, UserGroupIcon } from '@shared/assets';
 import { useEffect, useState } from 'react';
-import { useFullScreen } from '@app/providers/hooks/useFullScreen';
 import { useAuth } from '@app/providers/hooks/useAuth';
+import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
 
 interface GroupChatProfileProps {
   chat: ChatWithoutMessages;
+  updateChat: (chat: ChatWithoutMessages) => void;
 }
 
-const GroupChatProfile = ({ chat }: GroupChatProfileProps) => {
+const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
   const [avatars, setAvatars] = useState<AvatarInfo[]>([]);
   const [avatarsUrls, setAvatarsUrls] = useState<string[]>([]);
   const { copyMessage, handleCopy } = useCopyMessage();
-  const { openFullScreen } = useFullScreen();
   const { user } = useAuth();
+  const {
+    openSlider,
+    isOpen,
+    currentImage,
+    images,
+    headerContent,
+    closeSlider,
+    navigateSlider,
+    removeImage,
+  } = useFullScreenSlider();
 
   const [allAvatars, { loading: loadingAllAvatars, error: errorAllAvatars }] =
     useChatAllAvatarsLazyQuery();
-  const [
-    deleteAvatar,
-    { loading: loadingDeleteAvatar, error: errorDeleteAvatar },
-  ] = useDeleteChatAvatarMutation();
+  const [deleteAvatar, { loading: loadingDeleteAvatar }] =
+    useDeleteChatAvatarMutation();
 
   useEffect(() => {
     const fetchChat = async () => {
@@ -51,13 +59,23 @@ const GroupChatProfile = ({ chat }: GroupChatProfileProps) => {
     fetchChat();
   }, [allAvatars, chat]);
 
-  const handleDeleteAvatar = async () => {
+  const handleDeleteAvatar = async (url: string) => {
     try {
-      await deleteAvatar({
+      const { data } = await deleteAvatar({
         variables: {
           chatId: chat.id,
+          avatarUrl: url,
         },
       });
+
+      removeImage(url);
+      setAvatars(avatars.filter((avatar) => avatar.url !== url));
+
+      const updatedChat = {
+        ...chat,
+        groupAvatarUrl: data?.deleteChatAvatar,
+      };
+      updateChat(updatedChat);
     } catch (error) {
       console.error(error);
       throw new Error(error);
@@ -82,21 +100,21 @@ const GroupChatProfile = ({ chat }: GroupChatProfileProps) => {
       </div>
     );
 
-    if (user?.uuid === chat.userUuid) {
-      openFullScreen(
-        avatars,
-        avatars[index],
-        headerContent,
-        true,
-        handleDeleteAvatar,
-      );
-    } else {
-      openFullScreen(avatars, avatars[index], headerContent, false);
-    }
+    openSlider(avatars, avatars[index], headerContent);
   };
 
   return (
     <>
+      <FullScreenSlider
+        isOpen={isOpen}
+        currentImage={currentImage}
+        images={images}
+        headerContent={headerContent}
+        onClose={closeSlider}
+        onNavigate={navigateSlider}
+        onDelete={user?.uuid === chat.userUuid ? handleDeleteAvatar : undefined}
+        isLoading={loadingDeleteAvatar}
+      />
       <CopyMessage copyMessage={copyMessage} />
       <main className="profile-settings__main">
         <DrawOutline

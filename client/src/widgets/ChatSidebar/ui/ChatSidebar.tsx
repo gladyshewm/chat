@@ -12,6 +12,7 @@ interface ChatSidebarProps {
   handleMessageSelect: (messageId: string) => void;
   isChatInfo: boolean;
   setIsChatInfo: (isChatInfo: boolean) => void;
+  updateChat: (chat: ChatWithoutMessages) => void;
 }
 
 const ChatSidebar = ({
@@ -21,6 +22,7 @@ const ChatSidebar = ({
   chat,
   isChatInfo,
   setIsChatInfo,
+  updateChat,
 }: ChatSidebarProps) => {
   return (
     <AnimatePresence>
@@ -40,7 +42,11 @@ const ChatSidebar = ({
               setIsSearch={setIsSearch}
             />
           ) : (
-            <ChatProfile setIsChatInfo={setIsChatInfo} chat={chat} />
+            <ChatProfile
+              setIsChatInfo={setIsChatInfo}
+              chat={chat}
+              updateChat={updateChat}
+            />
           )}
         </motion.div>
       )}

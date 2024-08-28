@@ -10,9 +10,10 @@ import GroupChatProfile from './GroupChatProfile/GroupChatProfile';
 interface ChatProfileProps {
   setIsChatInfo: (isChatInfo: boolean) => void;
   chat: ChatWithoutMessages;
+  updateChat: (chat: ChatWithoutMessages) => void;
 }
 
-const ChatProfile = ({ setIsChatInfo, chat }: ChatProfileProps) => {
+const ChatProfile = ({ setIsChatInfo, chat, updateChat }: ChatProfileProps) => {
   return (
     <AnimatePresence>
       <DrawOutline
@@ -42,7 +43,7 @@ const ChatProfile = ({ setIsChatInfo, chat }: ChatProfileProps) => {
           </motion.header>
         </DrawOutline>
         {chat.isGroupChat ? (
-          <GroupChatProfile chat={chat} />
+          <GroupChatProfile chat={chat} updateChat={updateChat} />
         ) : (
           <SingleChatProfile chat={chat} />
         )}

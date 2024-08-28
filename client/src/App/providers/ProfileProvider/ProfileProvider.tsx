@@ -1,6 +1,5 @@
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import { ProfileContext } from './ProfileContext';
-import { Avatar } from '../FullScreenProvider/FullScreenContext';
 import {
   useChangeCredentialsMutation,
   useDeleteAvatarMutation,
@@ -8,7 +7,7 @@ import {
   useUserAllAvatarsLazyQuery,
   useUserAvatarLazyQuery,
 } from './profile.generated';
-import { ChangeCredentialsInput } from '@shared/types';
+import { AvatarInfo, ChangeCredentialsInput } from '@shared/types';
 import { useAuth } from '../hooks/useAuth';
 
 interface ProfileProviderProps {
@@ -18,7 +17,7 @@ interface ProfileProviderProps {
 export const ProfileProvider = ({ children }: ProfileProviderProps) => {
   const { user, setUser } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [allAvatars, setAllAvatars] = useState<Avatar[] | []>([]);
+  const [allAvatars, setAllAvatars] = useState<AvatarInfo[] | []>([]);
   const [avatarUrls, setAvatarUrls] = useState<string[] | []>([]);
   const [profileLoadingStates, setProfileLoadingStates] = useState({
     deleteAvatar: false,
@@ -93,7 +92,7 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
         });
 
         if (data) {
-          const newAvatarUrl: Avatar = data.uploadAvatar;
+          const newAvatarUrl: AvatarInfo = data.uploadAvatar;
           setAvatarUrl(newAvatarUrl.url);
           setAllAvatars([...allAvatars, newAvatarUrl]);
           await refetchQueryAllAvatars();
@@ -183,7 +182,7 @@ export const ProfileProvider = ({ children }: ProfileProviderProps) => {
       });
 
       if (dataQueryAllAvatars && dataQueryAllAvatars.userAllAvatars) {
-        setAllAvatars(dataQueryAllAvatars.userAllAvatars as Avatar[]);
+        setAllAvatars(dataQueryAllAvatars.userAllAvatars as AvatarInfo[]);
       }
 
       setLoading('profileData', false);

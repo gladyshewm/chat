@@ -1,10 +1,10 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import './DownLoadButton.css';
-import { Avatar } from '@app/providers/FullScreenProvider/FullScreenContext';
 import { DocumentArrowDownIcon } from '@shared/assets';
+import { AvatarInfo } from '@shared/types';
 
 interface DownLoadButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  image: Avatar;
+  image: AvatarInfo;
   className?: string;
   children?: ReactNode;
 }
@@ -38,7 +38,9 @@ export const DownLoadButton = ({
       onClick={handleDownload}
       {...props}
     >
-      <DocumentArrowDownIcon />
+      <abbr title="Загрузить">
+        <DocumentArrowDownIcon />
+      </abbr>
       {children}
     </button>
   );

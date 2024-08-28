@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import './ProfileInfo.css';
 import { DrawOutline, Loader, OptionButton, Slider } from '@shared/ui';
 import { logoutButtonVariants } from '../motion';
-import { useFullScreen } from '@app/providers/hooks/useFullScreen';
 import { useProfile } from '@app/providers/hooks/useProfile';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import {
@@ -17,6 +16,7 @@ import {
   UserIcon,
 } from '@shared/assets';
 import { CopyMessage, useCopyMessage } from '@features';
+import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
 
 interface ProfileInfoProps {
   handleBackClick: () => void;
@@ -29,7 +29,6 @@ const ProfileInfo = ({
 }: ProfileInfoProps) => {
   const [isExitClicked, setIsExitClicked] = useState(false);
   const navigate = useNavigate();
-  const { openFullScreen } = useFullScreen();
   const {
     avatarUrl,
     errorQueryAvatar,
@@ -40,6 +39,16 @@ const ProfileInfo = ({
   } = useProfile();
   const { user, logout, loadingStates } = useAuth();
   const { copyMessage, handleCopy } = useCopyMessage();
+  const {
+    openSlider,
+    isOpen,
+    currentImage,
+    images,
+    headerContent,
+    closeSlider,
+    navigateSlider,
+    removeImage,
+  } = useFullScreenSlider();
 
   const handleImageClick = (index: number) => {
     const headerContent = (
@@ -54,13 +63,7 @@ const ProfileInfo = ({
         </div>
       </div>
     );
-    openFullScreen(
-      allAvatars,
-      allAvatars[index],
-      headerContent,
-      true,
-      handleDeleteAvatar,
-    );
+    openSlider(allAvatars, allAvatars[index], headerContent);
   };
 
   const handlePencilClick = () => {
@@ -85,9 +88,24 @@ const ProfileInfo = ({
     }
   };
 
+  const onDeleteAvatar = async (url: string) => {
+    await handleDeleteAvatar(url);
+    removeImage(url);
+  };
+
   return (
     <>
       {(loadingStates.logOut || profileLoadingStates.profileData) && <Loader />}
+      <FullScreenSlider
+        isOpen={isOpen}
+        currentImage={currentImage}
+        images={images}
+        headerContent={headerContent}
+        onClose={closeSlider}
+        onNavigate={navigateSlider}
+        onDelete={onDeleteAvatar}
+        isLoading={profileLoadingStates.deleteAvatar}
+      />
       <CopyMessage copyMessage={copyMessage} />
       <div className="profile-settings">
         <DrawOutline orientation="horizontal" position="bottom">

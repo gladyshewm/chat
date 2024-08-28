@@ -17,8 +17,6 @@ import {
   chatVariants,
 } from './motion';
 import ChatHeader from './ChatHeader/ChatHeader';
-import { FullScreenProvider } from '@app/providers';
-import { FullScreenSlider } from '@shared/ui/Slider';
 import { ChatSidebar } from '@widgets';
 
 const Chat = () => {
@@ -55,6 +53,10 @@ const Chat = () => {
         },
       });
     }
+  };
+
+  const updateChat = (updatedChat: ChatWithoutMessages) => {
+    setChat(updatedChat);
   };
 
   const handleKeyDown = () => {
@@ -108,68 +110,66 @@ const Chat = () => {
   if (error) return <div>{`Ошибка: ${error.message}`}</div>;
 
   return (
-    <FullScreenProvider>
-      <FullScreenSlider />
-      <AnimatePresence mode="wait">
-        <motion.div className="chat" key={chat_id} {...chatVariants}>
-          <SpaceBackground />
-          {!chat ? (
-            <Loader />
-          ) : (
-            <motion.div
-              key={chat.id}
-              className={`chat-content ${isSearch || isChatInfo ? 'reduced' : ''}`}
-              variants={chatContentVariants}
-              initial="fullWidth"
+    <AnimatePresence mode="wait">
+      <motion.div className="chat" key={chat_id} {...chatVariants}>
+        <SpaceBackground />
+        {!chat ? (
+          <Loader />
+        ) : (
+          <motion.div
+            key={chat.id}
+            className={`chat-content ${isSearch || isChatInfo ? 'reduced' : ''}`}
+            variants={chatContentVariants}
+            initial="fullWidth"
+            animate={isSearch || isChatInfo ? 'reduced' : 'full'}
+            transition={{ duration: 0.3 }}
+          >
+            <DrawOutline orientation="horizontal" position="bottom">
+              <ChatHeader
+                chat={chat}
+                user={user}
+                setIsSearch={handleSearchToggle}
+                setIsChatInfo={handleChatInfoToggle}
+              />
+            </DrawOutline>
+            <motion.main className="chat__body">
+              <Messages
+                user={user as UserInfo}
+                chat={chat}
+                isSearch={isSearch}
+                isChatInfo={isChatInfo}
+                selectedMessageId={selectedMessageId}
+              />
+            </motion.main>
+            <motion.footer
+              layoutId="chat__footer"
+              className="chat__footer"
+              variants={chatFooterVariants}
+              initial="full"
               animate={isSearch || isChatInfo ? 'reduced' : 'full'}
               transition={{ duration: 0.3 }}
             >
-              <DrawOutline orientation="horizontal" position="bottom">
-                <ChatHeader
-                  chat={chat}
-                  user={user}
-                  setIsSearch={handleSearchToggle}
-                  setIsChatInfo={handleChatInfoToggle}
-                />
-              </DrawOutline>
-              <motion.main className="chat__body">
-                <Messages
-                  user={user as UserInfo}
-                  chat={chat}
-                  isSearch={isSearch}
-                  isChatInfo={isChatInfo}
-                  selectedMessageId={selectedMessageId}
-                />
-              </motion.main>
-              <motion.footer
-                layoutId="chat__footer"
-                className="chat__footer"
-                variants={chatFooterVariants}
-                initial="full"
-                animate={isSearch || isChatInfo ? 'reduced' : 'full'}
-                transition={{ duration: 0.3 }}
-              >
-                <MessageForm
-                  sendMessage={sendMessage}
-                  onKeyDown={handleKeyDown}
-                  onBlur={handleBlur}
-                  onFocus={handleFocus}
-                />
-              </motion.footer>
-            </motion.div>
-          )}
-          <ChatSidebar
-            chat={chat as ChatWithoutMessages}
-            isSearch={isSearch}
-            setIsSearch={handleSearchToggle}
-            handleMessageSelect={handleMessageSelect}
-            isChatInfo={isChatInfo}
-            setIsChatInfo={handleChatInfoToggle}
-          />
-          {loading && <Loader />}
-        </motion.div>
-      </AnimatePresence>
-    </FullScreenProvider>
+              <MessageForm
+                sendMessage={sendMessage}
+                onKeyDown={handleKeyDown}
+                onBlur={handleBlur}
+                onFocus={handleFocus}
+              />
+            </motion.footer>
+          </motion.div>
+        )}
+        <ChatSidebar
+          chat={chat as ChatWithoutMessages}
+          isSearch={isSearch}
+          setIsSearch={handleSearchToggle}
+          handleMessageSelect={handleMessageSelect}
+          isChatInfo={isChatInfo}
+          setIsChatInfo={handleChatInfoToggle}
+          updateChat={updateChat}
+        />
+        {loading && <Loader />}
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

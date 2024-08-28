@@ -6,6 +6,6 @@ query chatAllAvatars($chatId: ID!) {
   }
 }
 
-mutation deleteChatAvatar($chatId: ID!) {
-  deleteChatAvatar(chatId: $chatId)
+mutation deleteChatAvatar($chatId: ID!, $avatarUrl: String!) {
+  deleteChatAvatar(chatId: $chatId, avatarUrl: $avatarUrl)
 }

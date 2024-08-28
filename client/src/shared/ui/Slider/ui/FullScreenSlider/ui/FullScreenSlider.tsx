@@ -1,60 +1,59 @@
-import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { format } from 'date-fns';
 import './FullScreenSlider.css';
 import { ru } from 'date-fns/locale';
-import { imageTransition, imageVariants, sliderVariants } from '../motion';
-import { useFullScreen } from '@app/providers/hooks/useFullScreen';
-import { useProfile } from '@app/providers/hooks/useProfile';
+import { imageTransition, imageVariants, sliderVariants } from '../../motion';
 import { DownLoadButton, Loader } from '@shared/ui';
 import { MID_ANIMATION_DURATION } from '@shared/constants/motion';
 import { ChevronLeftIcon, TrashIcon, XmarkIcon } from '@shared/assets';
+import { AvatarInfo } from '@shared/types';
+import { createPortal } from 'react-dom';
+import { useState } from 'react';
 
-const FullScreenSlider = () => {
+interface FullScreenSliderProps {
+  isOpen: boolean;
+  currentImage: AvatarInfo | null;
+  images: AvatarInfo[];
+  headerContent: React.ReactNode;
+  onClose: () => void;
+  onDelete?: (url: string) => void;
+  onNavigate: (direction: number) => void;
+  isLoading?: boolean;
+}
+
+export const FullScreenSlider = ({
+  isOpen,
+  currentImage,
+  images,
+  headerContent,
+  onClose,
+  onDelete,
+  onNavigate,
+  isLoading,
+}: FullScreenSliderProps) => {
   const [direction, setDirection] = useState(0);
-  const {
-    isFullScreen,
-    currentImage,
-    images,
-    headerContent,
-    closeFullScreen,
-    setCurrentImage,
-    canDeleteImage,
-    deleteImage,
-    removeImage,
-  } = useFullScreen();
-  const { profileLoadingStates } = useProfile();
 
-  if (!isFullScreen || !currentImage) return null;
+  if (!isOpen || !currentImage || !images || !images.length) return null;
 
-  const handleDeletePhoto = async () => {
-    if (canDeleteImage && currentImage) {
-      await deleteImage(currentImage.url);
-      removeImage(currentImage.url);
-    }
-  };
-
-  const currentIndex = images.indexOf(currentImage);
+  // const currentIndex = images.indexOf(currentImage);
   const createdAt = currentImage.createdAt.toString();
-
-  const paginate = (direction: number) => {
-    const newIndex = (currentIndex + direction + images.length) % images.length;
-    setCurrentImage(images[newIndex]);
-    setDirection(direction);
-  };
 
   const swipeConfidenceThreshold = 10000;
   const swipePower = (offset: number, velocity: number) => {
     return Math.abs(offset) * velocity;
   };
 
-  if (!images || !images.length) return null;
+  const paginate = (direction: number) => {
+    onNavigate(direction);
+    setDirection(direction);
+  };
 
-  return (
+  return createPortal(
     <AnimatePresence custom={direction}>
-      {profileLoadingStates?.deleteAvatar && <Loader />}
+      {isLoading && <Loader />}
       <motion.div
         className="full-screen-slider"
+        key={currentImage.url}
         variants={sliderVariants}
         initial="initial"
         animate="animate"
@@ -62,15 +61,24 @@ const FullScreenSlider = () => {
       >
         <div className="slider-header">
           {headerContent}
-          {canDeleteImage && (
-            <button className="close-button" onClick={handleDeletePhoto}>
-              <TrashIcon />
+          <div className="slider-header__buttons">
+            {onDelete && (
+              <button
+                className="close-button"
+                onClick={() => onDelete(currentImage.url)}
+              >
+                <abbr title="Удалить">
+                  <TrashIcon />
+                </abbr>
+              </button>
+            )}
+            <DownLoadButton image={currentImage} />
+            <button className="close-button" onClick={onClose}>
+              <abbr title="Закрыть">
+                <XmarkIcon />
+              </abbr>
             </button>
-          )}
-          <DownLoadButton image={currentImage} />
-          <button className="close-button" onClick={closeFullScreen}>
-            <XmarkIcon />
-          </button>
+          </div>
         </div>
         <motion.div
           className="slider-content"
@@ -95,7 +103,6 @@ const FullScreenSlider = () => {
             dragElastic={1}
             onDragEnd={(e, { offset, velocity }) => {
               const swipe = swipePower(offset.x, velocity.x);
-
               if (swipe < -swipeConfidenceThreshold) {
                 paginate(1);
               } else if (swipe > swipeConfidenceThreshold) {
@@ -121,8 +128,7 @@ const FullScreenSlider = () => {
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.getElementById('modal')!,
   );
 };
-
-export default FullScreenSlider;
