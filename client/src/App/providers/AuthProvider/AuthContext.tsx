@@ -16,12 +16,14 @@ interface AuthContextType {
   register: (createInput: CreateUserInput) => Promise<UserWithToken>;
   login: (loginInput: LoginUserInput) => Promise<UserWithToken>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   loadingStates: {
     checkAuth: boolean;
     user: boolean;
     createUser: boolean;
     logIn: boolean;
     logOut: boolean;
+    deleteUser: boolean;
   };
 }
 

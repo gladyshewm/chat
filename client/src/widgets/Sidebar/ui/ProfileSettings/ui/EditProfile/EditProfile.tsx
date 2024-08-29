@@ -25,6 +25,7 @@ import {
   ExclamationTriangleIcon,
   XmarkIcon,
 } from '@shared/assets';
+import DeleteModal from './DeleteModal/DeleteModal';
 
 interface EditProfileProps {
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,6 +35,7 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
   const [avatar, setAvatar] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     avatarUrl,
     errorQueryAvatar,
@@ -41,7 +43,7 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
     handleChangeCredentials,
     profileLoadingStates,
   } = useProfile();
-  const { user } = useAuth();
+  const { user, deleteAccount, loadingStates } = useAuth();
   const initialValues: ChangeCredentialsSchema = {
     username: user?.name || '',
     email: user?.email || '',
@@ -245,6 +247,19 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
                     Изменить данные
                   </CustomButton>
                 </DrawOutlineRect>
+                <DrawOutlineRect
+                  className="button-wrapper delete-button-wrapper"
+                  rx="15px"
+                  stroke="var(--danger-color-light)"
+                  strokeWidth={1}
+                >
+                  <CustomButton
+                    type="button"
+                    onClick={() => setIsModalOpen(true)}
+                  >
+                    Удалить профиль
+                  </CustomButton>
+                </DrawOutlineRect>
                 <AnimatePresence>
                   {successMessage.length > 0 && (
                     <motion.div
@@ -318,6 +333,12 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
           )}
         </Formik>
       </div>
+      <DeleteModal
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        handleDelete={deleteAccount}
+        loading={loadingStates.deleteUser}
+      />
     </div>
   );
 };

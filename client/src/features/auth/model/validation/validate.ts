@@ -46,7 +46,7 @@ const changeCredentials = {
     then: (schema) =>
       schema
         .oneOf([Yup.ref('password')], 'Пароли не совпадают')
-        .required('Введите подтверждение пароля'),
+        .required('Подтвердите пароль'),
     otherwise: (schema) =>
       schema.oneOf([Yup.ref('password')], 'Пароли не совпадают').optional(),
   }),

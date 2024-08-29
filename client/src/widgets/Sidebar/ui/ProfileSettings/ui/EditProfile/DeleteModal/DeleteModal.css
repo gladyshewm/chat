@@ -1,0 +1,99 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-delete__wrapper {
+  position: relative;
+  z-index: 1001;
+  padding: 0 0.1rem;
+}
+
+.modal-delete {
+  width: 28.5rem;
+  height: 14.3rem;
+  background-color: rgba(0, 0, 0, 0.9);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+
+  & .draw-outline-wrapper {
+    height: 50%;
+    width: 100%;
+  }
+
+  & header {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & svg {
+      flex-grow: 1;
+      height: 5rem;
+      width: 5rem;
+      stroke: var(--danger-color-light);
+    }
+
+    & .modal-delete__title {
+      height: 5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-evenly;
+
+      & h2 {
+        color: #fff;
+        font-size: 1.3rem;
+        font-weight: bold;
+      }
+
+      & p {
+        color: var(--outline-main-color);
+        margin-top: 0.3rem;
+      }
+    }
+  }
+
+  & main {
+    height: 50%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1rem;
+
+    & .draw-outline-rect-wrapper {
+      margin: 0 1rem;
+      width: 100%;
+      padding: 0 0.1rem;
+    }
+
+    & button {
+      height: 3.2rem;
+      width: 100%;
+      font-weight: bold;
+    }
+
+    & .delete-button-wrapper {
+      & .custom-button {
+        background-color: transparent;
+        color: var(--danger-color-light);
+
+        &:hover {
+          background-color: var(--danger-color);
+          color: #000;
+        }
+      }
+    }
+  }
+}

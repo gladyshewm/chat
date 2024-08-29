@@ -10,6 +10,8 @@
   --col2: #258770; /* rgba(37, 135, 112, 1); */
   --col3: #2dafe5;
   --error-color: #fc7d6c; /* rgba(252, 125, 108, 1) */
+  --danger-color: rgba(166, 26, 8, 1);
+  --danger-color-light: rgb(230, 44, 20);
   --outline-main-color: #999999; /* rgba(153, 153, 153, 1); */
   --outline-hover-color: #707070; /* rgba(112, 112, 112, 1); */
 }
@@ -17,6 +19,7 @@
 * {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
   font-family: 'Comfortaa' !important;
 
   scroll-behavior: smooth;

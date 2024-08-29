@@ -28,7 +28,6 @@
   }
 
   & .input__field {
-    box-sizing: border-box;
     display: block;
     outline: none;
     background: transparent;
@@ -39,6 +38,7 @@
     width: 21.5rem;
     height: 3.2rem;
     color: var(--input-color);
+    font-size: 1rem;
 
     &:focus,
     &:not(:placeholder-shown) {

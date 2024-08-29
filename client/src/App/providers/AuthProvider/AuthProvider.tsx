@@ -3,6 +3,7 @@ import { useApolloClient } from '@apollo/client';
 import { AuthContext } from './AuthContext';
 import {
   useCreateUserMutation,
+  useDeleteUserMutation,
   useLogInUserMutation,
   useLogOutUserMutation,
   useRefreshTokenMutation,
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     createUser: false,
     logIn: false,
     logOut: false,
+    deleteUser: false,
   });
 
   const setLoading = useCallback(
@@ -42,6 +44,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [fetchUser] = useUserLazyQuery();
   const [logOutUserMutation] = useLogOutUserMutation();
   const [logInUserMutation] = useLogInUserMutation();
+  const [deleteUserMutation] = useDeleteUserMutation();
   const [refreshTokenMutation] = useRefreshTokenMutation();
 
   useEffect(() => {
@@ -182,6 +185,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   };
 
+  const deleteAccount = async (): Promise<void> => {
+    setLoading('deleteUser', true);
+    try {
+      await deleteUserMutation();
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('accessToken');
+      client.clearStore();
+    } catch (error) {
+      console.error('Ошибка при удалении аккаунта:', error.message);
+      throw new Error(error.message);
+    } finally {
+      setLoading('deleteUser', false);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -193,6 +212,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         register,
         login,
         logout,
+        deleteAccount,
         loadingStates,
       }}
     >
