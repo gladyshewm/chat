@@ -1,23 +1,51 @@
 import React from 'react';
 import { Field, Form, Formik } from 'formik';
 import './MessageForm.css';
-import { validationMessageFormSchema } from '../../model/validate';
+import { validationMessageFormSchema } from '../model/validate';
 import { DrawOutlineRect, Emoji } from '@shared/ui';
 import { SendIcon } from '@shared/assets';
+import { useSendMessageMutation } from './message-form.generated';
 
 interface MessageFormProps {
-  sendMessage: (message: string) => void;
+  chat_id: string;
   onKeyDown?: (userName: string) => void;
   onBlur?: (userName: string) => void;
   onFocus?: (userName: string) => void;
 }
 
-const MessageForm = ({
-  sendMessage,
+export const MessageForm = ({
   onKeyDown,
   onBlur,
   onFocus,
+  chat_id,
 }: MessageFormProps) => {
+  const [postMessage] = useSendMessageMutation();
+
+  const sendMessage = (message: string) => {
+    if (chat_id && message) {
+      // onOptimisticUpdate(optimisticMessage);
+
+      postMessage({
+        variables: {
+          chatId: chat_id,
+          content: message,
+        },
+        /* optimisticResponse: {
+          sendMessage: {
+            id: Math.random().toString(),
+            chatId: chat_id,
+            userId: user?.uuid as string,
+            userName: user?.name as string,
+            content: message,
+            avatarUrl: '',
+            createdAt: new Date().toISOString(),
+            __typename: 'Message',
+          },
+        }, */
+      });
+    }
+  };
+
   return (
     <Formik
       initialValues={{ message: '' }}
@@ -60,5 +88,3 @@ const MessageForm = ({
     </Formik>
   );
 };
-
-export default MessageForm;

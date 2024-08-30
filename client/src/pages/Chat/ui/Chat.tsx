@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import './Chat.css';
 import {
   useChatByIdLazyQuery,
-  useSendMessageMutation,
   useSendTypingStatusMutation,
 } from './chat.generated';
 import { ChatWithoutMessages, UserInfo } from '@shared/types';
@@ -22,8 +21,7 @@ import { ChatSidebar } from '@widgets';
 const Chat = () => {
   const { user } = useAuth();
   const { id: chat_id } = useParams<{ id: string }>();
-  const [postMessage] = useSendMessageMutation();
-  const [chatQuery, { data, loading, error }] = useChatByIdLazyQuery();
+  const [chatQuery, { loading, error }] = useChatByIdLazyQuery();
   const [sendTypingStatus] = useSendTypingStatusMutation();
   const [chat, setChat] = useState<ChatWithoutMessages | null>(null);
   const [isSearch, setIsSearch] = useState(false);
@@ -33,31 +31,26 @@ const Chat = () => {
   const [isChatInfo, setIsChatInfo] = useState(false);
 
   useEffect(() => {
+    setChat(null);
     chatQuery({
       variables: {
         chatId: chat_id as string,
       },
+      onCompleted: (data) => {
+        if (data && data.chatById) {
+          setChat(data.chatById as ChatWithoutMessages);
+        }
+      },
     });
   }, [chatQuery, chat_id]);
-
-  useEffect(() => {
-    if (data) setChat(data?.chatById as ChatWithoutMessages);
-  }, [data]);
-
-  const sendMessage = (message: string) => {
-    if (chat_id && message) {
-      postMessage({
-        variables: {
-          chatId: chat_id,
-          content: message,
-        },
-      });
-    }
-  };
 
   const updateChat = (updatedChat: ChatWithoutMessages) => {
     setChat(updatedChat);
   };
+
+  /* const handleOptimisticUpdate = (optimisticMessage: Message) => {
+    setMessages((prevMessages) => [optimisticMessage, ...prevMessages]);
+  }; */
 
   const handleKeyDown = () => {
     sendTypingStatus({
@@ -113,7 +106,7 @@ const Chat = () => {
     <AnimatePresence mode="wait">
       <motion.div className="chat" key={chat_id} {...chatVariants}>
         <SpaceBackground />
-        {!chat ? (
+        {!chat || loading ? (
           <Loader />
         ) : (
           <motion.div
@@ -150,7 +143,7 @@ const Chat = () => {
               transition={{ duration: 0.3 }}
             >
               <MessageForm
-                sendMessage={sendMessage}
+                chat_id={chat_id as string}
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
@@ -167,7 +160,6 @@ const Chat = () => {
           setIsChatInfo={handleChatInfoToggle}
           updateChat={updateChat}
         />
-        {loading && <Loader />}
       </motion.div>
     </AnimatePresence>
   );

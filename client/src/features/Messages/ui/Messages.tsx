@@ -33,27 +33,6 @@ const Messages = ({
     container: containerRef,
   });
 
-  useMessageSentSubscription({
-    variables: {
-      chatId: chat.id,
-    },
-    onError: (error) => {
-      console.error(error);
-    },
-    onData: (data) => {
-      if (!data) return;
-
-      setMessages((prevMessages) => {
-        const newMessage = data.data.data?.messageSent;
-        if (!newMessage) return prevMessages;
-        if (!prevMessages.some((msg) => msg.id === newMessage.id)) {
-          return [newMessage, ...prevMessages];
-        }
-        return prevMessages;
-      });
-    },
-  });
-
   useChatMessagesQuery({
     variables: {
       chatId: chat.id,
@@ -67,6 +46,26 @@ const Messages = ({
     },
     onError: (error) => {
       console.error(error);
+    },
+  });
+
+  useMessageSentSubscription({
+    variables: {
+      chatId: chat.id,
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+    onData: (data) => {
+      if (!data) return;
+      setMessages((prevMessages) => {
+        const newMessage = data.data.data?.messageSent;
+        if (!newMessage) return prevMessages;
+        if (!prevMessages.some((msg) => msg.id === newMessage.id)) {
+          return [newMessage, ...prevMessages];
+        }
+        return prevMessages;
+      });
     },
   });
 

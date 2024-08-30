@@ -14,15 +14,6 @@ query chatById($chatId: ID!) {
   }
 }
 
-mutation sendMessage($chatId: ID!, $content: String!) {
-  sendMessage(chatId: $chatId, content: $content) {
-    userName
-    content
-    avatarUrl
-    createdAt
-  }
-}
-
 mutation sendTypingStatus(
   $chatId: ID!
   $userName: String!

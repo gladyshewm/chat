@@ -10,14 +10,6 @@ export type ChatByIdQueryVariables = Types.Exact<{
 
 export type ChatByIdQuery = { __typename?: 'Query', chatById?: { __typename?: 'ChatWithoutMessages', id: string, name?: string | null, userUuid: string, isGroupChat: boolean, groupAvatarUrl?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> } | null };
 
-export type SendMessageMutationVariables = Types.Exact<{
-  chatId: Types.Scalars['ID']['input'];
-  content: Types.Scalars['String']['input'];
-}>;
-
-
-export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: { __typename?: 'Message', userName: string, content: string, avatarUrl?: string | null, createdAt: any } };
-
 export type SendTypingStatusMutationVariables = Types.Exact<{
   chatId: Types.Scalars['ID']['input'];
   userName: Types.Scalars['String']['input'];
@@ -85,43 +77,6 @@ export type ChatByIdQueryHookResult = ReturnType<typeof useChatByIdQuery>;
 export type ChatByIdLazyQueryHookResult = ReturnType<typeof useChatByIdLazyQuery>;
 export type ChatByIdSuspenseQueryHookResult = ReturnType<typeof useChatByIdSuspenseQuery>;
 export type ChatByIdQueryResult = Apollo.QueryResult<ChatByIdQuery, ChatByIdQueryVariables>;
-export const SendMessageDocument = gql`
-    mutation sendMessage($chatId: ID!, $content: String!) {
-  sendMessage(chatId: $chatId, content: $content) {
-    userName
-    content
-    avatarUrl
-    createdAt
-  }
-}
-    `;
-export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation, SendMessageMutationVariables>;
-
-/**
- * __useSendMessageMutation__
- *
- * To run a mutation, you first call `useSendMessageMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSendMessageMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [sendMessageMutation, { data, loading, error }] = useSendMessageMutation({
- *   variables: {
- *      chatId: // value for 'chatId'
- *      content: // value for 'content'
- *   },
- * });
- */
-export function useSendMessageMutation(baseOptions?: Apollo.MutationHookOptions<SendMessageMutation, SendMessageMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SendMessageMutation, SendMessageMutationVariables>(SendMessageDocument, options);
-      }
-export type SendMessageMutationHookResult = ReturnType<typeof useSendMessageMutation>;
-export type SendMessageMutationResult = Apollo.MutationResult<SendMessageMutation>;
-export type SendMessageMutationOptions = Apollo.BaseMutationOptions<SendMessageMutation, SendMessageMutationVariables>;
 export const SendTypingStatusDocument = gql`
     mutation sendTypingStatus($chatId: ID!, $userName: String!, $isTyping: Boolean!) {
   sendTypingStatus(chatId: $chatId, userName: $userName, isTyping: $isTyping) {
