@@ -1,5 +1,4 @@
 .message-form {
-  box-sizing: border-box;
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -15,7 +14,6 @@
 
   & .message-input {
     position: relative;
-    box-sizing: border-box;
     flex-grow: 1;
     width: 100%;
     height: 50px;

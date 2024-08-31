@@ -48,10 +48,6 @@ const Chat = () => {
     setChat(updatedChat);
   };
 
-  /* const handleOptimisticUpdate = (optimisticMessage: Message) => {
-    setMessages((prevMessages) => [optimisticMessage, ...prevMessages]);
-  }; */
-
   const handleKeyDown = () => {
     sendTypingStatus({
       variables: {
@@ -147,6 +143,7 @@ const Chat = () => {
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
+                user={user as UserInfo}
               />
             </motion.footer>
           </motion.div>

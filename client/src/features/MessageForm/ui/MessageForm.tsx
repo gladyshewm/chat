@@ -5,12 +5,14 @@ import { validationMessageFormSchema } from '../model/validate';
 import { DrawOutlineRect, Emoji } from '@shared/ui';
 import { SendIcon } from '@shared/assets';
 import { useSendMessageMutation } from './message-form.generated';
+import { UserInfo } from '@shared/types';
 
 interface MessageFormProps {
   chat_id: string;
   onKeyDown?: (userName: string) => void;
   onBlur?: (userName: string) => void;
   onFocus?: (userName: string) => void;
+  user: UserInfo;
 }
 
 export const MessageForm = ({
@@ -18,13 +20,13 @@ export const MessageForm = ({
   onBlur,
   onFocus,
   chat_id,
+  user,
 }: MessageFormProps) => {
   const [postMessage] = useSendMessageMutation();
 
   const sendMessage = (message: string) => {
+    // const tempId = `temp_${Date.now()}`;
     if (chat_id && message) {
-      // onOptimisticUpdate(optimisticMessage);
-
       postMessage({
         variables: {
           chatId: chat_id,
@@ -32,15 +34,48 @@ export const MessageForm = ({
         },
         /* optimisticResponse: {
           sendMessage: {
-            id: Math.random().toString(),
+            __typename: 'Message',
+            id: tempId, //uuidv4()
             chatId: chat_id,
-            userId: user?.uuid as string,
-            userName: user?.name as string,
+            userId: user.uuid as string,
+            userName: user.name as string,
             content: message,
             avatarUrl: '',
             createdAt: new Date().toISOString(),
-            __typename: 'Message',
           },
+        },
+        update: (cache, { data }) => {
+          if (data && data.sendMessage) {
+            const newMessage = data.sendMessage;
+            cache.modify({
+              fields: {
+                chatMessages(existingMessages = [], { readField }) {
+                  const newMessageRef = cache.writeFragment({
+                    data: newMessage,
+                    fragment: gql`
+                      fragment NewMessage on Message {
+                        id
+                        chatId
+                        userId
+                        userName
+                        content
+                        avatarUrl
+                        createdAt
+                      }
+                    `,
+                  });
+                  if (
+                    existingMessages.some(
+                      (ref: any) => readField('id', ref) === newMessage.id,
+                    )
+                  ) {
+                    return existingMessages;
+                  }
+                  return [...existingMessages, newMessageRef];
+                },
+              },
+            });
+          }
         }, */
       });
     }

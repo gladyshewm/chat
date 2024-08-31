@@ -2,37 +2,37 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px;
+  height: 14.25rem;
   position: relative;
 }
 
 .magnifier {
-  width: 80px;
-  height: 80px;
+  width: 5.7rem;
+  height: 5.7rem;
   position: relative;
 }
 
 .magnifier-handle {
   position: absolute;
-  top: 80%;
-  right: 20%;
-  width: 10px;
-  height: 60px;
+  top: 65%;
+  right: 30%;
+  width: 0.7rem;
+  height: 4rem;
   background-color: var(--outline-main-color);
   transform: rotate(-45deg);
   transform-origin: top left;
 }
 
 .magnifier-glass {
-  width: 60px;
-  height: 60px;
-  border: 8px solid var(--outline-main-color);
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 0.55rem solid var(--outline-main-color);
   border-radius: 50%;
 }
 
 .particle {
-  width: 8px;
-  height: 8px;
+  width: 0.55rem;
+  height: 0.55rem;
   background-color: var(--outline-main-color);
   border-radius: 50%;
   position: absolute;

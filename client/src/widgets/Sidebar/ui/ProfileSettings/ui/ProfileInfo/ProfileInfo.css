@@ -103,7 +103,6 @@
 
     & .name,
     .email {
-      box-sizing: border-box;
       border-radius: 15px;
       display: flex;
       align-items: center;

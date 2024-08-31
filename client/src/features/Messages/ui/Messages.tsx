@@ -3,7 +3,7 @@ import { motion, useScroll } from 'framer-motion';
 import { format } from 'date-fns';
 import './Messages.css';
 import { ChatWithoutMessages, Message, UserInfo } from '@shared/types';
-import { ScrollButton } from '@shared/ui';
+import { Loader, ScrollButton } from '@shared/ui';
 import {
   useChatMessagesQuery,
   useMessageSentSubscription,
@@ -28,25 +28,30 @@ const Messages = ({
 }: MessagesProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     container: containerRef,
   });
+  const isLoadingRef = useRef(false);
+  const MESSAGES_PER_PAGE = 50;
 
-  useChatMessagesQuery({
+  const { loading, error, fetchMore } = useChatMessagesQuery({
     variables: {
       chatId: chat.id,
       offset: 0,
-      limit: 100,
+      limit: MESSAGES_PER_PAGE,
     },
     onCompleted: (data) => {
-      if (data) {
+      if (data && data.chatMessages) {
         setMessages(data.chatMessages as Message[]);
       }
     },
     onError: (error) => {
       console.error(error);
     },
+    // fetchPolicy: 'cache-and-network',
   });
 
   useMessageSentSubscription({
@@ -57,17 +62,86 @@ const Messages = ({
       console.error(error);
     },
     onData: (data) => {
-      if (!data) return;
+      if (!data || !data.data.data?.messageSent) return;
       setMessages((prevMessages) => {
         const newMessage = data.data.data?.messageSent;
         if (!newMessage) return prevMessages;
-        if (!prevMessages.some((msg) => msg.id === newMessage.id)) {
-          return [newMessage, ...prevMessages];
-        }
-        return prevMessages;
+
+        const existingMessage = prevMessages.find(
+          (msg) => msg.id === newMessage.id,
+        );
+
+        if (existingMessage) return prevMessages;
+
+        return [newMessage, ...prevMessages];
       });
     },
   });
+
+  useEffect(() => {
+    const fetchMoreMessages = async () => {
+      if (isLoadingRef.current || !hasMore) return;
+      isLoadingRef.current = true;
+      const newOffset = offset + MESSAGES_PER_PAGE;
+
+      try {
+        const { data } = await fetchMore({
+          variables: {
+            chatId: chat.id,
+            offset: newOffset,
+            limit: MESSAGES_PER_PAGE,
+          },
+        });
+
+        if (data && data.chatMessages) {
+          if (data.chatMessages.length < MESSAGES_PER_PAGE) {
+            setHasMore(false);
+          }
+
+          setMessages((prevMessages) => {
+            const newMessages = data.chatMessages as Message[];
+            const uniqueNewMessages = newMessages.filter(
+              (newMsg) =>
+                !prevMessages.some((prevMsg) => prevMsg.id === newMsg.id),
+            );
+            return [...uniqueNewMessages, ...prevMessages];
+          });
+
+          setOffset(newOffset);
+        }
+      } catch (error) {
+        console.error(`Error fetching more messages: ${error}`);
+      } finally {
+        isLoadingRef.current = false;
+      }
+    };
+
+    const handleScroll = () => {
+      if (containerRef.current) {
+        const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+
+        if (
+          scrollHeight + scrollTop <= clientHeight + 100 &&
+          !loading &&
+          !isLoadingRef.current &&
+          hasMore
+        ) {
+          fetchMoreMessages();
+        }
+      }
+    };
+
+    const currentContainer = containerRef.current;
+    if (currentContainer) {
+      currentContainer.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (currentContainer) {
+        currentContainer.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [offset, loading, fetchMore, chat.id, hasMore]);
 
   useEffect(() => {
     if (selectedMessageId) {
@@ -96,8 +170,8 @@ const Messages = ({
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (messages.length > 0 && offset === 0) scrollToBottom();
+  }, [messages, offset]);
 
   useEffect(() => {
     scrollYProgress.on('change', (progress) => {
@@ -109,77 +183,87 @@ const Messages = ({
   const groupedMessages = groupMessagesByDate(messages);
 
   return (
-    <motion.div
-      className="message-container"
-      ref={containerRef}
-      initial="full"
-      animate={isSearch || isChatInfo ? 'reduced' : 'full'}
-      variants={containerVariants}
-    >
-      {Object.keys(groupedMessages)
-        .reverse()
-        .map((date) => (
-          <motion.div className="wrapper" key={date}>
-            <motion.div className="date-divider">
-              <time>{date}</time>
-            </motion.div>
-            <motion.div className="messages-group">
-              {groupedMessages[date].map((message, index, messagesArray) => {
-                const isFirst =
-                  index === 0 ||
-                  messagesArray[index - 1].userId !== message.userId;
-                const isLast =
-                  index === messagesArray.length - 1 ||
-                  messagesArray[index + 1].userId !== message.userId;
+    <>
+      {loading && offset === 0 && <Loader />}
+      {error && <div>Ошибка: {error.message}</div>}
+      <motion.div
+        className="message-container"
+        ref={containerRef}
+        initial="full"
+        animate={isSearch || isChatInfo ? 'reduced' : 'full'}
+        variants={containerVariants}
+      >
+        {Object.keys(groupedMessages)
+          .reverse()
+          .map((date) => (
+            <motion.div className="wrapper" key={date}>
+              <motion.div className="date-divider">
+                <time>{date}</time>
+              </motion.div>
+              <motion.div className="messages-group">
+                {groupedMessages[date].map((message, index, messagesArray) => {
+                  const isFirst =
+                    index === 0 ||
+                    messagesArray[index - 1].userId !== message.userId;
+                  const isLast =
+                    index === messagesArray.length - 1 ||
+                    messagesArray[index + 1].userId !== message.userId;
 
-                return (
-                  <motion.div
-                    key={message.id}
-                    id={`message-${message.id}`}
-                    className={
-                      message.userId === user.uuid
-                        ? 'message_me-block'
-                        : `message-block ${isLast ? 'last' : isFirst ? 'first' : ''}`
-                    }
-                  >
-                    {chat.isGroupChat &&
-                      message.userId !== user.uuid &&
-                      isLast && (
-                        <motion.div className="message-avatar">
-                          {message.avatarUrl ? (
-                            <img src={message.avatarUrl} alt="avatar" />
-                          ) : (
-                            <p>{message.userName.slice(0, 1).toUpperCase()}</p>
-                          )}
-                        </motion.div>
-                      )}
+                  return (
                     <motion.div
+                      key={message.id}
+                      id={`message-${message.id}`}
                       className={
                         message.userId === user.uuid
-                          ? `message_me ${isLast ? 'last' : isFirst ? 'first' : ''}`
-                          : `message ${isLast ? 'last' : isFirst ? 'first' : ''}`
+                          ? 'message_me-block'
+                          : `message-block ${isLast ? 'last' : isFirst ? 'first' : ''}`
                       }
                     >
                       {chat.isGroupChat &&
                         message.userId !== user.uuid &&
-                        isFirst && (
-                          <p className="message-username">{message.userName}</p>
+                        isLast && (
+                          <motion.div className="message-avatar">
+                            {message.avatarUrl ? (
+                              <img src={message.avatarUrl} alt="avatar" />
+                            ) : (
+                              <p>
+                                {message.userName.slice(0, 1).toUpperCase()}
+                              </p>
+                            )}
+                          </motion.div>
                         )}
-                      <motion.div className="message-main">
-                        <p className="message-text">{message.content}</p>
-                        <time className="message-time">
-                          {String(format(new Date(message.createdAt), 'HH:mm'))}
-                        </time>
+                      <motion.div
+                        className={
+                          message.userId === user.uuid
+                            ? `message_me ${isLast ? 'last' : isFirst ? 'first' : ''}`
+                            : `message ${isLast ? 'last' : isFirst ? 'first' : ''}`
+                        }
+                      >
+                        {chat.isGroupChat &&
+                          message.userId !== user.uuid &&
+                          isFirst && (
+                            <p className="message-username">
+                              {message.userName}
+                            </p>
+                          )}
+                        <motion.div className="message-main">
+                          <p className="message-text">{message.content}</p>
+                          <time className="message-time">
+                            {String(
+                              format(new Date(message.createdAt), 'HH:mm'),
+                            )}
+                          </time>
+                        </motion.div>
                       </motion.div>
                     </motion.div>
-                  </motion.div>
-                );
-              })}
+                  );
+                })}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        ))}
-      <ScrollButton isScrolled={isScrolled} scrollToBottom={scrollToBottom} />
-    </motion.div>
+          ))}
+        <ScrollButton isScrolled={isScrolled} scrollToBottom={scrollToBottom} />
+      </motion.div>
+    </>
   );
 };
 

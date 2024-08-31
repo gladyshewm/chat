@@ -10,7 +10,7 @@ export type ChatMessagesQueryVariables = Types.Exact<{
 }>;
 
 
-export type ChatMessagesQuery = { __typename?: 'Query', chatMessages?: Array<{ __typename?: 'Message', id: string, userId: string, content: string, createdAt: any, isRead: boolean, userName: string, avatarUrl?: string | null }> | null };
+export type ChatMessagesQuery = { __typename?: 'Query', chatMessages?: Array<{ __typename?: 'Message', id: string, userId: string, chatId: string, content: string, createdAt: any, isRead: boolean, userName: string, avatarUrl?: string | null }> | null };
 
 export type MessageSentSubscriptionVariables = Types.Exact<{
   chatId: Types.Scalars['ID']['input'];
@@ -25,6 +25,7 @@ export const ChatMessagesDocument = gql`
   chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {
     id
     userId
+    chatId
     content
     createdAt
     isRead

@@ -2,6 +2,7 @@ query chatMessages($chatId: ID!, $limit: Int, $offset: Int) {
   chatMessages(chatId: $chatId, limit: $limit, offset: $offset) {
     id
     userId
+    chatId
     content
     createdAt
     isRead
