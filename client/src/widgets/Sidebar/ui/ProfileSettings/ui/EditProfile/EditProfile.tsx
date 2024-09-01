@@ -57,7 +57,13 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setAvatar(event.target.files[0]);
+      const file = event.target.files[0];
+      if (file.type.startsWith('image/')) {
+        setAvatar(file);
+      } else {
+        alert('Недопустимый тип файла. Пожалуйста, выберите изображение.');
+        event.target.value = '';
+      }
     }
   };
 
@@ -141,6 +147,7 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
         <div className="avatar">
           <input
             type="file"
+            accept="image/*"
             id="avatarInput"
             style={{ display: 'none' }}
             onChange={handleFileChange}
@@ -202,7 +209,12 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
                   rx="15px"
                   strokeWidth={1}
                 >
-                  <CustomInput name="username" placeholder=" " label="Имя" />
+                  <CustomInput
+                    name="username"
+                    placeholder=" "
+                    label="Имя"
+                    spellCheck={false}
+                  />
                 </DrawOutlineRect>
                 <DrawOutlineRect
                   className="profile__input-wrapper"
