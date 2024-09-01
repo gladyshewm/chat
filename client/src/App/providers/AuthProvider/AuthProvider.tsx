@@ -51,11 +51,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const checkAuth = async () => {
       setLoading('checkAuth', true);
+      const setCheckAuthStates = () => {
+        setAuthChecked(true);
+        setLoading('checkAuth', false);
+      };
       const token = localStorage.getItem('accessToken');
 
       if (!token) {
         setIsAuthenticated(false);
-        setLoading('checkAuth', false);
+        setCheckAuthStates();
         return;
       }
 
@@ -69,7 +73,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             localStorage.removeItem('accessToken');
             setIsAuthenticated(false);
             setUser(null);
-            setLoading('checkAuth', false);
+            setCheckAuthStates();
             return;
           }
 
@@ -82,29 +86,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             email: refreshedUser.email,
           });
           setIsAuthenticated(true);
-          setLoading('checkAuth', false);
-
-          return;
+        } else {
+          setUser({
+            uuid: data.user.user.uuid,
+            name: data.user.user.name,
+            email: data.user.user.email,
+          });
+          setIsAuthenticated(true);
         }
-
-        setUser({
-          uuid: data.user.user.uuid,
-          name: data.user.user.name,
-          email: data.user.user.email,
-        });
-        setIsAuthenticated(true);
       } catch (error) {
         console.error('Ошибка получения пользователя:', error.message);
         setIsAuthenticated(false);
         setUser(null);
+      } finally {
+        setCheckAuthStates();
       }
-
-      setLoading('checkAuth', false);
-      setAuthChecked(true);
     };
 
     checkAuth();
-  }, [fetchUser, setLoading, refreshTokenMutation]);
+  }, [fetchUser, refreshTokenMutation, setLoading, setAuthChecked]);
 
   const register = async (input: CreateUserInput): Promise<UserWithToken> => {
     setLoading('createUser', true);
