@@ -24,11 +24,16 @@ const Chat = () => {
   const [chatQuery, { loading, error }] = useChatByIdLazyQuery();
   const [sendTypingStatus] = useSendTypingStatusMutation();
   const [chat, setChat] = useState<ChatWithoutMessages | null>(null);
-  const [isSearch, setIsSearch] = useState(false);
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(
     null,
   );
+  const [isSearch, setIsSearch] = useState(false);
   const [isChatInfo, setIsChatInfo] = useState(false);
+
+  useEffect(() => {
+    setIsSearch(false);
+    setIsChatInfo(false);
+  }, [chat_id]);
 
   useEffect(() => {
     setChat(null);
