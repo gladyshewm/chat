@@ -25,6 +25,7 @@ interface AuthContextType {
     logOut: boolean;
     deleteUser: boolean;
   };
+  authChecked: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType>(

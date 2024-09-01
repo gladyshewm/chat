@@ -13,12 +13,18 @@ import { Loader } from '@shared/ui';
 import { Auth, Chat, Main } from '@pages';
 
 const AppRouter = () => {
-  const { isAuthenticated, loadingStates } = useAuth();
+  const { isAuthenticated, authChecked } = useAuth();
 
   const routes = [
     {
       path: '/auth',
-      element: !isAuthenticated ? <Auth /> : <Navigate to="/" />,
+      element: !authChecked ? (
+        <Loader />
+      ) : !isAuthenticated ? (
+        <Auth />
+      ) : (
+        <Navigate to="/" replace />
+      ),
     },
     {
       element: <PrivateRoute />,
@@ -40,18 +46,19 @@ const AppRouter = () => {
     },
     {
       path: '*',
-      element: isAuthenticated ? <Navigate to="/" /> : <Navigate to="/auth" />,
+      element: !authChecked ? (
+        <Loader />
+      ) : isAuthenticated ? (
+        <Navigate to="/" replace />
+      ) : (
+        <Navigate to="/auth" replace />
+      ),
     },
   ];
 
   const router = createBrowserRouter(routes);
 
-  return (
-    <>
-      {loadingStates.checkAuth && <Loader key={`loader-${Date.now()}`} />}
-      <RouterProvider router={router} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 };
 
 export default AppRouter;

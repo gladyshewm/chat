@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const client = useApolloClient();
   const [user, setUser] = useState<UserInfo | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const [loadingStates, setLoadingStates] = useState({
     checkAuth: false,
     user: false,
@@ -99,6 +100,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       setLoading('checkAuth', false);
+      setAuthChecked(true);
     };
 
     checkAuth();
@@ -214,6 +216,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         logout,
         deleteAccount,
         loadingStates,
+        authChecked,
       }}
     >
       {children}
