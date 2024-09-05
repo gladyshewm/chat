@@ -1,0 +1,64 @@
+.modal-file-preview {
+  width: 28.5rem;
+  height: 30rem;
+  background-color: var(--base-color);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+
+  & header,
+  footer {
+    height: 4rem;
+    padding: 0 1.4rem;
+    display: flex;
+    align-items: center;
+  }
+
+  & header {
+    & button abbr {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      width: 100%;
+      height: 100%;
+
+      & svg {
+        stroke: #fff;
+        transition: stroke 0.3s ease;
+      }
+    }
+
+    & p {
+      margin-left: 1.4rem;
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #fff;
+    }
+  }
+
+  & main {
+    flex-grow: 1;
+
+    & .img-wrapper {
+      margin: 0 0.8rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      & img {
+        max-width: 100%;
+        max-height: 100%;
+        height: auto;
+        width: auto;
+        object-fit: cover;
+        border-radius: 15px;
+      }
+    }
+  }
+
+  & footer {
+    /* background-color: #d230b2; */
+  }
+}

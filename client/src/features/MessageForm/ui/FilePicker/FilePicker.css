@@ -1,0 +1,25 @@
+.files-clip-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  & abbr {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    & svg {
+      stroke: var(--outline-main-color);
+      transition: stroke 0.3s ease;
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    & svg {
+      stroke: #fff;
+      transition: stroke 0.3s ease;
+    }
+  }
+}

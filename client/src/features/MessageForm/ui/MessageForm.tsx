@@ -1,18 +1,16 @@
-import React from 'react';
 import { Field, Form, Formik } from 'formik';
 import './MessageForm.css';
 import { validationMessageFormSchema } from '../model/validate';
 import { DrawOutlineRect, Emoji } from '@shared/ui';
 import { SendIcon } from '@shared/assets';
+import FilePicker from './FilePicker/FilePicker';
 import { useSendMessageMutation } from './message-form.generated';
-import { UserInfo } from '@shared/types';
 
 interface MessageFormProps {
   chat_id: string;
   onKeyDown?: (userName: string) => void;
   onBlur?: (userName: string) => void;
   onFocus?: (userName: string) => void;
-  user: UserInfo;
 }
 
 export const MessageForm = ({
@@ -20,7 +18,6 @@ export const MessageForm = ({
   onBlur,
   onFocus,
   chat_id,
-  user,
 }: MessageFormProps) => {
   const [postMessage] = useSendMessageMutation();
 
@@ -29,8 +26,10 @@ export const MessageForm = ({
     if (chat_id && message) {
       postMessage({
         variables: {
-          chatId: chat_id,
-          content: message,
+          sendMessageInput: {
+            chatId: chat_id,
+            content: message,
+          }
         },
         /* optimisticResponse: {
           sendMessage: {
@@ -110,6 +109,7 @@ export const MessageForm = ({
               onBlur={onBlur}
               onFocus={onFocus}
             />
+            <FilePicker />
           </DrawOutlineRect>
           <DrawOutlineRect rx={'50%'} className="send-button-wrapper">
             <button type="submit" className="send-button">

@@ -4,24 +4,25 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type SendMessageMutationVariables = Types.Exact<{
-  chatId: Types.Scalars['ID']['input'];
-  content: Types.Scalars['String']['input'];
+  sendMessageInput: Types.SendMessageInput;
 }>;
 
 
-export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: { __typename?: 'Message', id: string, chatId: string, userId: string, userName: string, content: string, avatarUrl?: string | null, createdAt: any } };
+export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: { __typename?: 'Message', userName: string, content: string, avatarUrl?: string | null, createdAt: any, attachedFiles: Array<{ __typename?: 'AttachedFile', fileId: string, fileUrl: string, fileName: string } | null> } };
 
 
 export const SendMessageDocument = gql`
-    mutation sendMessage($chatId: ID!, $content: String!) {
-  sendMessage(chatId: $chatId, content: $content) {
-    id
-    chatId
-    userId
+    mutation sendMessage($sendMessageInput: SendMessageInput!) {
+  sendMessage(sendMessageInput: $sendMessageInput) {
     userName
     content
     avatarUrl
     createdAt
+    attachedFiles {
+      fileId
+      fileUrl
+      fileName
+    }
   }
 }
     `;
@@ -40,8 +41,7 @@ export type SendMessageMutationFn = Apollo.MutationFunction<SendMessageMutation,
  * @example
  * const [sendMessageMutation, { data, loading, error }] = useSendMessageMutation({
  *   variables: {
- *      chatId: // value for 'chatId'
- *      content: // value for 'content'
+ *      sendMessageInput: // value for 'sendMessageInput'
  *   },
  * });
  */

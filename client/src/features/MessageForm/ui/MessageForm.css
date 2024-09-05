@@ -26,12 +26,16 @@
   }
 
   & .emoji-input-container {
-    margin-left: 0.5rem;
+    margin-left: 1rem;
 
     & .emoji-picker-container {
-      left: -0.5rem;
+      left: -1rem;
     }
   }
+}
+
+.files-clip-container {
+  margin-right: 1rem;
 }
 
 .send-button-wrapper {

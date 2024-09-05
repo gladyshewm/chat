@@ -148,7 +148,6 @@ const Chat = () => {
                 onKeyDown={handleKeyDown}
                 onBlur={handleBlur}
                 onFocus={handleFocus}
-                user={user as UserInfo}
               />
             </motion.footer>
           </motion.div>

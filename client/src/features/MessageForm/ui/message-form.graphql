@@ -1,11 +1,13 @@
-mutation sendMessage($chatId: ID!, $content: String!) {
-  sendMessage(chatId: $chatId, content: $content) {
-    id
-    chatId
-    userId
+mutation sendMessage($sendMessageInput: SendMessageInput!) {
+  sendMessage(sendMessageInput: $sendMessageInput) {
     userName
     content
     avatarUrl
     createdAt
+    attachedFiles {
+      fileId
+      fileUrl
+      fileName
+    }
   }
 }

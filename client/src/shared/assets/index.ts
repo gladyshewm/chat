@@ -19,3 +19,4 @@ export { UserGroupIcon } from './icons/UserGroupIcon';
 export { UserIcon } from './icons/UserIcon';
 export { XmarkIcon } from './icons/XmarkIcon';
 export { FaceFrownIcon } from './icons/FaceFrownIcon';
+export { PaperClipIcon } from './icons/PaperClipIcon';

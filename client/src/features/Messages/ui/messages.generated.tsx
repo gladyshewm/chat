@@ -10,14 +10,14 @@ export type ChatMessagesQueryVariables = Types.Exact<{
 }>;
 
 
-export type ChatMessagesQuery = { __typename?: 'Query', chatMessages?: Array<{ __typename?: 'Message', id: string, userId: string, chatId: string, content: string, createdAt: any, isRead: boolean, userName: string, avatarUrl?: string | null }> | null };
+export type ChatMessagesQuery = { __typename?: 'Query', chatMessages?: Array<{ __typename?: 'Message', id: string, userId: string, chatId: string, content: string, createdAt: any, isRead: boolean, userName: string, avatarUrl?: string | null, attachedFiles: Array<{ __typename?: 'AttachedFile', fileId: string, fileUrl: string, fileName: string } | null> }> | null };
 
 export type MessageSentSubscriptionVariables = Types.Exact<{
   chatId: Types.Scalars['ID']['input'];
 }>;
 
 
-export type MessageSentSubscription = { __typename?: 'Subscription', messageSent: { __typename?: 'Message', id: string, userId: string, chatId: string, content: string, createdAt: any, isRead: boolean, userName: string, avatarUrl?: string | null } };
+export type MessageSentSubscription = { __typename?: 'Subscription', messageSent: { __typename?: 'Message', id: string, userId: string, chatId: string, content: string, createdAt: any, isRead: boolean, userName: string, avatarUrl?: string | null, attachedFiles: Array<{ __typename?: 'AttachedFile', fileId: string, fileUrl: string, fileName: string } | null> } };
 
 
 export const ChatMessagesDocument = gql`
@@ -31,6 +31,11 @@ export const ChatMessagesDocument = gql`
     isRead
     userName
     avatarUrl
+    attachedFiles {
+      fileId
+      fileUrl
+      fileName
+    }
   }
 }
     `;
@@ -80,6 +85,11 @@ export const MessageSentDocument = gql`
     isRead
     userName
     avatarUrl
+    attachedFiles {
+      fileId
+      fileUrl
+      fileName
+    }
   }
 }
     `;
