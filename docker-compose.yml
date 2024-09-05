@@ -1,0 +1,76 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: chat_app_server
+    ports:
+      - 5000:5000
+    networks:
+      - app-network
+    restart: unless-stopped
+    develop:
+      watch:
+        - path: ./server
+          target: /app
+          action: sync
+          ignore: 
+            - node_modules/
+            - dist/
+    profiles:
+      - dev
+
+  server-prod:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    container_name: chat_app_server_prod
+    ports:
+      - 5000:5000
+    networks:
+      - app-network
+    restart: unless-stopped
+    profiles:
+      - prod
+
+  client:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile.dev
+    container_name: chat_app_client
+    ports:
+      - 3000:3000
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - server
+    develop:
+      watch:
+        - path: ./client
+          target: /app
+          action: sync
+          ignore: 
+            - node_modules/
+            - build/
+    profiles:
+      - dev
+  
+  client-prod:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile.prod
+    container_name: chat_app_client_prod
+    ports:
+      - 3000:3000
+    networks:
+      - app-network
+    restart: unless-stopped
+    depends_on:
+      - server-prod
+    profiles:
+      - prod
+
+networks:
+  app-network:
+    driver: bridge
