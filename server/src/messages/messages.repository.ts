@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { MessageData } from './models/messages.model';
+import { AttachedFileInput, MessageData } from './models/messages.model';
 import { SupabaseResponse, SupabaseService } from 'supabase/supabase.service';
 
 export const MESSAGE_REPOSITORY = 'MESSAGE_REPOSITORY';
@@ -18,6 +18,7 @@ export interface MessageRepository {
     chatId: string,
     userUuid: string,
     content: string,
+    attachedFiles?: AttachedFileInput[],
   ): Promise<MessageData>;
 }
 
@@ -44,6 +45,11 @@ export class SupabaseMessageRepository implements MessageRepository {
             content,
             created_at,
             is_read,
+            attached_files (
+              file_id,
+              file_url,
+              file_name
+            ),
             profiles:user_uuid (
               name,
               avatar_url
@@ -79,6 +85,11 @@ export class SupabaseMessageRepository implements MessageRepository {
           chat_id,
           user_uuid,
           is_read,
+          attached_files (
+            file_id,
+            file_url,
+            file_name
+          ),
           profiles:user_uuid (
             name,
             avatar_url
@@ -86,7 +97,13 @@ export class SupabaseMessageRepository implements MessageRepository {
           `,
         )
         .eq('chat_id', chatId)
-        .ilike('content', `%${query}%`)) as SupabaseResponse<MessageData[]>;
+        .ilike('content', `%${query}%`)
+        // .or(
+        //   `content.ilike.%${query}%, attached_files.file_name.ilike.%${query}%`,
+        // ) TODO: <-- этот or не работает из-за вложенности; добавить поиск по имени файла
+        .order('created_at', { ascending: false })) as SupabaseResponse<
+        MessageData[]
+      >;
 
       return this.supabaseService.handleSupabaseResponse(response) || [];
     } catch (error) {
@@ -99,6 +116,7 @@ export class SupabaseMessageRepository implements MessageRepository {
     chatId: string,
     userUuid: string,
     content: string,
+    attachedFiles?: AttachedFileInput[],
   ): Promise<MessageData> {
     try {
       const response = (await this.supabaseService
@@ -137,7 +155,62 @@ export class SupabaseMessageRepository implements MessageRepository {
         );
       }
 
-      return newMessage;
+      if (attachedFiles && attachedFiles.length > 0) {
+        const files = attachedFiles.map((file) => ({
+          message_id: newMessage.message_id,
+          file_url: file.file_url,
+          file_name: file.file_name,
+        }));
+
+        const { error: fileError } = await this.supabaseService
+          .getClient()
+          .from('attached_files')
+          .insert(files);
+
+        if (fileError) {
+          throw new HttpException(
+            'Не удалось добавить вложенные файлы',
+            HttpStatus.INTERNAL_SERVER_ERROR,
+          );
+        }
+      }
+
+      const fullMessageResponse = (await this.supabaseService
+        .getClient()
+        .from('messages')
+        .select(
+          `
+          message_id,
+          chat_id, 
+          user_uuid,
+          content, 
+          created_at, 
+          is_read,
+          attached_files (
+            file_id,
+            file_url,
+            file_name
+          ),
+          profiles:user_uuid (
+            name,
+            avatar_url
+          )
+        `,
+        )
+        .eq('message_id', newMessage.message_id)
+        .single()) as SupabaseResponse<MessageData>;
+
+      const fullMessage =
+        this.supabaseService.handleSupabaseResponse(fullMessageResponse);
+
+      if (!fullMessage) {
+        throw new HttpException(
+          'Не удалось получить полную информацию о новом сообщении',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      return fullMessage;
     } catch (error) {
       this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);

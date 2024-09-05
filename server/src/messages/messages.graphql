@@ -9,12 +9,30 @@ type Message {
   content: String!
   createdAt: Date!
   isRead: Boolean!
+  attachedFiles: [AttachedFile]!
+}
+
+type AttachedFile {
+  fileId: String!
+  fileUrl: String!
+  fileName: String!
+}
+
+input AttachedFileInput {
+  fileUrl: String!
+  fileName: String!
 }
 
 type TypingFeedback {
   chatId: ID!
   userName: String!
   isTyping: Boolean!
+}
+
+input SendMessageInput {
+  chatId: ID!
+  content: String!
+  attachedFiles: [AttachedFileInput!]
 }
 
 type Query {
@@ -25,7 +43,7 @@ type Query {
 }
 
 type Mutation {
-  sendMessage(chatId: ID!, content: String!): Message!
+  sendMessage(sendMessageInput: SendMessageInput!): Message!
   sendTypingStatus(
     chatId: ID!
     userName: String!

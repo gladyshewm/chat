@@ -11,4 +11,13 @@ export type MessageData = {
   created_at: Date;
   is_read: boolean;
   profiles: Profile;
+  attached_files?: AttachedFile[];
 };
+
+export type AttachedFile = {
+  file_id: string;
+  file_url: string;
+  file_name: string;
+};
+
+export type AttachedFileInput = Omit<AttachedFile, 'file_id'>;

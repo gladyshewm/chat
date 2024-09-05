@@ -11,8 +11,8 @@ import { Inject, UseGuards } from '@nestjs/common';
 import { PUB_SUB } from 'common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
 import { JwtHttpAuthGuard } from 'auth/guards/jwt-http-auth.guard';
-import { Message } from 'graphql';
 import { JwtWsAuthGuard } from 'auth/guards/jwt-ws-auth.guard';
+import { Message, SendMessageInput } from 'generated_graphql';
 
 @Resolver('Messages')
 export class MessagesResolver {
@@ -52,11 +52,16 @@ export class MessagesResolver {
   @UseGuards(JwtHttpAuthGuard)
   @Mutation('sendMessage')
   async sendMessage(
-    @Args('chatId') chatId: string,
-    @Args('content') content: string,
+    @Args('sendMessageInput') sendMessageInput: SendMessageInput,
     @Context('user_uuid') userUuid: string,
   ): Promise<Message> {
-    return this.messagesService.sendMessageSub(chatId, userUuid, content);
+    const { chatId, content, attachedFiles } = sendMessageInput;
+    return this.messagesService.sendMessageSub(
+      chatId,
+      userUuid,
+      content,
+      attachedFiles ?? undefined,
+    );
   }
 
   @UseGuards(JwtWsAuthGuard)

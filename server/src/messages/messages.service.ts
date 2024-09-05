@@ -6,10 +6,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PUB_SUB } from 'common/pubsub/pubsub.provider';
-import { Message } from 'graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { MESSAGE_REPOSITORY, MessageRepository } from './messages.repository';
 import { ChatsService } from 'chats/chats.service';
+import { AttachedFileInput, Message } from 'generated_graphql';
 
 @Injectable()
 export class MessagesService {
@@ -58,6 +58,12 @@ export class MessagesService {
         content: message.content,
         createdAt: message.created_at,
         isRead: message.is_read,
+        attachedFiles:
+          message.attached_files?.map((file) => ({
+            fileId: file.file_id,
+            fileName: file.file_name,
+            fileUrl: file.file_url,
+          })) ?? [],
       }));
 
       return messages;
@@ -83,6 +89,12 @@ export class MessagesService {
         content: message.content,
         createdAt: new Date(message.created_at),
         isRead: message.is_read,
+        attachedFiles:
+          message.attached_files?.map((file) => ({
+            fileId: file.file_id,
+            fileName: file.file_name,
+            fileUrl: file.file_url,
+          })) ?? [],
       }));
 
       return messages;
@@ -96,6 +108,7 @@ export class MessagesService {
     chatId: string,
     userUuid: string,
     content: string,
+    attachedFiles?: AttachedFileInput[],
   ): Promise<Message> {
     try {
       const isParticipant = await this.chatsService.isParticipant(
@@ -110,13 +123,19 @@ export class MessagesService {
         );
       }
 
+      const files = attachedFiles?.map((file) => ({
+        file_name: file.fileName,
+        file_url: file.fileUrl,
+      }));
+
       const newMessage = await this.messageRepository.sendMessage(
         chatId,
         userUuid,
         content,
+        files,
       );
 
-      const message = {
+      const message: Message = {
         id: newMessage.message_id,
         chatId: newMessage.chat_id,
         userId: newMessage.user_uuid,
@@ -125,6 +144,12 @@ export class MessagesService {
         isRead: newMessage.is_read,
         userName: newMessage.profiles.name,
         avatarUrl: newMessage.profiles.avatar_url,
+        attachedFiles:
+          newMessage.attached_files?.map((file) => ({
+            fileId: file.file_id,
+            fileName: file.file_name,
+            fileUrl: file.file_url,
+          })) ?? [],
       };
 
       this.pubSub.publish('messageSent', { messageSent: message });

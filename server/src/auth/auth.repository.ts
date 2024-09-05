@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Session, User } from '@supabase/supabase-js';
-import { AuthPayload, UserInfo, UserWithToken } from 'graphql';
+import { AuthPayload, UserInfo, UserWithToken } from 'generated_graphql';
 import { SupabaseService } from 'supabase/supabase.service';
 
 export const AUTH_REPOSITORY = 'AUTH_REPOSITORY';
