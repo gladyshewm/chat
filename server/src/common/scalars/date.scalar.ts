@@ -2,18 +2,24 @@ import { CustomScalar, Scalar } from '@nestjs/graphql';
 import { ValueNode, Kind } from '../../../node_modules/graphql';
 
 @Scalar('Date')
-export class DateScalar implements CustomScalar<string, Date> {
+export class DateScalar implements CustomScalar<number, Date> {
   description = 'Date custom scalar type';
 
-  parseValue(value: number | string): Date {
-    return new Date(value);
+  parseValue(value: unknown): Date {
+    if (typeof value === 'string' || typeof value === 'number') {
+      return new Date(value);
+    }
+    throw new Error('Invalid value for Date scalar');
   }
 
-  serialize(value: Date | string): number {
+  serialize(value: unknown): number {
     if (typeof value === 'string') {
       return new Date(value).getTime();
     }
-    return value.getTime();
+    if (value instanceof Date) {
+      return value.getTime();
+    }
+    throw new Error('Invalid value for Date serialization');
   }
 
   /* serialize(value: Date | string): string {
@@ -36,10 +42,10 @@ export class DateScalar implements CustomScalar<string, Date> {
     return formatter.format(value);
   } */
 
-  parseLiteral(ast: ValueNode): Date | null {
+  parseLiteral(ast: ValueNode): Date {
     if (ast.kind === Kind.INT || ast.kind === Kind.STRING) {
       return new Date(ast.value);
     }
-    return null;
+    throw new Error('Invalid literal for Date scalar');
   }
 }

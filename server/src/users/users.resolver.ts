@@ -1,9 +1,13 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { UserWithAvatar, AvatarInfo, ChangeCredentialsInput } from '../graphql';
 import { UseGuards } from '@nestjs/common';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { JwtHttpAuthGuard } from '../auth/guards/jwt-http-auth.guard';
+import {
+  AvatarInfo,
+  ChangeCredentialsInput,
+  UserWithAvatar,
+} from 'generated_graphql';
 
 @Resolver('User')
 export class UsersResolver {

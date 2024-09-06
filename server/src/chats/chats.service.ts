@@ -5,12 +5,12 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { AvatarInfo, ChatWithoutMessages } from '../graphql';
 import { FileUpload } from 'graphql-upload-ts';
 import { CHAT_REPOSITORY, ChatRepository } from './chats.repository';
 import { UsersService } from 'users/users.service';
 import { ChatWithParticipantsData } from './models/chats.model';
 import { FilesService } from 'files/files.service';
+import { AvatarInfo, ChatWithoutMessages } from 'generated_graphql';
 
 @Injectable()
 export class ChatsService {
