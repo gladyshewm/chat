@@ -4,6 +4,9 @@ services:
       context: ./server
       dockerfile: Dockerfile.dev
     container_name: chat_app_server
+    # volumes:
+    #   - /app/node_modules
+    #   - ./server:/app
     ports:
       - 5000:5000
     networks:
@@ -38,6 +41,9 @@ services:
       context: ./client
       dockerfile: Dockerfile.dev
     container_name: chat_app_client
+    # volumes:
+    #   - /app/node_modules
+    #   - ./client:/app
     ports:
       - 3000:3000
     networks:
