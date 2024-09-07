@@ -1,19 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Response, Request } from 'express';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { authPayloadStub, userStub } from './stubs/auth.stub';
+import { authPayloadStub, userByTokenStub, userStub } from './stubs/auth.stub';
 import { AuthPayload, UserWithToken } from '../graphql';
+import { AUTH_STRATEGY } from './strategies/auth-strategy.token';
+import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Response } from 'express';
 import { LoginUserDto } from './dto/login-user.dto';
 
 jest.mock('./auth.service');
 
-const mockGqlContextRequest = () => {
-  const req: Partial<Request> = {};
-  // req.accessToken = '';
-  return req as Request;
+const mockGqlContextRequest = (accessToken?: string) => {
+  return {
+    accessToken,
+  } as unknown as Request;
 };
 
 const mockGqlContextResponse = () => {
@@ -25,16 +27,23 @@ const mockGqlContextResponse = () => {
 
 describe('AuthResolver', () => {
   let authResolver: AuthResolver;
-  let authService: jest.Mocked<AuthService>;
+  let authService: AuthService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [JwtModule],
-      providers: [AuthResolver, AuthService],
+      imports: [JwtModule.register({})],
+      providers: [
+        AuthResolver,
+        AuthService,
+        {
+          provide: AUTH_STRATEGY,
+          useClass: JwtAuthStrategy,
+        },
+      ],
     }).compile();
 
     authResolver = module.get<AuthResolver>(AuthResolver);
-    authService = module.get(AuthService);
+    authService = module.get<AuthService>(AuthService);
     jest.clearAllMocks();
   });
 
@@ -67,28 +76,46 @@ describe('AuthResolver', () => {
   describe('getUser', () => {
     let user: UserWithToken | null;
 
-    beforeEach(async () => {
+    describe('when token is provided', () => {
+      const mockReq = mockGqlContextRequest('mockAccessToken');
+
+      beforeEach(async () => {
+        user = await authResolver.getUser(mockReq);
+      });
+
+      it('should call authService', async () => {
+        expect(authService.getUser).toHaveBeenCalled();
+      });
+
+      it('should call authService with correct token', async () => {
+        expect(authService.getUser).toHaveBeenCalledWith('mockAccessToken');
+      });
+
+      it('should return user and token', async () => {
+        const token = mockReq.accessToken as string;
+        expect(user).toEqual(userByTokenStub(token));
+      });
+
+      it('should return correct UserWithToken structure', () => {
+        expect(user).toHaveProperty('user');
+        expect(user).toHaveProperty('token');
+      });
+    });
+
+    describe('when token is not provided', () => {
       const mockReq = mockGqlContextRequest();
-      user = await authResolver.getUser(mockReq);
-    });
 
-    it('should call authService', async () => {
-      expect(authService.getUser).toHaveBeenCalled();
-    });
+      beforeEach(async () => {
+        user = await authResolver.getUser(mockReq);
+      });
 
-    it('should return user and token', async () => {
-      expect(user).toEqual(userStub());
-    });
+      it('should return null for unauthenticated user', async () => {
+        expect(user).toBeNull();
+      });
 
-    it('should return correct UserWithToken structure', () => {
-      expect(user).toHaveProperty('user');
-      expect(user).toHaveProperty('token');
-    });
-
-    it('should return null for unauthenticated user', async () => {
-      authService.getUser.mockResolvedValue(null);
-      const result = await authResolver.getUser();
-      expect(result).toBeNull();
+      it('should not call authService', async () => {
+        expect(authService.getUser).not.toHaveBeenCalled();
+      });
     });
   });
 
@@ -105,7 +132,7 @@ describe('AuthResolver', () => {
       authPayload = await authResolver.createUser(createInput);
     });
 
-    it('should call authService', async () => {
+    it('should call authService with correct data', async () => {
       expect(authService.createUser).toHaveBeenCalledWith(createInput);
     });
 
@@ -134,7 +161,7 @@ describe('AuthResolver', () => {
       authPayload = await authResolver.logInUser(loginInput, mockRes);
     });
 
-    it('should call authService', async () => {
+    it('should call authService with correct data', async () => {
       expect(authService.logInUser).toHaveBeenCalledWith(loginInput, mockRes);
     });
 
@@ -144,6 +171,9 @@ describe('AuthResolver', () => {
 
     it('should return correct AuthPayload structure', () => {
       expect(authPayload).toHaveProperty('user');
+      expect(authPayload.user).toHaveProperty('uuid');
+      expect(authPayload.user).toHaveProperty('name');
+      expect(authPayload.user).toHaveProperty('email');
       expect(authPayload).toHaveProperty('accessToken');
       expect(authPayload).toHaveProperty('refreshToken');
     });
@@ -160,12 +190,12 @@ describe('AuthResolver', () => {
       expect(authService.logOutUser).toHaveBeenCalled();
     });
 
-    it('should return true', async () => {
+    it('should return true when user is logged out successfully', async () => {
       expect(logout).toBeTruthy();
     });
 
-    it('should handle logout failure', async () => {
-      authService.logOutUser.mockResolvedValue(false);
+    it('should return false when user is not logged in', async () => {
+      (authService.logOutUser as jest.Mock).mockResolvedValue(false);
       const result = await authResolver.logOutUser();
       expect(result).toBeFalsy();
     });

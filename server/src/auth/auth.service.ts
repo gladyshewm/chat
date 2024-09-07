@@ -9,7 +9,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Response } from 'express';
 import { LoginUserDto } from './dto/login-user.dto';
 import { AUTH_REPOSITORY, AuthRepository } from './auth.repository';
-import { USER_REPOSITORY, UserRepository } from 'users/users.repository';
+import { USER_REPOSITORY, UserRepository } from '../users/users.repository';
 import { AuthPayload, UserWithToken } from 'generated_graphql';
 
 @Injectable()

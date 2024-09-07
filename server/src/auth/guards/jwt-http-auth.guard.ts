@@ -7,8 +7,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { AuthStrategy } from 'auth/strategies/auth.strategy.interface';
-import { AUTH_STRATEGY } from 'auth/strategies/auth-strategy.token';
+import { AuthStrategy } from '../strategies/auth.strategy.interface';
+import { AUTH_STRATEGY } from '../strategies/auth-strategy.token';
 
 @Injectable()
 export class JwtHttpAuthGuard implements CanActivate {

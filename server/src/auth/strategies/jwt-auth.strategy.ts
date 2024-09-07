@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthStrategy } from './auth.strategy.interface';
 import { JwtService } from '@nestjs/jwt';
-import { AuthService } from 'auth/auth.service';
+import { AuthService } from '../auth.service';
 import { Response } from 'express';
 
 @Injectable()
