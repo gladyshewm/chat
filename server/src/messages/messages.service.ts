@@ -9,7 +9,10 @@ import { PUB_SUB } from 'common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
 import { MESSAGE_REPOSITORY, MessageRepository } from './messages.repository';
 import { ChatsService } from 'chats/chats.service';
-import { AttachedFileInput, Message } from 'generated_graphql';
+import { AttachedFile, Message } from 'generated_graphql';
+import { FileUpload } from 'graphql-upload-ts';
+import { FilesService } from 'files/files.service';
+import { AttachedFileInput } from './models/messages.model';
 
 @Injectable()
 export class MessagesService {
@@ -20,6 +23,7 @@ export class MessagesService {
     @Inject(MESSAGE_REPOSITORY)
     private readonly messageRepository: MessageRepository,
     @Inject(PUB_SUB) private pubSub: PubSub,
+    private readonly filesService: FilesService,
   ) {}
 
   async getChatMessages(
@@ -108,7 +112,7 @@ export class MessagesService {
     chatId: string,
     userUuid: string,
     content: string,
-    attachedFiles?: AttachedFileInput[],
+    attachedFiles?: FileUpload[],
   ): Promise<Message> {
     try {
       const isParticipant = await this.chatsService.isParticipant(
@@ -123,16 +127,20 @@ export class MessagesService {
         );
       }
 
-      const files = attachedFiles?.map((file) => ({
-        file_name: file.fileName,
-        file_url: file.fileUrl,
-      }));
-
       const newMessage = await this.messageRepository.sendMessage(
         chatId,
         userUuid,
         content,
-        files,
+      );
+
+      const resolvedFiles = attachedFiles
+        ? await Promise.all(attachedFiles)
+        : [];
+
+      const files = await this.processAttachedFiles(
+        chatId,
+        newMessage.message_id,
+        resolvedFiles,
       );
 
       const message: Message = {
@@ -144,12 +152,7 @@ export class MessagesService {
         isRead: newMessage.is_read,
         userName: newMessage.profiles.name,
         avatarUrl: newMessage.profiles.avatar_url,
-        attachedFiles:
-          newMessage.attached_files?.map((file) => ({
-            fileId: file.file_id,
-            fileName: file.file_name,
-            fileUrl: file.file_url,
-          })) ?? [],
+        attachedFiles: files,
       };
 
       this.pubSub.publish('messageSent', { messageSent: message });
@@ -157,6 +160,59 @@ export class MessagesService {
       return message;
     } catch (error) {
       this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  private async processAttachedFiles(
+    chatId: string,
+    messageId: string,
+    files: FileUpload[],
+  ): Promise<AttachedFile[]> {
+    try {
+      const uploadFilePromises = files.map(async (file) => {
+        const buffer = await this.filesService.readFile(file);
+        const uniqueFilename = this.filesService.generateUniqueFilename(
+          file.filename,
+        );
+        const filePath = `chats/${chatId}/${uniqueFilename}`;
+
+        await this.messageRepository.uploadFileToUserStorage(
+          buffer,
+          filePath,
+          file.mimetype,
+        );
+
+        const fileUrl = await this.messageRepository.getFilePublicUrl(
+          chatId,
+          uniqueFilename,
+        );
+
+        const fileToInsert: AttachedFileInput = {
+          file_name: uniqueFilename,
+          file_path: filePath,
+          buffer,
+          mimetype: file.mimetype,
+          file_url: fileUrl,
+        };
+
+        const attachedFile = await this.messageRepository.insertAttachedFile(
+          messageId,
+          fileToInsert,
+        );
+
+        return {
+          fileId: attachedFile.file_id,
+          fileName: attachedFile.file_name,
+          fileUrl: attachedFile.file_url,
+        };
+      });
+
+      return Promise.all(uploadFilePromises);
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при обработке вложенных файлов: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

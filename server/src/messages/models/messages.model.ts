@@ -18,6 +18,9 @@ export type AttachedFile = {
   file_id: string;
   file_url: string;
   file_name: string;
+  file_path: string;
+  buffer: Buffer;
+  mimetype: string;
 };
 
 export type AttachedFileInput = Omit<AttachedFile, 'file_id'>;

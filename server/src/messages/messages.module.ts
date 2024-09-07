@@ -8,9 +8,10 @@ import {
   SupabaseMessageRepository,
 } from './messages.repository';
 import { ChatsModule } from 'chats/chats.module';
+import { FilesModule } from 'files/files.module';
 
 @Module({
-  imports: [AuthModule, ChatsModule],
+  imports: [AuthModule, ChatsModule, FilesModule],
   providers: [
     MessagesResolver,
     MessagesService,

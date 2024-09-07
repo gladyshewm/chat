@@ -21,17 +21,6 @@ export class LoginUserInput {
     password: string;
 }
 
-export class AttachedFileInput {
-    fileUrl: string;
-    fileName: string;
-}
-
-export class SendMessageInput {
-    chatId: string;
-    content: string;
-    attachedFiles?: Nullable<AttachedFileInput[]>;
-}
-
 export class ChangeCredentialsInput {
     name?: Nullable<string>;
     password?: Nullable<string>;
@@ -105,7 +94,7 @@ export abstract class IMutation {
 
     abstract deleteChatAvatar(chatId: string, avatarUrl: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract sendMessage(sendMessageInput: SendMessageInput): Message | Promise<Message>;
+    abstract sendMessage(chatId: string, content: string, attachedFiles?: Nullable<Upload[]>): Message | Promise<Message>;
 
     abstract sendTypingStatus(chatId: string, userName: string, isTyping: boolean): TypingFeedback | Promise<TypingFeedback>;
 

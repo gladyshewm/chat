@@ -1,4 +1,5 @@
 scalar Date
+scalar Upload
 
 type Message {
   id: ID!
@@ -18,21 +19,10 @@ type AttachedFile {
   fileName: String!
 }
 
-input AttachedFileInput {
-  fileUrl: String!
-  fileName: String!
-}
-
 type TypingFeedback {
   chatId: ID!
   userName: String!
   isTyping: Boolean!
-}
-
-input SendMessageInput {
-  chatId: ID!
-  content: String!
-  attachedFiles: [AttachedFileInput!]
 }
 
 type Query {
@@ -43,7 +33,7 @@ type Query {
 }
 
 type Mutation {
-  sendMessage(sendMessageInput: SendMessageInput!): Message!
+  sendMessage(chatId: ID!, content: String!, attachedFiles: [Upload!]): Message!
   sendTypingStatus(
     chatId: ID!
     userName: String!

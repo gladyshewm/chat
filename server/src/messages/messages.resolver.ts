@@ -12,7 +12,8 @@ import { PUB_SUB } from 'common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
 import { JwtHttpAuthGuard } from 'auth/guards/jwt-http-auth.guard';
 import { JwtWsAuthGuard } from 'auth/guards/jwt-ws-auth.guard';
-import { Message, SendMessageInput } from 'generated_graphql';
+import { Message } from 'generated_graphql';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 
 @Resolver('Messages')
 export class MessagesResolver {
@@ -52,15 +53,17 @@ export class MessagesResolver {
   @UseGuards(JwtHttpAuthGuard)
   @Mutation('sendMessage')
   async sendMessage(
-    @Args('sendMessageInput') sendMessageInput: SendMessageInput,
+    @Args('chatId') chatId: string,
+    @Args('content') content: string,
+    @Args({ name: 'attachedFiles', type: () => [GraphQLUpload] })
+    attachedFiles: FileUpload[],
     @Context('user_uuid') userUuid: string,
   ): Promise<Message> {
-    const { chatId, content, attachedFiles } = sendMessageInput;
     return this.messagesService.sendMessageSub(
       chatId,
       userUuid,
       content,
-      attachedFiles ?? undefined,
+      attachedFiles,
     );
   }
 

@@ -1,5 +1,9 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { AttachedFileInput, MessageData } from './models/messages.model';
+import {
+  AttachedFile,
+  AttachedFileInput,
+  MessageData,
+} from './models/messages.model';
 import { SupabaseResponse, SupabaseService } from 'supabase/supabase.service';
 
 export const MESSAGE_REPOSITORY = 'MESSAGE_REPOSITORY';
@@ -18,8 +22,17 @@ export interface MessageRepository {
     chatId: string,
     userUuid: string,
     content: string,
-    attachedFiles?: AttachedFileInput[],
   ): Promise<MessageData>;
+  uploadFileToUserStorage(
+    buffer: Buffer,
+    filePath: string,
+    mimetype: string,
+  ): Promise<void>;
+  getFilePublicUrl(chatId: string, filename: string): Promise<string>;
+  insertAttachedFile(
+    messageId: string,
+    attachedFile: AttachedFileInput,
+  ): Promise<AttachedFile>;
 }
 
 @Injectable()
@@ -116,7 +129,6 @@ export class SupabaseMessageRepository implements MessageRepository {
     chatId: string,
     userUuid: string,
     content: string,
-    attachedFiles?: AttachedFileInput[],
   ): Promise<MessageData> {
     try {
       const response = (await this.supabaseService
@@ -155,64 +167,91 @@ export class SupabaseMessageRepository implements MessageRepository {
         );
       }
 
-      if (attachedFiles && attachedFiles.length > 0) {
-        const files = attachedFiles.map((file) => ({
-          message_id: newMessage.message_id,
-          file_url: file.file_url,
-          file_name: file.file_name,
-        }));
+      return newMessage;
+    } catch (error) {
+      this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
-        const { error: fileError } = await this.supabaseService
-          .getClient()
-          .from('attached_files')
-          .insert(files);
+  async uploadFileToUserStorage(
+    buffer: Buffer,
+    filePath: string,
+    mimetype: string,
+  ): Promise<void> {
+    const { error } = await this.supabaseService
+      .getClient()
+      .storage.from('messages')
+      .upload(filePath, buffer, {
+        contentType: mimetype,
+        upsert: true,
+      });
 
-        if (fileError) {
-          throw new HttpException(
-            'Не удалось добавить вложенные файлы',
-            HttpStatus.INTERNAL_SERVER_ERROR,
-          );
-        }
+    if (error) {
+      this.logger.error('Ошибка загрузки файла:', error.message);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getFilePublicUrl(chatId: string, filename: string): Promise<string> {
+    try {
+      const { data } = await this.supabaseService
+        .getClient()
+        .storage.from('messages')
+        .getPublicUrl(`chats/${chatId}/${filename}`);
+
+      return data.publicUrl;
+    } catch (error) {
+      this.logger.error(
+        'Ошибка получения публичного URL для аватара пользователя:',
+        error.message,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async insertAttachedFile(
+    messageId: string,
+    attachedFile: AttachedFileInput,
+  ): Promise<AttachedFile> {
+    try {
+      if (!attachedFile) {
+        this.logger.error('Не переданы вложенные файлы');
+        throw new HttpException(
+          'Не переданы вложенные файлы',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
-      const fullMessageResponse = (await this.supabaseService
+      const file = {
+        message_id: messageId,
+        file_url: attachedFile.file_url,
+        file_name: attachedFile.file_name,
+      };
+
+      const response = (await this.supabaseService
         .getClient()
-        .from('messages')
-        .select(
-          `
-          message_id,
-          chat_id, 
-          user_uuid,
-          content, 
-          created_at, 
-          is_read,
-          attached_files (
-            file_id,
-            file_url,
-            file_name
-          ),
-          profiles:user_uuid (
-            name,
-            avatar_url
-          )
-        `,
-        )
-        .eq('message_id', newMessage.message_id)
-        .single()) as SupabaseResponse<MessageData>;
+        .from('attached_files')
+        .insert(file)
+        .select('*')
+        .single()) as SupabaseResponse<AttachedFile>;
 
-      const fullMessage =
-        this.supabaseService.handleSupabaseResponse(fullMessageResponse);
+      const attached_files =
+        this.supabaseService.handleSupabaseResponse(response);
 
-      if (!fullMessage) {
+      if (!attached_files) {
         throw new HttpException(
-          'Не удалось получить полную информацию о новом сообщении',
+          'Не удалось добавить вложенные файлы',
           HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
 
-      return fullMessage;
+      return attached_files;
     } catch (error) {
-      this.logger.error(`Ошибка при отправке сообщения: ${error.message}`);
+      this.logger.error(
+        'Ошибка при добавлении вложенных файлов:',
+        error.message,
+      );
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

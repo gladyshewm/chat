@@ -21,15 +21,10 @@ export class LoginUserInput {
     password: string;
 }
 
-export class AttachedFileInput {
-    fileUrl: string;
-    fileName: string;
-}
-
 export class SendMessageInput {
     chatId: string;
     content: string;
-    attachedFiles?: Nullable<AttachedFileInput[]>;
+    attachedFiles?: Nullable<Upload[]>;
 }
 
 export class ChangeCredentialsInput {
