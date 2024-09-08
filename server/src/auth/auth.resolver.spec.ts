@@ -1,29 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { authPayloadStub, userByTokenStub, userStub } from './stubs/auth.stub';
+import { authPayloadStub, userStub } from './stubs/auth.stub';
 import { AuthPayload, UserWithToken } from '../graphql';
 import { AUTH_STRATEGY } from './strategies/auth-strategy.token';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import {
+  mockGqlContextRequest,
+  mockGqlContextResponse,
+} from './__mocks__/gql-context.mock';
 
 jest.mock('./auth.service');
-
-const mockGqlContextRequest = (accessToken?: string) => {
-  return {
-    accessToken,
-  } as unknown as Request;
-};
-
-const mockGqlContextResponse = () => {
-  const res: Partial<Response> = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
-  return res as Response;
-};
 
 describe('AuthResolver', () => {
   let authResolver: AuthResolver;
@@ -93,7 +84,7 @@ describe('AuthResolver', () => {
 
       it('should return user and token', async () => {
         const token = mockReq.accessToken as string;
-        expect(user).toEqual(userByTokenStub(token));
+        expect(user).toEqual(userStub(token));
       });
 
       it('should return correct UserWithToken structure', () => {
