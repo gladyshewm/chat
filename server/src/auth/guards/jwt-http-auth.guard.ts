@@ -24,6 +24,7 @@ export class JwtHttpAuthGuard implements CanActivate {
 
     try {
       const accessToken = this.extractTokenFromHeader(req);
+
       if (!accessToken) {
         this.logger.error('Access token not found');
         throw new UnauthorizedException({ message: 'Access token not found' });
@@ -38,6 +39,7 @@ export class JwtHttpAuthGuard implements CanActivate {
       } catch (error) {
         this.logger.warn(`JWT verification failed: ${error.message}`);
 
+        //для supabase не нужно
         const refreshToken = req.cookies['refreshToken'];
 
         if (!refreshToken) {

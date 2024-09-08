@@ -7,8 +7,8 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { WsException } from '@nestjs/websockets';
-import { AUTH_STRATEGY } from 'auth/strategies/auth-strategy.token';
-import { AuthStrategy } from 'auth/strategies/auth.strategy.interface';
+import { AUTH_STRATEGY } from '../strategies/auth-strategy.token';
+import { AuthStrategy } from '../strategies/auth.strategy.interface';
 
 @Injectable()
 export class JwtWsAuthGuard implements CanActivate {
@@ -27,8 +27,14 @@ export class JwtWsAuthGuard implements CanActivate {
       connectionParams = gqlContext.connectionParams;
     }
 
+    if (!connectionParams) {
+      this.logger.error('Connection params not found');
+      throw new WsException({ message: 'Connection params not found' });
+    }
+
     try {
       const accessToken = this.extractTokenFromHeader(connectionParams);
+
       if (!accessToken) {
         this.logger.error('Access token not found');
         throw new WsException({ message: 'Access token not found' });
