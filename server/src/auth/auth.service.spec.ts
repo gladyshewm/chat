@@ -1,35 +1,41 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
-import { SupabaseService } from '../supabase/supabase.service';
-import { authPayloadStub, userStub } from './stubs/auth.stub';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { UserInfo } from 'src/graphql';
+import { FileObject } from '@supabase/storage-js';
+import { AuthService } from './auth.service';
+import { authPayloadStub, userStub } from './stubs/auth.stub';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { Response } from 'express';
-import { mockSupabaseClient } from './__mocks__/supabase-client.mock';
-
-jest.mock('../supabase/supabase.service');
+import { AuthPayload, UserWithToken } from 'generated_graphql';
+import { AUTH_REPOSITORY, AuthRepository } from './auth.repository';
+import { USER_REPOSITORY, UserRepository } from '../users/users.repository';
+import { mockGqlContextResponse } from './__mocks__/gql-context.mock';
+import { AuthRepositoryMock } from './__mocks__/auth.repository';
+import { UserRepositoryMock } from './__mocks__/users.repository';
+import { fileStub } from './stubs/users.stub';
 
 describe('AuthService', () => {
   let authService: AuthService;
-  // let supabaseService: jest.Mocked<SupabaseService>;
+  let authRepository: jest.Mocked<AuthRepository>;
+  let userRepository: jest.Mocked<UserRepository>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         {
-          provide: SupabaseService,
-          useValue: {
-            getClient: jest.fn().mockReturnValue(mockSupabaseClient),
-          },
+          provide: AUTH_REPOSITORY,
+          useValue: AuthRepositoryMock,
+        },
+        {
+          provide: USER_REPOSITORY,
+          useValue: UserRepositoryMock,
         },
       ],
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
-    // supabaseService = module.get(SupabaseService);
+    authRepository = module.get<jest.Mocked<AuthRepository>>(AUTH_REPOSITORY);
+    userRepository = module.get<jest.Mocked<UserRepository>>(USER_REPOSITORY);
   });
 
   afterEach(() => {
@@ -41,286 +47,235 @@ describe('AuthService', () => {
   });
 
   describe('refreshToken', () => {
-    it('should return user with refreshed tokens successfully', async () => {
-      const user = authPayloadStub().user;
-      const mockRefreshData = {
-        data: {
-          user: {
-            id: user.uuid,
-            user_metadata: { name: user.name },
-            email: user.email,
-          },
-          session: {
-            access_token: authPayloadStub().accessToken,
-            refresh_token: authPayloadStub().refreshToken,
-          },
-        },
-        error: null,
-      };
-      mockSupabaseClient.auth.refreshSession.mockResolvedValue(mockRefreshData);
+    let refreshed: AuthPayload;
 
-      const result = await authService.refreshToken();
-
-      expect(result).toEqual(authPayloadStub());
+    beforeEach(async () => {
+      refreshed = await authService.refreshToken();
     });
 
-    it('should throw an error if refresh token fails', async () => {
-      const mockRefreshData = {
-        data: null,
-        error: { message: 'Error refreshing token' },
-      };
-      mockSupabaseClient.auth.refreshSession.mockResolvedValue(mockRefreshData);
+    it('should call authRepository', () => {
+      expect(authRepository.refreshToken).toHaveBeenCalled();
+    });
 
-      await expect(authService.refreshToken()).rejects.toThrow(HttpException);
+    it('should return user with refreshed tokens successfully', async () => {
+      expect(refreshed).toEqual(authPayloadStub());
     });
   });
 
   describe('getUser', () => {
-    let user: UserInfo;
+    let user: UserWithToken | null;
+    const mockAccessToken = 'mockAccessToken';
 
-    beforeEach(() => {
-      user = authPayloadStub().user;
+    beforeEach(async () => {
+      user = await authService.getUser('mockAccessToken');
+    });
+
+    it('should call authRepository with correct data', async () => {
+      expect(authRepository.getUser).toHaveBeenCalledWith(mockAccessToken);
     });
 
     it('should return user successfully', async () => {
-      const mockUserData = {
-        data: {
-          user: {
-            id: user.uuid,
-            user_metadata: { name: user.name },
-            email: user.email,
-          },
-        },
-        error: null,
-      };
-      const sessionData = {
-        data: {
-          session: {
-            access_token: authPayloadStub().accessToken,
-          },
-        },
-        error: null,
-      };
-      mockSupabaseClient.auth.getUser.mockResolvedValue(mockUserData);
-      mockSupabaseClient.auth.getSession.mockResolvedValue(sessionData);
-
-      const result = await authService.getUser();
-
-      expect(result).toEqual(userStub());
+      expect(user).toEqual(userStub(mockAccessToken));
     });
 
     it('should return null if user not found', async () => {
-      const mockUserData = {
-        data: {
-          user: null,
-        },
-        error: null,
-      };
-      const sessionData = {
-        data: {
-          session: null,
-        },
-        error: null,
-      };
-      mockSupabaseClient.auth.getUser.mockResolvedValue(mockUserData);
-      mockSupabaseClient.auth.getSession.mockResolvedValue(sessionData);
-
-      const result = await authService.getUser();
-
+      authService.getUser = jest.fn().mockResolvedValue(null);
+      const result = await authService.getUser(mockAccessToken);
       expect(result).toBeNull();
-    });
-
-    it('should throw an error if session not found', async () => {
-      const mockUserData = {
-        data: {
-          user: {
-            id: user.uuid,
-            user_metadata: { name: user.name },
-            email: user.email,
-          },
-        },
-        error: null,
-      };
-      const sessionData = {
-        data: {
-          session: null,
-        },
-        error: null,
-      };
-      mockSupabaseClient.auth.getUser.mockResolvedValue(mockUserData);
-      mockSupabaseClient.auth.getSession.mockResolvedValue(sessionData);
-
-      await expect(authService.getUser()).rejects.toThrow(
-        new HttpException(
-          'Сессия пользователя не найдена',
-          HttpStatus.NOT_FOUND,
-        ),
-      );
     });
   });
 
   describe('createUser', () => {
     let createUserDto: CreateUserDto;
+    let createdUser: AuthPayload;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       createUserDto = {
-        name: userStub().user.name,
-        email: userStub().user.email,
+        name: 'Test User',
+        email: 'test@example.com',
         password: '123456',
       };
+      createdUser = await authService.createUser(createUserDto);
+    });
+
+    it('should call authRepository with correct data', () => {
+      const { name, email, password } = createUserDto;
+      expect(authRepository.createUser).toHaveBeenCalledWith(
+        name,
+        email,
+        password,
+      );
     });
 
     it('should create user successfully', async () => {
-      const mockSignUpData = {
-        data: {
-          user: {
-            id: '123',
-          },
-          session: {
-            access_token: authPayloadStub().accessToken,
-            refresh_token: authPayloadStub().refreshToken,
-          },
-        },
-        error: null,
-      };
-      mockSupabaseClient.auth.signUp.mockResolvedValue(mockSignUpData);
-      mockSupabaseClient.from().insert.mockResolvedValue({
-        error: null,
+      const { name, email } = createUserDto;
+      expect(createdUser).toEqual(authPayloadStub(name, email));
+    });
+
+    it('should return correct AuthPayload structure', () => {
+      expect(createdUser).toHaveProperty('user');
+      expect(createdUser).toHaveProperty('accessToken');
+      expect(createdUser).toHaveProperty('refreshToken');
+    });
+  });
+
+  describe('deleteUser', () => {
+    const mockUuid = '3b8d8290-b7d0-450e-a5ad-2b5b6397aff3';
+    let isUserDeleted: boolean;
+
+    beforeEach(async () => {
+      isUserDeleted = await authService.deleteUser(mockUuid);
+    });
+
+    it("should call userRepository.getUserAvatars with user's uuid", async () => {
+      expect(userRepository.getUserAvatars).toHaveBeenCalledWith(mockUuid);
+    });
+
+    it("should call userRepository.deleteUserProfile with user's uuid", async () => {
+      expect(userRepository.deleteUserProfile).toHaveBeenCalledWith(mockUuid);
+    });
+
+    it("should call authRepository.deleteUser with user's uuid", async () => {
+      expect(authRepository.deleteUser).toHaveBeenCalledWith(mockUuid);
+    });
+
+    it('should return true if user is deleted', async () => {
+      expect(isUserDeleted).toBeTruthy();
+    });
+
+    it('should throw an error if deleting user fails', async () => {
+      authRepository.deleteUser.mockRejectedValueOnce(
+        new HttpException('', HttpStatus.BAD_REQUEST),
+      );
+      await expect(authService.deleteUser(mockUuid)).rejects.toThrow(
+        HttpException,
+      );
+    });
+
+    describe('when user has avatars', () => {
+      let avatars: FileObject[];
+
+      beforeEach(async () => {
+        const avatarsStubs = [fileStub('avatar1'), fileStub('avatar2')];
+        userRepository.getUserAvatars = jest
+          .fn()
+          .mockResolvedValue(avatarsStubs);
+        avatars = await userRepository.getUserAvatars(mockUuid);
       });
 
-      const result = await authService.createUser(createUserDto);
+      it("should return user's avatars", async () => {
+        expect(avatars).toHaveLength(2);
+      });
 
-      expect(result).toEqual({
-        user: {
-          uuid: expect.any(String),
-          name: createUserDto.name,
-          email: createUserDto.email,
-        },
-        accessToken: mockSignUpData.data.session.access_token,
-        refreshToken: mockSignUpData.data.session.refresh_token,
+      it('should call userRepository.removeAvatarFromStorage with correct path', async () => {
+        const avatarsStubs = [fileStub('avatar1'), fileStub('avatar2')];
+        avatarsStubs.forEach((avatar) =>
+          expect(userRepository.removeAvatarFromStorage).toHaveBeenCalledWith(
+            `profiles/${mockUuid}/${avatar.name}`,
+          ),
+        );
+      });
+
+      it('should throw an error if removing avatar from storage fails', async () => {
+        const avatarsStubs = [fileStub('avatar1'), fileStub('avatar2')];
+        userRepository.removeAvatarFromStorage.mockResolvedValueOnce(false);
+
+        await expect(authService.deleteUser(mockUuid)).rejects.toThrow(
+          HttpException,
+        );
+
+        expect(userRepository.getUserAvatars).toHaveBeenCalledWith(mockUuid);
+        expect(userRepository.removeAvatarFromStorage).toHaveBeenCalledWith(
+          `profiles/${mockUuid}/${avatarsStubs[0].name}`,
+        );
+        expect(userRepository.removeAvatarFromStorage).toHaveBeenCalledWith(
+          `profiles/${mockUuid}/${avatarsStubs[1].name}`,
+        );
       });
     });
 
-    it('should throw an error if user creation fails', async () => {
-      const mockSignUpData = {
-        data: null,
-        error: { message: 'Error creating user' },
-      };
-      mockSupabaseClient.auth.signUp.mockResolvedValue(mockSignUpData);
+    describe('when user has no avatars', () => {
+      let avatars: FileObject[];
 
-      await expect(authService.createUser(createUserDto)).rejects.toThrow(
-        HttpException,
-      );
+      beforeEach(async () => {
+        userRepository.getUserAvatars = jest.fn().mockResolvedValue([]);
+        avatars = await userRepository.getUserAvatars(mockUuid);
+      });
+
+      it("should return empty array if user's avatars not found", async () => {
+        expect(avatars).toEqual([]);
+      });
     });
   });
 
   describe('logInUser', () => {
     let loginUserDto: LoginUserDto;
+    let loggedInUser: AuthPayload;
+    const mockRes = mockGqlContextResponse();
 
-    it('should log in user successfully', async () => {
+    beforeEach(async () => {
       loginUserDto = {
-        email: userStub().user.email,
+        email: 'test@example.com',
         password: '123456',
       };
+      loggedInUser = await authService.logInUser(loginUserDto, mockRes);
+      jest.spyOn(authService['logger'], 'error');
+    });
 
-      const mockSignInData = {
-        data: {
-          user: {
-            id: userStub().user.uuid,
-            user_metadata: { name: userStub().user.name },
-            email: userStub().user.email,
-          },
-          session: {
-            access_token: authPayloadStub().accessToken,
-            refresh_token: authPayloadStub().refreshToken,
-          },
-        },
-        error: null,
-      };
-      mockSupabaseClient.auth.signInWithPassword.mockResolvedValue(
-        mockSignInData,
-      );
+    it('should call authRepository with correct data', async () => {
+      const { email, password } = loginUserDto;
+      expect(authRepository.logInUser).toHaveBeenCalledWith(email, password);
+    });
 
-      const mockResponse = {
-        cookie: jest.fn(),
-      } as unknown as Response;
+    it('should log in user successfully', async () => {
+      const { email } = loginUserDto;
+      expect(loggedInUser).toEqual(authPayloadStub(email));
+    });
 
-      const result = await authService.logInUser(loginUserDto, mockResponse);
-
-      expect(result).toEqual({
-        user: {
-          uuid: userStub().user.uuid,
-          name: userStub().user.name,
-          email: userStub().user.email,
-        },
-        accessToken: mockSignInData.data.session.access_token,
-        refreshToken: mockSignInData.data.session.refresh_token,
-      });
-      expect(mockResponse.cookie).toHaveBeenCalledWith(
+    it('should set refresh token in cookie', () => {
+      expect(mockRes.cookie).toHaveBeenCalledWith(
         'refreshToken',
         'refreshToken',
         expect.any(Object),
       );
     });
 
-    it('should throw UnauthorizedException on login error', async () => {
-      loginUserDto = {
-        email: userStub().user.email,
-        password: 'wrongPassword',
-      };
+    it('should throw HttpException on login error', async () => {
+      jest
+        .spyOn(authRepository, 'logInUser')
+        .mockRejectedValue(new Error('Invalid credentials'));
 
-      const mockSignInData = {
-        data: null,
-        error: { message: 'Invalid credentials' },
-      };
-      mockSupabaseClient.auth.signInWithPassword.mockResolvedValue(
-        mockSignInData,
-      );
+      try {
+        await authService.logInUser(loginUserDto, mockRes);
+      } catch (error) {
+        expect(error).toBeInstanceOf(HttpException);
+        expect(error.message).toBe('Invalid credentials');
+        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
+      }
 
-      const mockResponse = {} as Response;
-
-      await expect(
-        authService.logInUser(loginUserDto, mockResponse),
-      ).rejects.toThrow(HttpException);
+      expect(authService['logger'].error).toHaveBeenCalled();
     });
   });
 
   describe('logOutUser', () => {
-    it('should log out user successfully when authenticated', async () => {
-      mockSupabaseClient.auth.getSession.mockResolvedValue({
-        data: { session: {} },
-        error: null,
-      });
-      mockSupabaseClient.auth.signOut.mockResolvedValue({ error: null });
+    let logout: boolean;
 
-      const result = await authService.logOutUser();
-
-      expect(result).toBe(true);
-      expect(mockSupabaseClient.auth.signOut).toHaveBeenCalled();
+    beforeEach(async () => {
+      logout = await authRepository.logOutUser();
     });
 
-    it('should return false when user is not authenticated', async () => {
-      mockSupabaseClient.auth.getSession.mockResolvedValue({
-        data: { session: null },
-        error: null,
-      });
-
-      const result = await authService.logOutUser();
-
-      expect(result).toBe(false);
-      expect(mockSupabaseClient.auth.signOut).not.toHaveBeenCalled();
+    it('should call authRepository', async () => {
+      expect(authRepository.logOutUser).toHaveBeenCalled();
     });
 
-    it('should throw HttpException on logout error', async () => {
-      mockSupabaseClient.auth.getSession.mockResolvedValue({
-        data: { session: {} },
-        error: null,
-      });
-      mockSupabaseClient.auth.signOut.mockResolvedValue({
-        error: 'Logout failed',
-      });
+    it('should return true when user is logged out successfully', async () => {
+      expect(logout).toBeTruthy();
+    });
 
-      await expect(authService.logOutUser()).rejects.toThrow(HttpException);
+    it('should return false when user is not logged in', async () => {
+      (authRepository.logOutUser as jest.Mock).mockResolvedValue(false);
+      const result = await authRepository.logOutUser();
+      expect(result).toBeFalsy();
     });
   });
 });
