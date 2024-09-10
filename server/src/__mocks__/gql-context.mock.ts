@@ -16,3 +16,12 @@ export const mockGqlContextResponse = () => {
   res.setHeader = jest.fn().mockReturnValue(res);
   return res as Response;
 };
+
+export const mockGqlContext = () => {
+  const gqlContext = {
+    req: mockGqlContextRequest(),
+    res: mockGqlContextResponse(),
+    user_uuid: '3b8d8290-b7d0-450e-a5ad-2b5b6397aff3',
+  };
+  return gqlContext;
+};

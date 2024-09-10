@@ -5,7 +5,7 @@ import { AuthStrategy } from '../strategies/auth.strategy.interface';
 import {
   mockGqlContextRequest,
   mockGqlContextResponse,
-} from '../__mocks__/gql-context.mock';
+} from '../../__mocks__/gql-context.mock';
 
 describe('JwtHttpAuthGuard', () => {
   let guard: JwtHttpAuthGuard;

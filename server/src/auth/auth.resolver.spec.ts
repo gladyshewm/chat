@@ -12,7 +12,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import {
   mockGqlContextRequest,
   mockGqlContextResponse,
-} from './__mocks__/gql-context.mock';
+} from '../__mocks__/gql-context.mock';
 
 jest.mock('./auth.service');
 

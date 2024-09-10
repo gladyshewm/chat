@@ -8,7 +8,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { AuthPayload, UserWithToken } from 'generated_graphql';
 import { AUTH_REPOSITORY, AuthRepository } from './auth.repository';
 import { USER_REPOSITORY, UserRepository } from '../users/users.repository';
-import { mockGqlContextResponse } from './__mocks__/gql-context.mock';
+import { mockGqlContextResponse } from '../__mocks__/gql-context.mock';
 import { AuthRepositoryMock } from './__mocks__/auth.repository';
 import { UserRepositoryMock } from './__mocks__/users.repository';
 import { fileStub } from './stubs/users.stub';
