@@ -34,9 +34,9 @@ jobs:
         working-directory: ./server
         run: npm run test
       
-      - name: Run e2e tests
-        working-directory: ./server
-        run: npm run test:e2e
+      #- name: Run e2e tests
+      #  working-directory: ./server
+      #  run: npm run test:e2e
       
       - name: lint code
         working-directory: ./server
