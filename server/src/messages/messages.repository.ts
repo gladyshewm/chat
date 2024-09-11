@@ -4,7 +4,10 @@ import {
   AttachedFileInput,
   MessageData,
 } from './models/messages.model';
-import { SupabaseResponse, SupabaseService } from 'supabase/supabase.service';
+import {
+  SupabaseResponse,
+  SupabaseService,
+} from '../supabase/supabase.service';
 
 export const MESSAGE_REPOSITORY = 'MESSAGE_REPOSITORY';
 

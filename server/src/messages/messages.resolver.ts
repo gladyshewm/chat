@@ -6,14 +6,14 @@ import {
   Resolver,
   Subscription,
 } from '@nestjs/graphql';
-import { MessagesService } from './messages.service';
-import { Inject, UseGuards } from '@nestjs/common';
-import { PUB_SUB } from 'common/pubsub/pubsub.provider';
-import { PubSub } from 'graphql-subscriptions';
-import { JwtHttpAuthGuard } from 'auth/guards/jwt-http-auth.guard';
-import { JwtWsAuthGuard } from 'auth/guards/jwt-ws-auth.guard';
-import { Message } from 'generated_graphql';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
+import { Inject, UseGuards } from '@nestjs/common';
+import { PubSub } from 'graphql-subscriptions';
+import { MessagesService } from './messages.service';
+import { Message } from '../generated_graphql';
+import { PUB_SUB } from '../common/pubsub/pubsub.provider';
+import { JwtHttpAuthGuard } from '../auth/guards/jwt-http-auth.guard';
+import { JwtWsAuthGuard } from '../auth/guards/jwt-ws-auth.guard';
 
 @Resolver('Messages')
 export class MessagesResolver {

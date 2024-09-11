@@ -7,7 +7,7 @@ import {
   AvatarInfo,
   ChangeCredentialsInput,
   UserWithAvatar,
-} from 'generated_graphql';
+} from '../generated_graphql';
 
 @Resolver('User')
 export class UsersResolver {

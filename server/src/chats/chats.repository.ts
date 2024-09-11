@@ -1,12 +1,15 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { SupabaseResponse, SupabaseService } from 'supabase/supabase.service';
+import { FileObject } from '@supabase/storage-js';
+import {
+  SupabaseResponse,
+  SupabaseService,
+} from '../supabase/supabase.service';
 import {
   ChatData,
   ChatWithParticipantsData,
   GroupAvatarData,
   PartyItem,
 } from './models/chats.model';
-import { FileObject } from '@supabase/storage-js';
 
 export const CHAT_REPOSITORY = 'CHAT_REPOSITORY';
 

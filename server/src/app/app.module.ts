@@ -9,9 +9,9 @@ import { UsersModule } from '../users/users.module';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { AuthModule } from '../auth/auth.module';
 import { ChatsModule } from '../chats/chats.module';
-import { MessagesModule } from 'messages/messages.module';
 import { UploadScalar } from '../common/scalars/upload.scalar';
 import { DateScalar } from '../common/scalars/date.scalar';
+import { MessagesModule } from '../messages/messages.module';
 
 @Module({
   imports: [

@@ -5,14 +5,14 @@ import {
   Injectable,
   Logger,
 } from '@nestjs/common';
-import { PUB_SUB } from 'common/pubsub/pubsub.provider';
 import { PubSub } from 'graphql-subscriptions';
-import { MESSAGE_REPOSITORY, MessageRepository } from './messages.repository';
-import { ChatsService } from 'chats/chats.service';
-import { AttachedFile, Message } from 'generated_graphql';
 import { FileUpload } from 'graphql-upload-ts';
-import { FilesService } from 'files/files.service';
+import { MESSAGE_REPOSITORY, MessageRepository } from './messages.repository';
+import { AttachedFile, Message } from '../generated_graphql';
 import { AttachedFileInput } from './models/messages.model';
+import { FilesService } from '../files/files.service';
+import { ChatsService } from '../chats/chats.service';
+import { PUB_SUB } from '../common/pubsub/pubsub.provider';
 
 @Injectable()
 export class MessagesService {

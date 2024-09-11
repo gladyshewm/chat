@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { FileObject } from '@supabase/storage-js';
 import {
   SupabaseResponse,
   SupabaseService,
 } from '../supabase/supabase.service';
 import { AvatarInfoData, UserWithAvatarData } from './models/users.model';
-import { FileObject } from '@supabase/storage-js';
-import { ChangeCredentialsInput, UserInfo } from 'generated_graphql';
+import { ChangeCredentialsInput, UserInfo } from '../generated_graphql';
 
 export const USER_REPOSITORY = 'USER_REPOSITORY';
 

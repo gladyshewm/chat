@@ -1,9 +1,9 @@
 import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { ChatsService } from './chats.service';
 import { UseGuards } from '@nestjs/common';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
+import { ChatsService } from './chats.service';
 import { JwtHttpAuthGuard } from '../auth/guards/jwt-http-auth.guard';
-import { AvatarInfo, ChatWithoutMessages } from 'generated_graphql';
+import { AvatarInfo, ChatWithoutMessages } from '../generated_graphql';
 
 @Resolver('Chats')
 export class ChatsResolver {

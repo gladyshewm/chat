@@ -18,8 +18,9 @@
     "useUnknownInCatchVariables": false,
     // "noImplicitAny": false,
     "forceConsistentCasingInFileNames": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "types": ["node", "jest"]
   },
-  "include": ["src"],
+  "include": ["src", "test/*.ts"],
   "exclude": ["node_modules", "dist"]
 }

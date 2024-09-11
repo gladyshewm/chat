@@ -12,11 +12,11 @@ import { AuthMiddleware } from './middlewares/auth.middleware';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { AUTH_STRATEGY } from './strategies/auth-strategy.token';
 import { AUTH_REPOSITORY, SupabaseAuthRepository } from './auth.repository';
-import { UsersModule } from 'users/users.module';
 import {
   SupabaseUserRepository,
   USER_REPOSITORY,
-} from 'users/users.repository';
+} from '../users/users.repository';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [

@@ -8,13 +8,13 @@ import {
 import { FileUpload } from 'graphql-upload-ts';
 import { UserWithAvatarData } from './models/users.model';
 import { USER_REPOSITORY, UserRepository } from './users.repository';
-import { FilesService } from 'files/files.service';
 import {
   AvatarInfo,
   ChangeCredentialsInput,
   UserInfo,
   UserWithAvatar,
-} from 'generated_graphql';
+} from '../generated_graphql';
+import { FilesService } from '../files/files.service';
 
 @Injectable()
 export class UsersService {
