@@ -4,7 +4,7 @@ import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { authPayloadStub, userStub } from './stubs/auth.stub';
-import { AuthPayload, UserWithToken } from '../graphql';
+import { AuthPayload, UserWithToken } from '../generated_graphql';
 import { AUTH_STRATEGY } from './strategies/auth-strategy.token';
 import { JwtAuthStrategy } from './strategies/jwt-auth.strategy';
 import { CreateUserDto } from './dto/create-user.dto';

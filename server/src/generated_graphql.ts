@@ -1,3 +1,4 @@
+
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -18,12 +19,6 @@ export class CreateUserInput {
 export class LoginUserInput {
     email: string;
     password: string;
-}
-
-export class SendMessageInput {
-    chatId: string;
-    content: string;
-    attachedFiles?: Nullable<Upload[]>;
 }
 
 export class ChangeCredentialsInput {
@@ -99,7 +94,7 @@ export abstract class IMutation {
 
     abstract deleteChatAvatar(chatId: string, avatarUrl: string): Nullable<string> | Promise<Nullable<string>>;
 
-    abstract sendMessage(sendMessageInput: SendMessageInput): Message | Promise<Message>;
+    abstract sendMessage(chatId: string, content?: Nullable<string>, attachedFiles?: Nullable<Upload[]>): Message | Promise<Message>;
 
     abstract sendTypingStatus(chatId: string, userName: string, isTyping: boolean): TypingFeedback | Promise<TypingFeedback>;
 
@@ -139,9 +134,10 @@ export class Message {
     userId: string;
     userName: string;
     avatarUrl?: Nullable<string>;
-    content: string;
+    content?: Nullable<string>;
     createdAt: Date;
     isRead: boolean;
+    hasFiles: boolean;
     attachedFiles: Nullable<AttachedFile>[];
 }
 

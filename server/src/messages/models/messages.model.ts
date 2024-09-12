@@ -11,6 +11,7 @@ export type MessageData = {
   created_at: Date;
   is_read: boolean;
   profiles: Profile;
+  has_files: boolean;
   attached_files?: AttachedFile[];
 };
 

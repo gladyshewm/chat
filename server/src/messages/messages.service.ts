@@ -62,6 +62,7 @@ export class MessagesService {
         content: message.content,
         createdAt: message.created_at,
         isRead: message.is_read,
+        hasFiles: message.has_files,
         attachedFiles:
           message.attached_files?.map((file) => ({
             fileId: file.file_id,
@@ -93,6 +94,7 @@ export class MessagesService {
         content: message.content,
         createdAt: new Date(message.created_at),
         isRead: message.is_read,
+        hasFiles: message.has_files,
         attachedFiles:
           message.attached_files?.map((file) => ({
             fileId: file.file_id,
@@ -131,6 +133,7 @@ export class MessagesService {
         chatId,
         userUuid,
         content,
+        !!attachedFiles,
       );
 
       const resolvedFiles = attachedFiles
@@ -152,6 +155,7 @@ export class MessagesService {
         isRead: newMessage.is_read,
         userName: newMessage.profiles.name,
         avatarUrl: newMessage.profiles.avatar_url,
+        hasFiles: newMessage.has_files,
         attachedFiles: files,
       };
 

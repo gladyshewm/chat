@@ -7,9 +7,10 @@ type Message {
   userId: ID!
   userName: String!
   avatarUrl: String
-  content: String!
+  content: String
   createdAt: Date!
   isRead: Boolean!
+  hasFiles: Boolean!
   attachedFiles: [AttachedFile]!
 }
 
@@ -33,7 +34,7 @@ type Query {
 }
 
 type Mutation {
-  sendMessage(chatId: ID!, content: String!, attachedFiles: [Upload!]): Message!
+  sendMessage(chatId: ID!, content: String, attachedFiles: [Upload!]): Message!
   sendTypingStatus(
     chatId: ID!
     userName: String!

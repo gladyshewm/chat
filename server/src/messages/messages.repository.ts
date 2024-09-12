@@ -25,6 +25,7 @@ export interface MessageRepository {
     chatId: string,
     userUuid: string,
     content: string,
+    hasFiles: boolean,
   ): Promise<MessageData>;
   uploadFileToUserStorage(
     buffer: Buffer,
@@ -61,6 +62,7 @@ export class SupabaseMessageRepository implements MessageRepository {
             content,
             created_at,
             is_read,
+            has_files,
             attached_files (
               file_id,
               file_url,
@@ -101,6 +103,7 @@ export class SupabaseMessageRepository implements MessageRepository {
           chat_id,
           user_uuid,
           is_read,
+          has_files,
           attached_files (
             file_id,
             file_url,
@@ -131,7 +134,8 @@ export class SupabaseMessageRepository implements MessageRepository {
   async sendMessage(
     chatId: string,
     userUuid: string,
-    content: string,
+    content: string | null = null,
+    hasFiles: boolean = false,
   ): Promise<MessageData> {
     try {
       const response = (await this.supabaseService
@@ -144,6 +148,7 @@ export class SupabaseMessageRepository implements MessageRepository {
           chat_id: chatId,
           user_uuid: userUuid,
           is_read: false,
+          has_files: hasFiles,
         })
         .select(
           `
@@ -153,6 +158,7 @@ export class SupabaseMessageRepository implements MessageRepository {
           content, 
           created_at, 
           is_read,
+          has_files,
           profiles:user_uuid (
             name,
             avatar_url

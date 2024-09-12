@@ -30,7 +30,7 @@ import { MessagesModule } from '../messages/messages.module';
       }),
       typePaths: ['./**/*.graphql'],
       definitions: {
-        path: join(process.cwd(), 'src/graphql.ts'),
+        path: join(process.cwd(), 'src/generated_graphql.ts'),
         outputAs: 'class',
         customScalarTypeMapping: {
           Upload: 'FileUpload',
