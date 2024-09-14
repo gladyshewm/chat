@@ -1,6 +1,6 @@
 .image-placeholder {
   width: 100%;
-  height: 200px; /* Установить подходящую высоту */
+  height: 0; /* Установить подходящую высоту */
   background-color: #f33f3f;
   animation: pulse 1.5s infinite;
 }

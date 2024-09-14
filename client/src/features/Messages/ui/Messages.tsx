@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, useScroll } from 'framer-motion';
 import { format } from 'date-fns';
 import './Messages.css';
-import { ChatWithoutMessages, Message, UserInfo } from '@shared/types';
+import {
+  AvatarInfo,
+  ChatWithoutMessages,
+  Message,
+  UserInfo,
+} from '@shared/types';
 import { ImageLoader, Loader, ScrollButton } from '@shared/ui';
 import {
   useChatMessagesQuery,
@@ -10,6 +15,8 @@ import {
 } from './messages.generated';
 import { groupMessagesByDate } from '../utils';
 import { containerVariants } from './motion';
+import { UserIcon } from '@shared/assets';
+import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
 
 interface MessagesProps {
   user: UserInfo;
@@ -36,6 +43,15 @@ const Messages = ({
   });
   const isLoadingRef = useRef(false);
   const MESSAGES_PER_PAGE = 50;
+  const {
+    openSlider,
+    isOpen,
+    currentImage,
+    images,
+    headerContent,
+    closeSlider,
+    navigateSlider,
+  } = useFullScreenSlider();
 
   const { loading, error, fetchMore } = useChatMessagesQuery({
     variables: {
@@ -180,12 +196,51 @@ const Messages = ({
     });
   }, [scrollYProgress]);
 
+  const handleImageClick = (message: Message) => {
+    const headerContent = (
+      <div className="profile-info__header">
+        <div className="header__info">
+          {message && (
+            <>
+              <div className="header__avatar">
+                {message.avatarUrl ? (
+                  <img src={message.avatarUrl} alt="avatar" />
+                ) : (
+                  <UserIcon />
+                )}
+              </div>
+              <div className="header__name">
+                <span>{message.userName}</span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+
+    const image: AvatarInfo = {
+      url: message.attachedFiles[0]?.fileUrl as string,
+      createdAt: message.createdAt,
+      name: '',
+    };
+
+    openSlider([image], image, headerContent);
+  };
+
   const groupedMessages = groupMessagesByDate(messages);
 
   return (
     <>
       {loading && offset === 0 && <Loader />}
       {error && <div>Ошибка: {error.message}</div>}
+      <FullScreenSlider
+        isOpen={isOpen}
+        currentImage={currentImage}
+        images={images}
+        headerContent={headerContent}
+        onClose={closeSlider}
+        onNavigate={navigateSlider}
+      />
       <motion.div
         className="message-container"
         ref={containerRef}
@@ -241,7 +296,8 @@ const Messages = ({
                       >
                         {chat.isGroupChat &&
                           message.userId !== user.uuid &&
-                          isFirst && (
+                          isFirst &&
+                          !message.hasFiles && (
                             <p className="message-username">
                               {message.userName}
                             </p>
@@ -255,7 +311,7 @@ const Messages = ({
                                   src={file?.fileUrl as string}
                                   alt="attached file"
                                   className="attached-file"
-                                  onClick={() => console.log('Image clicked')}
+                                  onClick={() => handleImageClick(message)}
                                 />
                               ))}
                               {!message.content && (
