@@ -9,7 +9,7 @@ export type FindMessagesQueryVariables = Types.Exact<{
 }>;
 
 
-export type FindMessagesQuery = { __typename?: 'Query', findMessages?: Array<{ __typename?: 'Message', id: string, chatId: string, userId: string, userName: string, avatarUrl?: string | null, content: string, createdAt: any, isRead: boolean }> | null };
+export type FindMessagesQuery = { __typename?: 'Query', findMessages?: Array<{ __typename?: 'Message', id: string, chatId: string, userId: string, userName: string, avatarUrl?: string | null, content?: string | null, createdAt: any, isRead: boolean }> | null };
 
 
 export const FindMessagesDocument = gql`

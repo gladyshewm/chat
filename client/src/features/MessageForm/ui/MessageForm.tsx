@@ -19,17 +19,19 @@ export const MessageForm = ({
   onFocus,
   chat_id,
 }: MessageFormProps) => {
-  const [postMessage] = useSendMessageMutation();
+  const [postMessage, { loading, error }] = useSendMessageMutation();
 
-  const sendMessage = (message: string) => {
+  const sendMessage = async (
+    message: string | null,
+    attachedFiles: File[] = [],
+  ) => {
     // const tempId = `temp_${Date.now()}`;
-    if (chat_id && message) {
-      postMessage({
+    if (chat_id) {
+      await postMessage({
         variables: {
-          sendMessageInput: {
-            chatId: chat_id,
-            content: message,
-          }
+          chatId: chat_id,
+          content: message,
+          attachedFiles: attachedFiles,
         },
         /* optimisticResponse: {
           sendMessage: {
@@ -102,6 +104,7 @@ export const MessageForm = ({
               name="message"
               id="message-input"
               className="message-input"
+              placeholder="Сообщение"
               onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) =>
                 e.key === 'Enter' && handleSubmit()
               }
@@ -109,7 +112,11 @@ export const MessageForm = ({
               onBlur={onBlur}
               onFocus={onFocus}
             />
-            <FilePicker />
+            <FilePicker
+              sendMessage={sendMessage}
+              sendMessageLoading={loading}
+              sendMessageError={error}
+            />
           </DrawOutlineRect>
           <DrawOutlineRect rx={'50%'} className="send-button-wrapper">
             <button type="submit" className="send-button">

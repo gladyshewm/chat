@@ -8,6 +8,7 @@ query chatMessages($chatId: ID!, $limit: Int, $offset: Int) {
     isRead
     userName
     avatarUrl
+    hasFiles
     attachedFiles {
       fileId
       fileUrl
@@ -26,6 +27,7 @@ subscription messageSent($chatId: ID!) {
     isRead
     userName
     avatarUrl
+    hasFiles
     attachedFiles {
       fileId
       fileUrl

@@ -3,7 +3,7 @@ import { motion, useScroll } from 'framer-motion';
 import { format } from 'date-fns';
 import './Messages.css';
 import { ChatWithoutMessages, Message, UserInfo } from '@shared/types';
-import { Loader, ScrollButton } from '@shared/ui';
+import { ImageLoader, Loader, ScrollButton } from '@shared/ui';
 import {
   useChatMessagesQuery,
   useMessageSentSubscription,
@@ -247,12 +247,39 @@ const Messages = ({
                             </p>
                           )}
                         <motion.div className="message-main">
-                          <p className="message-text">{message.content}</p>
-                          <time className="message-time">
-                            {String(
-                              format(new Date(message.createdAt), 'HH:mm'),
-                            )}
-                          </time>
+                          {message.hasFiles && (
+                            <div id="attached-files">
+                              {message.attachedFiles.map((file) => (
+                                <ImageLoader
+                                  key={file?.fileId}
+                                  src={file?.fileUrl as string}
+                                  alt="attached file"
+                                  className="attached-file"
+                                  onClick={() => console.log('Image clicked')}
+                                />
+                              ))}
+                              {!message.content && (
+                                <time className="message-time overlay-time">
+                                  {String(
+                                    format(
+                                      new Date(message.createdAt),
+                                      'HH:mm',
+                                    ),
+                                  )}
+                                </time>
+                              )}
+                            </div>
+                          )}
+                          {message.content && (
+                            <div id="main-content">
+                              <p className="message-text">{message.content}</p>
+                              <time className="message-time">
+                                {String(
+                                  format(new Date(message.createdAt), 'HH:mm'),
+                                )}
+                              </time>
+                            </div>
+                          )}
                         </motion.div>
                       </motion.div>
                     </motion.div>

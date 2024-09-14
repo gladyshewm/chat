@@ -1,0 +1,35 @@
+.image-placeholder {
+  width: 100%;
+  height: 200px; /* Установить подходящую высоту */
+  background-color: #f33f3f;
+  animation: pulse 1.5s infinite;
+}
+
+.image-loading {
+  display: none; /* Реализовать загрузку */
+}
+
+.image-loaded {
+  animation: fadeIn 0.5s ;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

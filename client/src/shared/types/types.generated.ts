@@ -23,11 +23,6 @@ export type AttachedFile = {
   fileUrl: Scalars['String']['output'];
 };
 
-export type AttachedFileInput = {
-  fileName: Scalars['String']['input'];
-  fileUrl: Scalars['String']['input'];
-};
-
 export type AuthPayload = {
   __typename?: 'AuthPayload';
   accessToken: Scalars['String']['output'];
@@ -89,8 +84,9 @@ export type Message = {
   attachedFiles: Array<Maybe<AttachedFile>>;
   avatarUrl?: Maybe<Scalars['String']['output']>;
   chatId: Scalars['ID']['output'];
-  content: Scalars['String']['output'];
+  content?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['Date']['output'];
+  hasFiles: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   isRead: Scalars['Boolean']['output'];
   userId: Scalars['ID']['output'];
@@ -173,7 +169,9 @@ export type MutationRefreshTokenArgs = {
 
 
 export type MutationSendMessageArgs = {
-  sendMessageInput: SendMessageInput;
+  attachedFiles?: InputMaybe<Array<Scalars['Upload']['input']>>;
+  chatId: Scalars['ID']['input'];
+  content?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -257,12 +255,6 @@ export type QueryUserAllAvatarsArgs = {
 
 export type QueryUserAvatarArgs = {
   userUuid: Scalars['ID']['input'];
-};
-
-export type SendMessageInput = {
-  attachedFiles?: InputMaybe<Array<AttachedFileInput>>;
-  chatId: Scalars['ID']['input'];
-  content: Scalars['String']['input'];
 };
 
 export type Subscription = {

@@ -37,7 +37,7 @@
   }
 }
 
-.message-form .EmojiPickerReact {
+.EmojiPickerReact {
   --epr-emoji-size: 1.5rem;
   --epr-emoji-gap: 0.5rem;
   --epr-hover-bg-color: #4a4a4a;
@@ -46,12 +46,12 @@
   --epr-text-color: #ffffff;
 }
 
-.message-form .EmojiPickerReact.epr-dark-theme {
+.EmojiPickerReact.epr-dark-theme {
   --epr-bg-color: #212121;
   --epr-category-label-bg-color: transparent;
 }
 
-.message-form .EmojiPickerReact {
+.EmojiPickerReact {
   border-radius: 15px;
   padding: 0.5rem;
 

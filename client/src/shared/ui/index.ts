@@ -2,6 +2,7 @@ export * from './buttons';
 export * from './DrawOutline';
 export * from './inputs';
 export { Loader } from './Loader/Loader';
+export { ImageLoader } from './ImageLoader/ImageLoader';
 export { default as Modal } from './Modal/Modal';
 export { default as Cross } from './Cross/Cross';
 export { default as SearchIllustration } from './SearchIllustration/SearchIllustration';

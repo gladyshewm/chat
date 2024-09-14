@@ -71,7 +71,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  padding: 0.5rem 0.7rem;
+  /* padding: 0.5rem 0.7rem; */
   word-break: break-all;
   width: fit-content;
   min-width: 2.5rem;
@@ -81,8 +81,52 @@
 
   & .message-main {
     display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+    flex-direction: column;
+
+    & #attached-files {
+      display: flex;
+      width: 100%;
+      max-width: 20rem;
+      height: auto;
+      max-height: 30rem;
+
+      & img {
+        width: 100%;
+        height: auto;
+        max-height: 30rem;
+        border-radius: 1rem 1rem 0 0;
+        object-fit: cover;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      &:only-child {
+        height: 100%;
+
+        & img {
+          border-radius: 1rem 1rem 0 1rem;
+        }
+      }
+
+      & .overlay-time {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0.5rem;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 0.5rem;
+      }
+    }
+
+    & #main-content {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin: 0.5rem 0.7rem;
+    }
   }
 
   & .message-username {

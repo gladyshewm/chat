@@ -2,8 +2,19 @@ import { useState } from 'react';
 import './FilePicker.css';
 import { PaperClipIcon } from '@shared/assets';
 import ModalFilePreview from './ModalFilePreview';
+import { ApolloError } from '@apollo/client';
 
-const FilePicker = () => {
+interface FilePrickerProps {
+  sendMessage: (message: string | null, attachedFiles: File[]) => Promise<void>;
+  sendMessageLoading: boolean;
+  sendMessageError: ApolloError | undefined;
+}
+
+const FilePicker = ({
+  sendMessage,
+  sendMessageLoading,
+  sendMessageError,
+}: FilePrickerProps) => {
   const [file, setFile] = useState<File | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -38,14 +49,15 @@ const FilePicker = () => {
           <PaperClipIcon />
         </abbr>
       </div>
-      {file ? (
+      {file && (
         <ModalFilePreview
           file={file}
           isOpen={isModalOpen}
           setIsOpen={setIsModalOpen}
+          sendMessage={sendMessage}
+          sendMessageLoading={sendMessageLoading}
+          sendMessageError={sendMessageError}
         />
-      ) : (
-        <></>
       )}
     </>
   );
