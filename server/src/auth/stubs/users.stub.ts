@@ -7,7 +7,7 @@ export const fileStub = (name?: string): FileObject => {
     owner: 'string',
     id: 'string',
     updated_at: 'string',
-    created_at: 'string',
+    created_at: '2024-09-09T18:13:11.180Z',
     last_accessed_at: 'string',
     metadata: {
       filename: 'string',

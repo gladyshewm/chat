@@ -47,7 +47,7 @@ describe('ChatsResolver', () => {
 
     beforeEach(async () => {
       chatsService.createChat.mockResolvedValue(
-        chatWithoutMessagesStub(chatName, userUuid, participants),
+        chatWithoutMessagesStub('mockId', chatName, userUuid, participants),
       );
       createdChat = await chatsResolver.createChat(
         participantsIds,
@@ -66,7 +66,7 @@ describe('ChatsResolver', () => {
 
     it('should return created chat', async () => {
       expect(createdChat).toEqual(
-        chatWithoutMessagesStub(chatName, userUuid, participants),
+        chatWithoutMessagesStub('mockId', chatName, userUuid, participants),
       );
     });
 
@@ -161,7 +161,7 @@ describe('ChatsResolver', () => {
 
     beforeEach(async () => {
       chatsService.getChatWithUser.mockResolvedValue(
-        chatWithoutMessagesStub('mockName', userUuid, [withUser]),
+        chatWithoutMessagesStub('mockId', 'mockName', userUuid, [withUser]),
       );
       chatWithUser = await chatsResolver.getChatWithUser(
         withUserUuid,
@@ -178,7 +178,7 @@ describe('ChatsResolver', () => {
 
     it('should return chat with user', async () => {
       expect(chatWithUser).toEqual(
-        chatWithoutMessagesStub('mockName', userUuid, [withUser]),
+        chatWithoutMessagesStub('mockId', 'mockName', userUuid, [withUser]),
       );
     });
 

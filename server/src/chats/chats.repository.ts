@@ -40,7 +40,7 @@ export interface ChatRepository {
     chatId: string,
     publicURL: string | null,
   ): Promise<void>;
-  getCurrentChatAvatar(chatId: string): Promise<{ avatar_url: string } | null>;
+  getCurrentChatAvatar(chatId: string): Promise<{ avatar_url: string }>;
   checkDeleteAccess(file_path: string): Promise<boolean>;
   removeAvatarFromStorage(avatarPath: string): Promise<void>;
   getChatAvatars(chatId: string): Promise<FileObject[]>;
@@ -398,9 +398,7 @@ export class SupabaseChatRepository implements ChatRepository {
     }
   }
 
-  async getCurrentChatAvatar(
-    chatId: string,
-  ): Promise<{ avatar_url: string } | null> {
+  async getCurrentChatAvatar(chatId: string): Promise<{ avatar_url: string }> {
     const response = (await this.supabaseService
       .getClient()
       .from('group_chat')
@@ -411,6 +409,11 @@ export class SupabaseChatRepository implements ChatRepository {
     const currentChat = this.supabaseService.handleSupabaseResponse<{
       avatar_url: string;
     }>(response);
+
+    if (!currentChat) {
+      this.logger.warn(`Аватар чата не найден`);
+      throw new HttpException('Avatar not found', HttpStatus.NOT_FOUND);
+    }
 
     return currentChat;
   }

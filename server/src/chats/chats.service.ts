@@ -185,8 +185,6 @@ export class ChatsService {
     try {
       const chatData = await this.chatRepository.getChatById(chatId);
 
-      if (!chatData) return null;
-
       const chat: ChatWithoutMessages = {
         id: chatData.chat_id,
         name: chatData.name,
@@ -199,8 +197,6 @@ export class ChatsService {
 
       const chatParticipants =
         await this.chatRepository.getPartyByChatId(chatId);
-
-      if (!chatParticipants) return null;
 
       chat.participants = chatParticipants.map((item) => ({
         id: item.profiles.uuid,
@@ -259,11 +255,6 @@ export class ChatsService {
     try {
       const currentChat =
         await this.chatRepository.getCurrentChatAvatar(chatId);
-
-      if (!currentChat?.avatar_url) {
-        this.logger.error(`Не удалось получить текущий аватар чата`);
-        return null;
-      }
 
       const avatarPathToDelete = avatarUrl.split('/').slice(-3).join('/');
 
