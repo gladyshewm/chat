@@ -4,8 +4,12 @@ import { FileUpload } from 'graphql-upload-ts';
 @Injectable()
 export class FilesService {
   generateUniqueFilename(filename: string): string {
-    const fileExtension = filename.split('.').pop();
-    return `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
+    const fileExtension = filename.includes('.')
+      ? filename.split('.').pop()
+      : '';
+    const uniquePart = `${Date.now()}-${Math.random().toString(36).substring(2)}`;
+
+    return fileExtension ? `${uniquePart}.${fileExtension}` : uniquePart;
   }
 
   async readFile(file: FileUpload): Promise<Buffer> {
