@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import './Auth.css';
-import { LogInForm, RegistrationForm } from '@features';
 import { CustomButton, DrawOutlineRect, Loader, Modal } from '@shared/ui';
 import { signInVariants, signUpVariants } from './motion';
 import { TWEEN_TRANSITION } from '@shared/constants/motion';
 import { useAuth } from '@app/providers/hooks/useAuth';
+import { LogInForm, RegistrationForm } from '@widgets';
 
 const Auth = () => {
   const [modalActive, setModalActive] = useState<boolean>(false);

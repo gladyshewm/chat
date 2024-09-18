@@ -1,72 +1,10 @@
-import { useNavigate } from 'react-router-dom';
 import { ApolloError } from '@apollo/client';
 import { motion } from 'framer-motion';
 import './Search.css';
-import {
-  useChatWithUserQuery,
-  useCreateChatMutation,
-} from './search.generated';
 import { UserWithAvatar } from '@shared/types';
-import { Cross, DrawOutlineRect, Loader, SearchIllustration } from '@shared/ui';
-import { ExclamationTriangleIcon, UserIcon } from '@shared/assets';
-
-const SearchResultItem = ({ user }: { user: UserWithAvatar }) => {
-  const navigate = useNavigate();
-
-  const { data, loading, error } = useChatWithUserQuery({
-    variables: {
-      userUuid: user.id,
-    },
-  });
-  const [createChat] = useCreateChatMutation();
-
-  const handleClick = async () => {
-    if (loading) return <Loader />;
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    if (data && data.chatWithUser) {
-      navigate(`/chat/${data.chatWithUser.id}`);
-    } else {
-      try {
-        const result = await createChat({
-          variables: {
-            participantsIds: [user.id],
-            name: null,
-          },
-        });
-
-        navigate(`/chat/${result.data?.createChat?.id}`);
-      } catch (error) {
-        console.error('Не удалось создать чат', error);
-      }
-    }
-  };
-
-  return (
-    <div className="search-list-block" onClick={handleClick}>
-      <div className="user-result">
-        {user.avatarUrl ? (
-          <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
-            <div className="user-avatar">
-              <img src={user.avatarUrl} alt={user.name} />
-            </div>
-          </DrawOutlineRect>
-        ) : (
-          <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
-            <div className="empty-avatar">
-              <UserIcon />
-            </div>
-          </DrawOutlineRect>
-        )}
-        <span className="user-name">{user.name}</span>
-      </div>
-    </div>
-  );
-};
+import { Cross, DrawOutlineRect, SearchIllustration } from '@shared/ui';
+import { ExclamationTriangleIcon } from '@shared/assets';
+import { SearchResultItem } from '@features';
 
 interface SearchProps {
   searchValue: string;
@@ -130,7 +68,7 @@ const renderSearchResults = ({
                 strokeWidth={1}
                 showOnHover={true}
               >
-                <SearchResultItem user={user} />
+                <SearchResultItem resultUser={user} />
               </DrawOutlineRect>
             </motion.div>
           ))}

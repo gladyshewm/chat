@@ -1,0 +1,16 @@
+.chat-profile {
+  height: calc(100vh - 5.7rem);
+  overflow-y: auto;
+
+  & .profile-settings__main {
+    & .participants {
+      padding: 0 0.7rem;
+      margin: 0.7rem 0;
+
+      & .subtitle {
+        color: #fff;
+        padding: 0.7rem;
+      }
+    }
+  }
+}

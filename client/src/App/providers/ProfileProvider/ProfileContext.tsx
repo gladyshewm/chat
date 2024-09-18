@@ -1,8 +1,8 @@
 import { ApolloError, ApolloQueryResult } from '@apollo/client';
 import { createContext } from 'react';
 import { UserAvatarQuery } from './profile.generated';
-import { ChangeCredentialsSchema } from '../../../features/auth/model/validation/validationSchemas';
 import { AvatarInfo } from '@shared/types';
+import { ChangeCredentialsSchema } from '@widgets/Auth';
 
 interface ProfileContextType {
   avatarUrl: string | null;

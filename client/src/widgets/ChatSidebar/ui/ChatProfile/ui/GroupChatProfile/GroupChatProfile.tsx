@@ -1,15 +1,16 @@
+import { useEffect, useState } from 'react';
+import './GroupChatProfile.css';
 import { motion } from 'framer-motion';
-import { AvatarInfo, ChatWithoutMessages } from '@shared/types';
 import {
   useChatAllAvatarsLazyQuery,
   useDeleteChatAvatarMutation,
 } from './group-chat-profile.generated';
-import { CopyMessage, useCopyMessage } from '@features';
-import { DrawOutline, Loader, Slider } from '@shared/ui';
-import { IdentificationIcon, UserGroupIcon } from '@shared/assets';
-import { useEffect, useState } from 'react';
 import { useAuth } from '@app/providers/hooks/useAuth';
+import { CopyMessage, SearchResultItem, useCopyMessage } from '@features';
+import { DrawOutline, Loader, Slider } from '@shared/ui';
 import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
+import { AvatarInfo, ChatWithoutMessages } from '@shared/types';
+import { IdentificationIcon, UserGroupIcon } from '@shared/assets';
 
 interface GroupChatProfileProps {
   chat: ChatWithoutMessages;
@@ -104,7 +105,7 @@ const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
   };
 
   return (
-    <>
+    <div className="chat-profile">
       <FullScreenSlider
         isOpen={isOpen}
         currentImage={currentImage}
@@ -154,8 +155,22 @@ const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
             </div>
           </motion.div>
         </div>
+        <div className="participants">
+          <p className="subtitle">Участники</p>
+          <div className="participants-list">
+            {chat.participants.map((participant) => (
+              <motion.div
+                whileTap={{ scale: 0.95 }}
+                className="participant"
+                key={participant.id}
+              >
+                <SearchResultItem resultUser={participant} />
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </main>
-    </>
+    </div>
   );
 };
 

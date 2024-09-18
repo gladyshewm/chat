@@ -6,10 +6,6 @@ import { errorMessageVariants, successMessageVariants } from '../motion';
 import { useProfile } from '@app/providers/hooks/useProfile';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import {
-  ChangeCredentialsSchema,
-  validationChangeCredentialsSchema,
-} from '@features';
-import {
   CustomButton,
   CustomInput,
   DrawOutline,
@@ -26,6 +22,10 @@ import {
   XmarkIcon,
 } from '@shared/assets';
 import DeleteModal from './DeleteModal/DeleteModal';
+import {
+  ChangeCredentialsSchema,
+  validationChangeCredentialsSchema,
+} from '@widgets/Auth';
 
 interface EditProfileProps {
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;

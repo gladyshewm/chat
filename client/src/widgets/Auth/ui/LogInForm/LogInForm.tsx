@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Formik, Form } from 'formik';
 import './LogInForm.css';
 import { CustomButton, CustomInput, DrawOutlineRect, Loader } from '@shared/ui';
+import { useAuth } from '@app/providers/hooks/useAuth';
 import { LoginSchema } from '../../model/validation/validationSchemas';
 import { validationLoginSchema } from '../../model/validation/validate';
-import { useAuth } from '@app/providers/hooks/useAuth';
 
 interface LogInFormProps {
   handleCreateAccountClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
