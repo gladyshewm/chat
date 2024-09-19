@@ -20,3 +20,4 @@ export { UserIcon } from './icons/UserIcon';
 export { XmarkIcon } from './icons/XmarkIcon';
 export { FaceFrownIcon } from './icons/FaceFrownIcon';
 export { PaperClipIcon } from './icons/PaperClipIcon';
+export { PlusIcon } from './icons/PlusIcon';

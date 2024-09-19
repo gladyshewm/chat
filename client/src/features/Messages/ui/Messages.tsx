@@ -19,16 +19,16 @@ import { UserIcon } from '@shared/assets';
 import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
 
 interface MessagesProps {
-  user: UserInfo;
   chat: ChatWithoutMessages;
+  user: UserInfo;
   isSearch: boolean;
   selectedMessageId: string | null;
   isChatInfo: boolean;
 }
 
 const Messages = ({
-  user,
   chat,
+  user,
   isSearch,
   selectedMessageId,
   isChatInfo,
@@ -55,7 +55,7 @@ const Messages = ({
 
   const { loading, error, fetchMore } = useChatMessagesQuery({
     variables: {
-      chatId: chat.id,
+      chatId: chat?.id as string,
       offset: 0,
       limit: MESSAGES_PER_PAGE,
     },
@@ -72,7 +72,7 @@ const Messages = ({
 
   useMessageSentSubscription({
     variables: {
-      chatId: chat.id,
+      chatId: chat?.id as string,
     },
     onError: (error) => {
       console.error(error);
@@ -103,7 +103,7 @@ const Messages = ({
       try {
         const { data } = await fetchMore({
           variables: {
-            chatId: chat.id,
+            chatId: chat?.id,
             offset: newOffset,
             limit: MESSAGES_PER_PAGE,
           },
@@ -157,7 +157,7 @@ const Messages = ({
         currentContainer.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [offset, loading, fetchMore, chat.id, hasMore]);
+  }, [offset, loading, fetchMore, chat?.id, hasMore]);
 
   useEffect(() => {
     if (selectedMessageId) {

@@ -1,0 +1,22 @@
+.search-users {
+  & header {
+    & button {
+      margin: 0 1.5rem;
+
+      & abbr {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        & svg {
+          stroke: #fff;
+        }
+      }
+    }
+
+    & .search-input-wrapper {
+      flex-grow: 1;
+      margin-right: 1.5rem;
+    }
+  }
+}

@@ -1,0 +1,15 @@
+mutation addUserToChat($chatId: ID!, $userUuid: ID!) {
+  addUserToChat(chatId: $chatId, userUuid: $userUuid) {
+    id
+    name
+    userUuid
+    isGroupChat
+    groupAvatarUrl
+    createdAt
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+}

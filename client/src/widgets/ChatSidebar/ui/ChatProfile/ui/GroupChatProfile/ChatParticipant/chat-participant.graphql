@@ -1,0 +1,26 @@
+query chatWithUser($userUuid: String!) {
+  chatWithUser(userUuid: $userUuid) {
+    id
+    name
+    participants {
+      id
+      name
+    }
+    createdAt
+  }
+}
+
+mutation createChat($participantsIds: [ID!]!, $name: String) {
+  createChat(participantsIds: $participantsIds, name: $name) {
+    id
+    name
+    isGroupChat
+    groupAvatarUrl
+    isGroupChat
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+}

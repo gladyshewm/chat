@@ -1,32 +1,27 @@
 import './ChatSidebar.css';
 import { AnimatePresence, motion } from 'framer-motion';
 import { searchVariants } from './motion';
-import { ChatWithoutMessages } from '@shared/types';
 import { SearchMessages } from './SearchMessages';
 import { ChatProfile } from './ChatProfile';
 
 interface ChatSidebarProps {
-  chat: ChatWithoutMessages;
-  isSearch: boolean;
-  setIsSearch: (isSearch: boolean) => void;
+  isSearchMessages: boolean;
+  setIsSearchMessages: (isSearch: boolean) => void;
   handleMessageSelect: (messageId: string) => void;
   isChatInfo: boolean;
   setIsChatInfo: (isChatInfo: boolean) => void;
-  updateChat: (chat: ChatWithoutMessages) => void;
 }
 
 const ChatSidebar = ({
-  isSearch,
-  setIsSearch,
+  isSearchMessages,
+  setIsSearchMessages,
   handleMessageSelect,
-  chat,
   isChatInfo,
   setIsChatInfo,
-  updateChat,
 }: ChatSidebarProps) => {
   return (
-    <AnimatePresence>
-      {(isSearch || isChatInfo) && (
+    <AnimatePresence mode="wait">
+      {(isSearchMessages || isChatInfo) && (
         <motion.div
           className="search-messages"
           initial="hidden"
@@ -35,18 +30,13 @@ const ChatSidebar = ({
           variants={searchVariants}
           transition={{ duration: 0.3 }}
         >
-          {isSearch ? (
+          {isSearchMessages ? (
             <SearchMessages
-              chatId={chat.id}
               onMessageSelect={handleMessageSelect}
-              setIsSearch={setIsSearch}
+              setIsSearch={setIsSearchMessages}
             />
           ) : (
-            <ChatProfile
-              setIsChatInfo={setIsChatInfo}
-              chat={chat}
-              updateChat={updateChat}
-            />
+            <ChatProfile setIsChatInfo={setIsChatInfo} />
           )}
         </motion.div>
       )}

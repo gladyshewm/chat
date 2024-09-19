@@ -1,31 +1,35 @@
 import { useNavigate } from 'react-router-dom';
-import './SearchResultItem.css';
+import './ChatParticipant.css';
+import { DrawOutlineRect, Loader, OptionButton } from '@shared/ui';
+import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
+import { EllipsisVerticalIcon, UserIcon } from '@shared/assets';
+import { useAuth } from '@app/providers/hooks/useAuth';
 import {
   useChatWithUserQuery,
   useCreateChatMutation,
-} from './search-result-item.generated';
-import { DrawOutlineRect, Loader } from '@shared/ui';
-import { UserWithAvatar } from '@shared/types';
-import { UserIcon } from '@shared/assets';
-import { useAuth } from '@app/providers/hooks/useAuth';
+} from './chat-participant.generated';
 
-export const SearchResultItem = ({
-  resultUser,
-}: {
-  resultUser: UserWithAvatar;
-}) => {
+interface ChatParticipantProps {
+  chat: ChatWithoutMessages;
+  participant: UserWithAvatar;
+}
+
+export const ChatParticipant = ({
+  chat,
+  participant,
+}: ChatParticipantProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
   const { data, loading, error } = useChatWithUserQuery({
     variables: {
-      userUuid: resultUser.id,
+      userUuid: participant.id,
     },
   });
   const [createChat] = useCreateChatMutation();
 
   const handleClick = async () => {
-    if (user?.uuid === resultUser.id) return;
+    if (user?.uuid === participant.id) return;
 
     if (loading) return <Loader />;
 
@@ -40,7 +44,7 @@ export const SearchResultItem = ({
       try {
         const result = await createChat({
           variables: {
-            participantsIds: [resultUser.id],
+            participantsIds: [participant.id],
             name: null,
           },
         });
@@ -57,9 +61,9 @@ export const SearchResultItem = ({
     <div className="search-list-block" onClick={handleClick}>
       <div className="user-result">
         <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
-          {resultUser.avatarUrl ? (
+          {participant.avatarUrl ? (
             <div className="user-avatar">
-              <img src={resultUser.avatarUrl} alt={resultUser.name} />
+              <img src={participant.avatarUrl} alt={participant.name} />
             </div>
           ) : (
             <div className="empty-avatar">
@@ -67,7 +71,18 @@ export const SearchResultItem = ({
             </div>
           )}
         </DrawOutlineRect>
-        <span className="user-name">{resultUser.name}</span>
+        <div className="user-info">
+          <span className="user-name">{participant.name}</span>
+          {chat.userUuid === participant.id ? (
+            <span id="user-role">Создатель чата</span>
+          ) : (
+            <OptionButton>
+              <abbr title="Действия">
+                <EllipsisVerticalIcon />
+              </abbr>
+            </OptionButton>
+          )}
+        </div>
       </div>
     </div>
   );

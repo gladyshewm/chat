@@ -8,8 +8,27 @@
       margin: 0.7rem 0;
 
       & .subtitle {
-        color: #fff;
-        padding: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.3rem 0.7rem;
+        height: 3.4rem;
+
+        & p {
+          color: #fff;
+        }
+
+        & button {
+          & abbr {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            & svg {
+              stroke: #fff;
+            }
+          }
+        }
       }
     }
   }

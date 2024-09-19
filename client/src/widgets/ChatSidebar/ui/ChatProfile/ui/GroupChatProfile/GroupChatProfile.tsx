@@ -6,22 +6,28 @@ import {
   useDeleteChatAvatarMutation,
 } from './group-chat-profile.generated';
 import { useAuth } from '@app/providers/hooks/useAuth';
-import { CopyMessage, SearchResultItem, useCopyMessage } from '@features';
-import { DrawOutline, Loader, Slider } from '@shared/ui';
+import { CopyMessage, useCopyMessage } from '@features';
+import { DrawOutline, Loader, OptionButton, Slider } from '@shared/ui';
 import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
-import { AvatarInfo, ChatWithoutMessages } from '@shared/types';
-import { IdentificationIcon, UserGroupIcon } from '@shared/assets';
+import { AvatarInfo } from '@shared/types';
+import { IdentificationIcon, PlusIcon, UserGroupIcon } from '@shared/assets';
+import { ChatParticipant } from './ChatParticipant/ChatParticipant';
+import { useChat } from '@pages/Chat/ctx/ChatContext';
 
 interface GroupChatProfileProps {
-  chat: ChatWithoutMessages;
-  updateChat: (chat: ChatWithoutMessages) => void;
+  isSearchUsers: boolean;
+  setIsSearchUsers: (isSearchUsers: boolean) => void;
 }
 
-const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
+const GroupChatProfile = ({
+  isSearchUsers,
+  setIsSearchUsers,
+}: GroupChatProfileProps) => {
   const [avatars, setAvatars] = useState<AvatarInfo[]>([]);
   const [avatarsUrls, setAvatarsUrls] = useState<string[]>([]);
   const { copyMessage, handleCopy } = useCopyMessage();
   const { user } = useAuth();
+  const { chat, updateChat } = useChat();
   const {
     openSlider,
     isOpen,
@@ -32,7 +38,6 @@ const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
     navigateSlider,
     removeImage,
   } = useFullScreenSlider();
-
   const [allAvatars, { loading: loadingAllAvatars, error: errorAllAvatars }] =
     useChatAllAvatarsLazyQuery();
   const [deleteAvatar, { loading: loadingDeleteAvatar }] =
@@ -42,7 +47,7 @@ const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
     const fetchChat = async () => {
       const { data } = await allAvatars({
         variables: {
-          chatId: chat.id,
+          chatId: chat?.id as string,
         },
       });
 
@@ -59,6 +64,8 @@ const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
 
     fetchChat();
   }, [allAvatars, chat]);
+
+  if (!chat) return null;
 
   const handleDeleteAvatar = async (url: string) => {
     try {
@@ -156,7 +163,16 @@ const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
           </motion.div>
         </div>
         <div className="participants">
-          <p className="subtitle">Участники</p>
+          <div className="subtitle">
+            <p>Участники</p>
+            {chat.userUuid === user?.uuid && (
+              <OptionButton onClick={() => setIsSearchUsers(true)}>
+                <abbr title="Добавить участников">
+                  <PlusIcon />
+                </abbr>
+              </OptionButton>
+            )}
+          </div>
           <div className="participants-list">
             {chat.participants.map((participant) => (
               <motion.div
@@ -164,7 +180,7 @@ const GroupChatProfile = ({ chat, updateChat }: GroupChatProfileProps) => {
                 className="participant"
                 key={participant.id}
               >
-                <SearchResultItem resultUser={participant} />
+                <ChatParticipant chat={chat} participant={participant} />
               </motion.div>
             ))}
           </div>

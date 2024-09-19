@@ -95,6 +95,11 @@ export type Message = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /**
+   * Добавление пользователя в чат.
+   * Только создатель чата может добавлять новых участников.
+   */
+  addUserToChat: ChatWithoutMessages;
   changeCredentials: UserInfo;
   /**
    * Создание чата.
@@ -119,10 +124,21 @@ export type Mutation = {
   logInUser: AuthPayload;
   logOutUser: Scalars['Boolean']['output'];
   refreshToken: AuthPayload;
+  /**
+   * Удаление пользователя из чата.
+   * Только создатель чата может удалять участников.
+   */
+  removeUserFromChat: ChatWithoutMessages;
   sendMessage: Message;
   sendTypingStatus: TypingFeedback;
   uploadAvatar: AvatarInfo;
   uploadChatAvatar: Scalars['String']['output'];
+};
+
+
+export type MutationAddUserToChatArgs = {
+  chatId: Scalars['ID']['input'];
+  userUuid: Scalars['ID']['input'];
 };
 
 
@@ -165,6 +181,12 @@ export type MutationLogInUserArgs = {
 
 export type MutationRefreshTokenArgs = {
   refreshToken?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationRemoveUserFromChatArgs = {
+  chatId: Scalars['ID']['input'];
+  userUuid: Scalars['ID']['input'];
 };
 
 

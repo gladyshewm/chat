@@ -1,0 +1,7 @@
+query findUsers($input: String!) {
+  findUsers(input: $input) {
+    id
+    name
+    avatarUrl
+  }
+}

@@ -13,8 +13,6 @@ import {
   useFindUsersLazyQuery,
   useUserChatsLazyQuery,
 } from './messagesList.generated';
-import renderChats from './Chats/Chats';
-import renderSearchResults from './Search/Search';
 import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
 import { DrawOutline, DrawOutlineRect, SearchInput } from '@shared/ui';
 import {
@@ -25,6 +23,8 @@ import {
 import { useProfile } from '@app/providers/hooks/useProfile';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import { ArrowLeftIcon, UserIcon } from '@shared/assets';
+import { Search } from '@features';
+import Chats from './Chats/Chats';
 
 interface MessagesListProps {
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
@@ -164,21 +164,21 @@ const MessagesList = ({ setIsProfileSettings }: MessagesListProps) => {
         </div>
       </DrawOutline>
       {isSearch ? (
-        renderSearchResults({
-          searchValue,
-          searchData,
-          searchLoading,
-          searchError,
-        })
+        <Search
+          searchData={searchData}
+          searchLoading={searchLoading}
+          searchError={searchError}
+          searchValue={searchValue}
+        />
       ) : (
         <div className="message-list">
-          {renderChats({
-            user,
-            chats,
-            chatsLoading,
-            chatsError,
-            activeChatId: id,
-          })}
+          <Chats
+            user={user}
+            chats={chats}
+            chatsLoading={chatsLoading}
+            chatsError={chatsError}
+            activeChatId={id}
+          />
         </div>
       )}
     </>

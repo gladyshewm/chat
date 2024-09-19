@@ -3,16 +3,17 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import { useUserAllAvatarsLazyQuery } from '@app/providers/ProfileProvider/profile.generated';
 import { IdentificationIcon, UserIcon } from '@shared/assets';
-import { AvatarInfo, ChatWithoutMessages, UserWithAvatar } from '@shared/types';
+import { AvatarInfo, UserWithAvatar } from '@shared/types';
 import { DrawOutline, Loader, Slider } from '@shared/ui';
 import { CopyMessage, useCopyMessage } from '@features';
 import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
+import { useChat } from '@pages/Chat/ctx/ChatContext';
 
-interface SingleChatProfileProps {
+/* interface SingleChatProfileProps {
   chat: ChatWithoutMessages;
-}
+} */
 
-const SingleChatProfile = ({ chat }: SingleChatProfileProps) => {
+const SingleChatProfile = () => {
   const { user } = useAuth();
   const [avatars, setAvatars] = useState<AvatarInfo[]>([]);
   const [avatarsUrls, setAvatarsUrls] = useState<string[]>([]);
@@ -27,14 +28,15 @@ const SingleChatProfile = ({ chat }: SingleChatProfileProps) => {
     closeSlider,
     navigateSlider,
   } = useFullScreenSlider();
+  const { chat } = useChat();
 
   const [allAvatars, { loading: loadingAllAvatars, error: errorAllAvatars }] =
     useUserAllAvatarsLazyQuery();
 
   useEffect(() => {
-    const participant: UserWithAvatar = chat.participants.filter(
-      (p) => p.id !== user?.uuid,
-    )[0];
+    const participant: UserWithAvatar = (
+      chat?.participants as UserWithAvatar[]
+    ).filter((p) => p.id !== user?.uuid)[0];
     setWithUser(participant);
 
     if (!withUser) return;

@@ -4,7 +4,7 @@ import './Search.css';
 import { UserWithAvatar } from '@shared/types';
 import { Cross, DrawOutlineRect, SearchIllustration } from '@shared/ui';
 import { ExclamationTriangleIcon } from '@shared/assets';
-import { SearchResultItem } from '@features';
+import { SearchResultUser } from './SearchResultItem/SearchResultUser';
 
 interface SearchProps {
   searchValue: string;
@@ -13,7 +13,7 @@ interface SearchProps {
   searchError: ApolloError | undefined;
 }
 
-const renderSearchResults = ({
+export const Search = ({
   searchValue,
   searchData,
   searchLoading,
@@ -68,7 +68,7 @@ const renderSearchResults = ({
                 strokeWidth={1}
                 showOnHover={true}
               >
-                <SearchResultItem resultUser={user} />
+                <SearchResultUser resultUser={user} />
               </DrawOutlineRect>
             </motion.div>
           ))}
@@ -77,5 +77,3 @@ const renderSearchResults = ({
     </div>
   );
 };
-
-export default renderSearchResults;

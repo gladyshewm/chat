@@ -93,7 +93,7 @@ interface ChatsProps {
   activeChatId: string | undefined;
 }
 
-const renderChats = ({
+const Chats = ({
   user,
   chats,
   chatsLoading,
@@ -133,4 +133,4 @@ const renderChats = ({
   ));
 };
 
-export default renderChats;
+export default Chats;

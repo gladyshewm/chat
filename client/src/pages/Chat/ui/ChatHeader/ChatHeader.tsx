@@ -28,16 +28,18 @@ interface ChatHeaderProps {
 }
 
 const ChatHeader = ({
-  chat,
   user,
   setIsSearch,
   setIsChatInfo,
+  chat,
 }: ChatHeaderProps) => {
   const [typingStatus, setTypingStatus] = useState<TypingFeedback | null>(null);
   const [withUser, setWithUser] = useState<UserWithAvatar | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!chat) return;
+
     if (!chat.isGroupChat) {
       setWithUser(chat.participants.filter((p) => p.id !== user?.uuid)[0]);
     }
@@ -45,7 +47,7 @@ const ChatHeader = ({
 
   useUserTypingSubscription({
     variables: {
-      chatId: chat.id,
+      chatId: chat?.id as string,
     },
     onData: (userTypingData) => {
       const typingStatus = userTypingData.data.data
@@ -57,6 +59,8 @@ const ChatHeader = ({
   const handleCloseButton = () => {
     navigate('/');
   };
+
+  if (!chat) return null;
 
   return (
     <motion.header className="chat__header">

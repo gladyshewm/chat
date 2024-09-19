@@ -24,6 +24,7 @@ import { formatMessages } from '../utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ExclamationTriangleIcon, UserIcon, XmarkIcon } from '@shared/assets';
+import { useChat } from '@pages/Chat/ctx/ChatContext';
 
 const SearchResultItem = ({ message }: { message: Message }) => {
   return (
@@ -147,13 +148,11 @@ const renderSearchResults = ({
 };
 
 interface SearchMessagesProps {
-  chatId: string;
   onMessageSelect: (messageId: string) => void;
   setIsSearch: (isSearch: boolean) => void;
 }
 
 const SearchMessages = ({
-  chatId,
   onMessageSelect,
   setIsSearch,
 }: SearchMessagesProps) => {
@@ -161,6 +160,7 @@ const SearchMessages = ({
   const [searchValue, setSearchValue] = useState('');
   const [searchData, setSearchData] = useState<Message[] | null>(null);
   const [findMessages, { loading, error }] = useFindMessagesLazyQuery();
+  const { chat } = useChat();
 
   const handleSearch = useCallback(
     async (value: string) => {
@@ -169,7 +169,7 @@ const SearchMessages = ({
         try {
           const { data } = await findMessages({
             variables: {
-              chatId: chatId,
+              chatId: chat?.id as string,
               query: value,
             },
           });
@@ -182,7 +182,7 @@ const SearchMessages = ({
         setSearchData(null);
       }
     },
-    [findMessages, chatId],
+    [findMessages, chat?.id],
   );
 
   useEffect(() => {
@@ -200,7 +200,7 @@ const SearchMessages = ({
         subscription.unsubscribe();
       };
     }
-  }, [handleSearch, chatId]);
+  }, [handleSearch, chat?.id]);
 
   return (
     <AnimatePresence>
