@@ -448,6 +448,54 @@ describe('ChatsService', () => {
     });
   });
 
+  describe('addUserToChat', () => {
+    let result: ChatWithoutMessages;
+    const chatId = '12312213213';
+    const userUuid = 'mockUserUuid';
+    const currentUserUuid = 'mockCurrentUserUuid';
+    const participants = [
+      userWithAvatarStub('uuid1'),
+      userWithAvatarStub('uuid2'),
+    ];
+    const mockUpdatedChat = chatWithoutMessagesStub(
+      chatId,
+      'mockChatName',
+      userUuid,
+      participants,
+    );
+    const mockChat = chatDataStub(chatId, 'chatName', currentUserUuid, false);
+
+    beforeEach(async () => {
+      chatRepository.isParticipant.mockResolvedValue(false);
+      // this.getChatInfoById
+      chatRepository.getChatById.mockResolvedValue(mockChat);
+      chatRepository.getPartyByChatId.mockResolvedValueOnce([
+        partyItemStub(),
+        partyItemStub(),
+      ]);
+      chatRepository.getGroupChatAvatar.mockResolvedValue(
+        groupAvatarDataStub(),
+      );
+      chatRepository.getPartyByChatId.mockResolvedValueOnce([
+        partyItemStub(mockChat),
+        partyItemStub(mockChat),
+        partyItemStub(mockChat),
+      ]);
+    });
+
+    it('should call chatRepository.addUserToChat with correct data', async () => {
+      await chatsService.addUserToChat(chatId, userUuid, currentUserUuid);
+      expect(chatRepository.addUserToChat).toHaveBeenCalledWith(
+        chatId,
+        userUuid,
+      );
+    });
+
+    //TODO: should add a user to the chat when current user is the creator
+    //TODO: should throw an error when current user is not the creator
+    //TODO: should throw an error when user is already a participant
+  });
+
   describe('getChatAllAvatars', () => {
     let chatAvatars: AvatarInfo[];
     const chatId = 'testChatId';

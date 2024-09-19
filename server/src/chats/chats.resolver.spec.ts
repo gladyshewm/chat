@@ -265,6 +265,97 @@ describe('ChatsResolver', () => {
     });
   });
 
+  describe('addUserToChat', () => {
+    let result: ChatWithoutMessages;
+    const chatId = '12312213213';
+    const userUuid = 'mockUserUuid';
+    const currentUserUuid = 'mockCurrentUserUuid';
+    const participants = [
+      userWithAvatarStub('uuid1'),
+      userWithAvatarStub('uuid2'),
+      userWithAvatarStub(userUuid),
+    ];
+    const chat = chatWithoutMessagesStub(
+      chatId,
+      'mockChatName',
+      userUuid,
+      participants,
+    );
+
+    beforeEach(async () => {
+      chatsService.addUserToChat.mockResolvedValue(chat);
+      result = await chatsResolver.addUserToChat(
+        chatId,
+        userUuid,
+        currentUserUuid,
+      );
+    });
+
+    it('should call chatsService.addUserToChat with correct data', async () => {
+      expect(chatsService.addUserToChat).toHaveBeenCalledWith(
+        chatId,
+        userUuid,
+        currentUserUuid,
+      );
+    });
+
+    it('should add a user to the chat', async () => {
+      expect(result).toEqual(chat);
+    });
+
+    it('should propagate error if chatsService.addUserToChat throws an error', async () => {
+      chatsService.addUserToChat.mockRejectedValue(new Error('Service Error'));
+
+      await expect(
+        chatsResolver.addUserToChat(chatId, userUuid, currentUserUuid),
+      ).rejects.toThrow('Service Error');
+    });
+  });
+
+  describe('removeUserFromChat', () => {
+    const chatId = '12312213213';
+    const userUuid = 'mockUserUuid';
+    const currentUserUuid = 'mockCurrentUserUuid';
+    const chat = chatWithoutMessagesStub(
+      chatId,
+      'mockChatName',
+      'mockUserUuid',
+      [userWithAvatarStub(userUuid)],
+    );
+
+    beforeEach(async () => {
+      chatsService.removeUserFromChat.mockResolvedValue(chat);
+    });
+
+    it('should call chatsService.removeUserFromChat with correct data', async () => {
+      await chatsResolver.removeUserFromChat(chatId, userUuid, currentUserUuid);
+      expect(chatsService.removeUserFromChat).toHaveBeenCalledWith(
+        chatId,
+        userUuid,
+        currentUserUuid,
+      );
+    });
+
+    it('should remove a user from the chat', async () => {
+      await chatsResolver.removeUserFromChat(chatId, userUuid, currentUserUuid);
+      expect(chatsService.removeUserFromChat).toHaveBeenCalledWith(
+        chatId,
+        userUuid,
+        currentUserUuid,
+      );
+    });
+
+    it('should propagate error if chatsService.removeUserFromChat throws an error', async () => {
+      chatsService.removeUserFromChat.mockRejectedValue(
+        new Error('Service Error'),
+      );
+
+      await expect(
+        chatsResolver.removeUserFromChat(chatId, userUuid, currentUserUuid),
+      ).rejects.toThrow('Service Error');
+    });
+  });
+
   describe('uploadChatAvatar', () => {
     let chatId: string;
     let image: FileUpload;
