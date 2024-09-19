@@ -94,6 +94,10 @@ export abstract class IMutation {
 
     abstract deleteChatAvatar(chatId: string, avatarUrl: string): Nullable<string> | Promise<Nullable<string>>;
 
+    abstract addUserToChat(chatId: string, userUuid: string): ChatWithoutMessages | Promise<ChatWithoutMessages>;
+
+    abstract removeUserFromChat(chatId: string, userUuid: string): ChatWithoutMessages | Promise<ChatWithoutMessages>;
+
     abstract sendMessage(chatId: string, content?: Nullable<string>, attachedFiles?: Nullable<Upload[]>): Message | Promise<Message>;
 
     abstract sendTypingStatus(chatId: string, userName: string, isTyping: boolean): TypingFeedback | Promise<TypingFeedback>;

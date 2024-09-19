@@ -53,4 +53,14 @@ type Mutation {
   Возвращаемая строка содержит URL нового аватара.
   """
   deleteChatAvatar(chatId: ID!, avatarUrl: String!): String
+  """
+  Добавление пользователя в чат.
+  Только создатель чата может добавлять новых участников.
+  """
+  addUserToChat(chatId: ID!, userUuid: ID!): ChatWithoutMessages!
+  """
+  Удаление пользователя из чата.
+  Только создатель чата может удалять участников.
+  """
+  removeUserFromChat(chatId: ID!, userUuid: ID!): ChatWithoutMessages!
 }

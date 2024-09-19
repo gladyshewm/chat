@@ -81,4 +81,28 @@ export class ChatsResolver {
   ): Promise<string | null> {
     return this.chatsService.deleteChatAvatar(chatId, avatarUrl);
   }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('addUserToChat')
+  async addUserToChat(
+    @Args('chatId') chatId: string,
+    @Args('userUuid') userUuid: string,
+    @Context('user_uuid') currentUserUuid: string,
+  ): Promise<ChatWithoutMessages> {
+    return this.chatsService.addUserToChat(chatId, userUuid, currentUserUuid);
+  }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('removeUserFromChat')
+  async removeUserFromChat(
+    @Args('chatId') chatId: string,
+    @Args('userUuid') userUuid: string,
+    @Context('user_uuid') currentUserUuid: string,
+  ): Promise<ChatWithoutMessages> {
+    return this.chatsService.removeUserFromChat(
+      chatId,
+      userUuid,
+      currentUserUuid,
+    );
+  }
 }

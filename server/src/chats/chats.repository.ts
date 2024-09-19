@@ -29,6 +29,8 @@ export interface ChatRepository {
   createParty(chatId: string, participantsIds: string[]): Promise<void>;
   deleteOneOnOneChat(chatId: string, userUuid: string): Promise<boolean>;
   deleteGroupChat(chatId: string, userUuid: string): Promise<boolean>;
+  addUserToChat(chatId: string, userUuid: string): Promise<void>;
+  removeUserFromChat(chatId: string, userUuid: string): Promise<void>;
   // Avatars
   uploadAvatarToChatStorage(
     buffer: Buffer,
@@ -342,6 +344,36 @@ export class SupabaseChatRepository implements ChatRepository {
     }
 
     return true;
+  }
+
+  async addUserToChat(chatId: string, userUuid: string): Promise<void> {
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('party')
+      .insert({
+        chat_id: chatId,
+        user_uuid: userUuid,
+      });
+
+    if (error) {
+      this.logger.error(`Ошибка при добавлении пользователя в чат: ${error}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async removeUserFromChat(chatId: string, userUuid: string): Promise<void> {
+    const { error } = await this.supabaseService
+      .getClient()
+      .from('party')
+      .delete()
+      .match({ chat_id: chatId, user_uuid: userUuid });
+
+    if (error) {
+      this.logger.error(
+        `Ошибка при удалении пользователя из чата: ${error.message}`,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   async uploadAvatarToChatStorage(

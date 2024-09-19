@@ -181,7 +181,7 @@ export class ChatsService {
     }
   }
 
-  async getChatInfoById(chatId: string): Promise<ChatWithoutMessages | null> {
+  async getChatInfoById(chatId: string): Promise<ChatWithoutMessages> {
     try {
       const chatData = await this.chatRepository.getChatById(chatId);
 
@@ -291,6 +291,89 @@ export class ChatsService {
       return newAvatarUrl;
     } catch (error) {
       this.logger.error(`Ошибка удаления аватара: ${error.message}`);
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async addUserToChat(
+    chatId: string,
+    userUuid: string,
+    currentUserUuid: string,
+  ): Promise<ChatWithoutMessages> {
+    try {
+      const chat = await this.chatRepository.getChatById(chatId);
+
+      if (chat.user_uuid !== currentUserUuid) {
+        throw new HttpException(
+          'Only the chat creator can add new participants',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      const isParticipant = await this.chatRepository.isParticipant(
+        chatId,
+        userUuid,
+      );
+
+      if (isParticipant) {
+        /* throw new HttpException(
+          'User is already a participant in this chat',
+          HttpStatus.BAD_REQUEST,
+        ); */
+        this.logger.warn('Пользователь уже является участником чата');
+        return this.getChatInfoById(chatId);
+      }
+
+      await this.chatRepository.addUserToChat(chatId, userUuid);
+
+      return this.getChatInfoById(chatId);
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при добавлении пользователя в чат: ${error.message}`,
+      );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async removeUserFromChat(
+    chatId: string,
+    userUuid: string,
+    currentUserUuid: string,
+  ): Promise<ChatWithoutMessages> {
+    try {
+      const chat = await this.chatRepository.getChatById(chatId);
+
+      if (chat.user_uuid !== currentUserUuid) {
+        throw new HttpException(
+          'Only the chat creator can remove participants',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      const isParticipant = await this.chatRepository.isParticipant(
+        chatId,
+        userUuid,
+      );
+
+      if (!isParticipant) {
+        this.logger.warn('Пользователь не является участником чата');
+        return this.getChatInfoById(chatId);
+      }
+
+      if (userUuid === chat.user_uuid) {
+        throw new HttpException(
+          'Cannot remove the chat creator from the chat',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      await this.chatRepository.removeUserFromChat(chatId, userUuid);
+
+      return this.getChatInfoById(chatId);
+    } catch (error) {
+      this.logger.error(
+        `Ошибка при удалении пользователя из чата: ${error.message}`,
+      );
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
