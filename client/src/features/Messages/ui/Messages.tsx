@@ -312,6 +312,7 @@ const Messages = ({
                                   alt="attached file"
                                   className="attached-file"
                                   onClick={() => handleImageClick(message)}
+                                  aspectRatio={1}
                                 />
                               ))}
                               {!message.content && (
