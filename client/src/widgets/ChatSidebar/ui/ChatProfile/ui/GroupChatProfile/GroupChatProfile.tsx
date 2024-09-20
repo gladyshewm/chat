@@ -6,7 +6,7 @@ import {
   useDeleteChatAvatarMutation,
 } from './group-chat-profile.generated';
 import { useAuth } from '@app/providers/hooks/useAuth';
-import { CopyMessage, useCopyMessage } from '@features';
+import { CopyMessage, SuccessMessage, useCopyMessage } from '@features';
 import { DrawOutline, Loader, OptionButton, Slider } from '@shared/ui';
 import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
 import { AvatarInfo } from '@shared/types';
@@ -25,6 +25,7 @@ const GroupChatProfile = ({
 }: GroupChatProfileProps) => {
   const [avatars, setAvatars] = useState<AvatarInfo[]>([]);
   const [avatarsUrls, setAvatarsUrls] = useState<string[]>([]);
+  const [successMessage, setSuccessMessage] = useState<string[]>([]);
   const { copyMessage, handleCopy } = useCopyMessage();
   const { user } = useAuth();
   const { chat, updateChat } = useChat();
@@ -124,6 +125,12 @@ const GroupChatProfile = ({
         isLoading={loadingDeleteAvatar}
       />
       <CopyMessage copyMessage={copyMessage} />
+      {successMessage.length > 0 && (
+        <SuccessMessage
+          successMessage={successMessage}
+          setSuccessMessage={setSuccessMessage}
+        />
+      )}
       <main className="profile-settings__main">
         <DrawOutline
           className="all-avatars-wrapper"
@@ -175,13 +182,12 @@ const GroupChatProfile = ({
           </div>
           <div className="participants-list">
             {chat.participants.map((participant) => (
-              <motion.div
-                whileTap={{ scale: 0.95 }}
-                className="participant"
+              <ChatParticipant
                 key={participant.id}
-              >
-                <ChatParticipant chat={chat} participant={participant} />
-              </motion.div>
+                chat={chat}
+                participant={participant}
+                setSuccessMessage={setSuccessMessage}
+              />
             ))}
           </div>
         </div>

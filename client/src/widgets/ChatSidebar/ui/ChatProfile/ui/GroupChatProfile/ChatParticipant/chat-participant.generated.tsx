@@ -18,6 +18,14 @@ export type CreateChatMutationVariables = Types.Exact<{
 
 export type CreateChatMutation = { __typename?: 'Mutation', createChat: { __typename?: 'ChatWithoutMessages', id: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> } };
 
+export type RemoveUserFromChatMutationVariables = Types.Exact<{
+  chatId: Types.Scalars['ID']['input'];
+  userUuid: Types.Scalars['ID']['input'];
+}>;
+
+
+export type RemoveUserFromChatMutation = { __typename?: 'Mutation', removeUserFromChat: { __typename?: 'ChatWithoutMessages', id: string, name?: string | null, userUuid: string, isGroupChat: boolean, groupAvatarUrl?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> } };
+
 
 export const ChatWithUserDocument = gql`
     query chatWithUser($userUuid: String!) {
@@ -108,3 +116,47 @@ export function useCreateChatMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateChatMutationHookResult = ReturnType<typeof useCreateChatMutation>;
 export type CreateChatMutationResult = Apollo.MutationResult<CreateChatMutation>;
 export type CreateChatMutationOptions = Apollo.BaseMutationOptions<CreateChatMutation, CreateChatMutationVariables>;
+export const RemoveUserFromChatDocument = gql`
+    mutation removeUserFromChat($chatId: ID!, $userUuid: ID!) {
+  removeUserFromChat(chatId: $chatId, userUuid: $userUuid) {
+    id
+    name
+    userUuid
+    isGroupChat
+    groupAvatarUrl
+    createdAt
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+}
+    `;
+export type RemoveUserFromChatMutationFn = Apollo.MutationFunction<RemoveUserFromChatMutation, RemoveUserFromChatMutationVariables>;
+
+/**
+ * __useRemoveUserFromChatMutation__
+ *
+ * To run a mutation, you first call `useRemoveUserFromChatMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveUserFromChatMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeUserFromChatMutation, { data, loading, error }] = useRemoveUserFromChatMutation({
+ *   variables: {
+ *      chatId: // value for 'chatId'
+ *      userUuid: // value for 'userUuid'
+ *   },
+ * });
+ */
+export function useRemoveUserFromChatMutation(baseOptions?: Apollo.MutationHookOptions<RemoveUserFromChatMutation, RemoveUserFromChatMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveUserFromChatMutation, RemoveUserFromChatMutationVariables>(RemoveUserFromChatDocument, options);
+      }
+export type RemoveUserFromChatMutationHookResult = ReturnType<typeof useRemoveUserFromChatMutation>;
+export type RemoveUserFromChatMutationResult = Apollo.MutationResult<RemoveUserFromChatMutation>;
+export type RemoveUserFromChatMutationOptions = Apollo.BaseMutationOptions<RemoveUserFromChatMutation, RemoveUserFromChatMutationVariables>;

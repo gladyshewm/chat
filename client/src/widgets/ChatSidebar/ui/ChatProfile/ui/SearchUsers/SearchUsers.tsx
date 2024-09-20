@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import './SearchUsers.css';
+import { motion } from 'framer-motion';
 import {
   DrawOutline,
   DrawOutlineRect,
@@ -17,6 +18,7 @@ import {
 } from 'rxjs';
 import { SearchResult } from './SearchResult/SearchResult';
 import { useFindUsersLazyQuery } from './search-users.generated';
+import { searchHeaderVariants } from './motion';
 
 interface SearchUsersProps {
   setIsSearch: React.Dispatch<React.SetStateAction<boolean>>;
@@ -64,7 +66,12 @@ const SearchUsers = ({ setIsSearch, chat }: SearchUsersProps) => {
   return (
     <div className="search-users">
       <DrawOutline orientation="horizontal" position="bottom">
-        <header className="message-list__header">
+        <motion.header
+          className="message-list__header"
+          variants={searchHeaderVariants}
+          initial="hidden"
+          animate="visible"
+        >
           <OptionButton onClick={() => setIsSearch(false)}>
             <abbr title="Назад">
               <ArrowLeftIcon />
@@ -73,7 +80,7 @@ const SearchUsers = ({ setIsSearch, chat }: SearchUsersProps) => {
           <DrawOutlineRect className="search-input-wrapper" rx={20}>
             <SearchInput ref={inputRef} className="search-input" />
           </DrawOutlineRect>
-        </header>
+        </motion.header>
       </DrawOutline>
       <SearchResult
         searchValue={searchValue}

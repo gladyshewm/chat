@@ -71,11 +71,7 @@ const ProfileInfo = ({
   };
 
   const handleExitClick = () => {
-    if (isExitClicked) {
-      setIsExitClicked(false);
-    } else {
-      setIsExitClicked(true);
-    }
+    setIsExitClicked(!isExitClicked);
   };
 
   const handleLogout = async () => {

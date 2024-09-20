@@ -1,4 +1,3 @@
-import './SearchUserItem.css';
 import { DrawOutlineRect } from '@shared/ui';
 import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
 import { UserIcon } from '@shared/assets';
@@ -8,16 +7,20 @@ interface SearchResultChatUserProps {
   resultUser: UserWithAvatar;
   chat: ChatWithoutMessages;
   addUserToChat: any;
+  setSuccessMessage: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export const SearchUserItem = ({
   resultUser,
   addUserToChat,
+  setSuccessMessage,
 }: SearchResultChatUserProps) => {
   const { chat, updateChat } = useChat();
+
   if (!chat) return;
 
-  const handleClick = async () => {
+  const handleClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
     try {
       const result = await addUserToChat({
         variables: {
@@ -27,6 +30,10 @@ export const SearchUserItem = ({
       });
 
       updateChat(result.data.addUserToChat as ChatWithoutMessages);
+      setSuccessMessage((prev) => [
+        ...prev,
+        `Пользователь ${resultUser.name} добавлен в чат`,
+      ]);
     } catch (error) {
       throw new Error(
         `Ошибка при добавлении пользователя в чат: ${error.message}`,
@@ -35,21 +42,23 @@ export const SearchUserItem = ({
   };
 
   return (
-    <div className="search-list-block" onClick={handleClick}>
-      <div className="user-result">
-        <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
-          {resultUser.avatarUrl ? (
-            <div className="user-avatar">
-              <img src={resultUser.avatarUrl} alt={resultUser.name} />
-            </div>
-          ) : (
-            <div className="empty-avatar">
-              <UserIcon />
-            </div>
-          )}
-        </DrawOutlineRect>
-        <span className="user-name">{resultUser.name}</span>
+    <>
+      <div className="search-list-block" onClick={handleClick}>
+        <div className="user-result">
+          <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
+            {resultUser.avatarUrl ? (
+              <div className="user-avatar">
+                <img src={resultUser.avatarUrl} alt={resultUser.name} />
+              </div>
+            ) : (
+              <div className="empty-avatar">
+                <UserIcon />
+              </div>
+            )}
+          </DrawOutlineRect>
+          <span className="user-name">{resultUser.name}</span>
+        </div>
       </div>
-    </div>
+    </>
   );
 };

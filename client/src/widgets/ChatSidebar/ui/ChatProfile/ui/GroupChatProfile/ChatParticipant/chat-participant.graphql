@@ -24,3 +24,19 @@ mutation createChat($participantsIds: [ID!]!, $name: String) {
     }
   }
 }
+
+mutation removeUserFromChat($chatId: ID!, $userUuid: ID!) {
+  removeUserFromChat(chatId: $chatId, userUuid: $userUuid) {
+    id
+    name
+    userUuid
+    isGroupChat
+    groupAvatarUrl
+    createdAt
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+}

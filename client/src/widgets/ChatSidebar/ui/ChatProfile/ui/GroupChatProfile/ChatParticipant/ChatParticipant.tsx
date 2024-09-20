@@ -1,25 +1,34 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ChatParticipant.css';
-import { DrawOutlineRect, Loader, OptionButton } from '@shared/ui';
+import { AnimatePresence, motion } from 'framer-motion';
+import { DrawOutlineRect, Loader } from '@shared/ui';
 import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
-import { EllipsisVerticalIcon, UserIcon } from '@shared/assets';
+import { EllipsisVerticalIcon, ExitIcon, UserIcon } from '@shared/assets';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import {
   useChatWithUserQuery,
   useCreateChatMutation,
+  useRemoveUserFromChatMutation,
 } from './chat-participant.generated';
+import { actionButtonVariants } from './motion';
+import { useChat } from '@pages/Chat/ctx/ChatContext';
 
 interface ChatParticipantProps {
   chat: ChatWithoutMessages;
   participant: UserWithAvatar;
+  setSuccessMessage: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export const ChatParticipant = ({
   chat,
   participant,
+  setSuccessMessage,
 }: ChatParticipantProps) => {
+  const [isActionClicked, setIsActionClicked] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { updateChat } = useChat();
 
   const { data, loading, error } = useChatWithUserQuery({
     variables: {
@@ -27,6 +36,8 @@ export const ChatParticipant = ({
     },
   });
   const [createChat] = useCreateChatMutation();
+  const [removeUserFromChat, { loading: removeUserLoading }] =
+    useRemoveUserFromChatMutation();
 
   const handleClick = async () => {
     if (user?.uuid === participant.id) return;
@@ -57,31 +68,84 @@ export const ChatParticipant = ({
     }
   };
 
+  const handleActionClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setIsActionClicked(!isActionClicked);
+  };
+
+  const handleKickOutClick = async (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    const { data } = await removeUserFromChat({
+      variables: {
+        chatId: chat.id,
+        userUuid: participant.id,
+      },
+    });
+
+    if (!data) {
+      console.error('Не удалось удалить пользователя из чата');
+      throw new Error('Не удалось удалить пользователя из чата');
+    }
+
+    updateChat(data.removeUserFromChat as ChatWithoutMessages);
+    setSuccessMessage((prev) => [
+      ...prev,
+      `Пользователь ${participant.name} исключён из чата`,
+    ]);
+  };
+
   return (
-    <div className="search-list-block" onClick={handleClick}>
-      <div className="user-result">
-        <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
-          {participant.avatarUrl ? (
-            <div className="user-avatar">
-              <img src={participant.avatarUrl} alt={participant.name} />
-            </div>
-          ) : (
-            <div className="empty-avatar">
-              <UserIcon />
-            </div>
-          )}
-        </DrawOutlineRect>
-        <div className="user-info">
-          <span className="user-name">{participant.name}</span>
-          {chat.userUuid === participant.id ? (
-            <span id="user-role">Создатель чата</span>
-          ) : (
-            <OptionButton>
-              <abbr title="Действия">
-                <EllipsisVerticalIcon />
-              </abbr>
-            </OptionButton>
-          )}
+    <div className="chat-participant">
+      {removeUserLoading && <Loader />}
+      <div className="search-list-block" onClick={handleClick}>
+        <div className="user-result">
+          <DrawOutlineRect className="avatar-wrapper" strokeWidth={1} rx="50%">
+            {participant.avatarUrl ? (
+              <div className="user-avatar">
+                <img src={participant.avatarUrl} alt={participant.name} />
+              </div>
+            ) : (
+              <div className="empty-avatar">
+                <UserIcon />
+              </div>
+            )}
+          </DrawOutlineRect>
+          <div className="user-info">
+            <span className="user-name">{participant.name}</span>
+            {chat.userUuid === participant.id ? (
+              <span id="user-role">Создатель чата</span>
+            ) : (
+              chat.userUuid === user?.uuid && (
+                <>
+                  <button onClick={handleActionClick}>
+                    <abbr title="Действия">
+                      <EllipsisVerticalIcon />
+                    </abbr>
+                  </button>
+                  <AnimatePresence mode="wait">
+                    {isActionClicked && (
+                      <motion.div
+                        className="action-button"
+                        key="actionButton"
+                        variants={actionButtonVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                      >
+                        <div
+                          className="action-button__text"
+                          onClick={handleKickOutClick}
+                        >
+                          <ExitIcon />
+                          <p>Исключить из чата</p>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </>
+              )
+            )}
+          </div>
         </div>
       </div>
     </div>

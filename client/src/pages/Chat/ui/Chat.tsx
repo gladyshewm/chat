@@ -9,14 +9,13 @@ import {
 import { ChatWithoutMessages, UserInfo } from '@shared/types';
 import { DrawOutline, Loader, SpaceBackground } from '@shared/ui';
 import { useAuth } from '@app/providers/hooks/useAuth';
-import { MessageForm, Messages } from '@features';
 import {
   chatContentVariants,
   chatFooterVariants,
   chatVariants,
 } from './motion';
 import ChatHeader from './ChatHeader/ChatHeader';
-import { ChatSidebar } from '@widgets';
+import { ChatSidebar, MessageForm, Messages } from '@widgets';
 import { ChatProvider, useChat } from '../ctx/ChatContext';
 
 const Chat = () => {

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ApolloError } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { Cross, DrawOutlineRect, Loader, SearchIllustration } from '@shared/ui';
@@ -5,6 +6,7 @@ import { ExclamationTriangleIcon } from '@shared/assets';
 import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
 import { SearchUserItem } from './SearchUserItem';
 import { useAddUserToChatMutation } from './search-result.generated';
+import { SuccessMessage } from '@features';
 
 interface SearchResultProps {
   searchValue: string;
@@ -23,6 +25,7 @@ export const SearchResult = ({
   setIsSearch,
   chat,
 }: SearchResultProps) => {
+  const [successMessage, setSuccessMessage] = useState<string[]>([]);
   const [addUserToChat, { loading }] = useAddUserToChatMutation();
 
   if (searchValue !== '' && searchLoading) {
@@ -80,6 +83,7 @@ export const SearchResult = ({
                     resultUser={user}
                     chat={chat as ChatWithoutMessages}
                     addUserToChat={addUserToChat}
+                    setSuccessMessage={setSuccessMessage}
                   />
                 </DrawOutlineRect>
               </motion.div>
@@ -87,6 +91,12 @@ export const SearchResult = ({
           </>
         )}
       </div>
+      {successMessage.length > 0 && (
+        <SuccessMessage
+          successMessage={successMessage}
+          setSuccessMessage={setSuccessMessage}
+        />
+      )}
     </>
   );
 };

@@ -1,13 +1,106 @@
-.user-result {
-  & .user-info {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.chat-participant {
+  & .search-list-block {
+    position: relative;
+    overflow: visible;
+    height: 4rem;
 
-    & #user-role {
-      color: var(--outline-main-color);
-      font-size: 0.85rem;
+    &:hover {
+      & .user-info button {
+        border-left: 1px solid #fff;
+      }
+    }
+
+    & .action-button {
+      z-index: 99;
+      position: absolute;
+      right: 0;
+      top: -3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 1rem;
+      padding: 0 0.7rem;
+      height: 3rem;
+      width: 12rem;
+      background-color: rgba(25, 25, 25, 0.8);
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        cursor: pointer;
+        background-color: rgba(25, 25, 25, 1);
+        transition: background-color 0.3s ease;
+      }
+
+      & .action-button__text {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        padding: 0 0.7rem;
+
+        & p {
+          font-size: 0.9rem;
+          color: #fff;
+          transition: color 0.3s ease;
+        }
+
+        & svg {
+          width: 2.5rem;
+          height: 2.5rem;
+          stroke: #fff;
+          transition: stroke 0.3s ease;
+          margin-right: 1.5rem;
+        }
+      }
+    }
+  }
+
+  & .user-result {
+    & .user-avatar, .empty-avatar {
+      height: 3rem;
+      width: 3rem;
+    }
+
+    & .user-info {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      & #user-role {
+        color: var(--outline-main-color);
+        font-size: 0.85rem;
+      }
+
+      & button {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 4rem;
+        height: 100%;
+        background-color: transparent;
+        border: none;
+        border-radius: 0 1rem 1rem 0;
+        transition: all 0.3s ease;
+
+        & abbr {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          & svg {
+            stroke: #fff;
+          }
+        }
+
+        &:hover {
+          cursor: pointer;
+          background-color: var(--outline-hover-color);
+        }
+      }
     }
   }
 }

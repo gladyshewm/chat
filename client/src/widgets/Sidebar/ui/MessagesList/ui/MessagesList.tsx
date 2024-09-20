@@ -23,8 +23,8 @@ import {
 import { useProfile } from '@app/providers/hooks/useProfile';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import { ArrowLeftIcon, UserIcon } from '@shared/assets';
-import { Search } from '@features';
 import Chats from './Chats/Chats';
+import { Search } from './Search';
 
 interface MessagesListProps {
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;

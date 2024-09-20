@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Formik, Form } from 'formik';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import './EditProfile.css';
-import { errorMessageVariants, successMessageVariants } from '../motion';
 import { useProfile } from '@app/providers/hooks/useProfile';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import {
@@ -16,9 +15,7 @@ import {
 import {
   ArrowLeftIcon,
   CameraIcon,
-  CheckCircleIcon,
   CheckIcon,
-  ExclamationTriangleIcon,
   XmarkIcon,
 } from '@shared/assets';
 import DeleteModal from './DeleteModal/DeleteModal';
@@ -26,6 +23,7 @@ import {
   ChangeCredentialsSchema,
   validationChangeCredentialsSchema,
 } from '@widgets/Auth';
+import { ErrorMessage, SuccessMessage } from '@features';
 
 interface EditProfileProps {
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
@@ -34,7 +32,7 @@ interface EditProfileProps {
 const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
   const [avatar, setAvatar] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState<string[]>([]);
-  const [errorMessage, setErrorMessage] = useState<string | null>();
+  const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const {
     avatarUrl,
@@ -120,13 +118,9 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
     setTimeout(() => setSuccessMessage([]), 5000);
   };
 
-  const handleErrorMessage = (message: string) => {
+  const handleErrorMessage = (message: string[]) => {
     setErrorMessage(message);
-    setTimeout(() => setErrorMessage(null), 5000);
-  };
-
-  const removeMessage = (index: number) => {
-    setSuccessMessage((prev) => prev.filter((_, i) => i !== index));
+    setTimeout(() => setErrorMessage([]), 5000);
   };
 
   return (
@@ -274,70 +268,16 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
                 </DrawOutlineRect>
                 <AnimatePresence>
                   {successMessage.length > 0 && (
-                    <motion.div
-                      className="success-message"
-                      key="successMessage"
-                      initial="initial"
-                      animate="animate"
-                      exit="exit"
-                      variants={{
-                        animate: {
-                          transition: {
-                            staggerChildren: 0.1,
-                          },
-                        },
-                      }}
-                    >
-                      {successMessage.map((msg, index) => (
-                        <motion.div
-                          className="message-wrapper"
-                          key={index}
-                          variants={successMessageVariants}
-                          whileHover="hover"
-                          whileTap="tap"
-                          onTap={() => removeMessage(index)}
-                        >
-                          <DrawOutlineRect
-                            className="message-wrapper__rect"
-                            rx="15px"
-                            strokeWidth={1}
-                            stroke="var(--col1)"
-                            key={index}
-                          >
-                            <p>
-                              <CheckCircleIcon />
-                              {msg}
-                            </p>
-                          </DrawOutlineRect>
-                        </motion.div>
-                      ))}
-                    </motion.div>
+                    <SuccessMessage
+                      successMessage={successMessage}
+                      setSuccessMessage={setSuccessMessage}
+                    />
                   )}
-                  {errorMessage && (
-                    <motion.div
-                      key="errorMessage"
-                      className="error-message"
-                      variants={errorMessageVariants}
-                      initial="initial"
-                      animate="animate"
-                      whileHover="hover"
-                      whileTap="tap"
-                      onTap={() => setErrorMessage('')}
-                    >
-                      <div className="message-wrapper">
-                        <DrawOutlineRect
-                          className="message-wrapper__rect"
-                          rx="15px"
-                          strokeWidth={1}
-                          stroke="var(--error-color)"
-                        >
-                          <p>
-                            <ExclamationTriangleIcon />
-                            {errorMessage}
-                          </p>
-                        </DrawOutlineRect>
-                      </div>
-                    </motion.div>
+                  {errorMessage.length > 0 && (
+                    <ErrorMessage
+                      errorMessage={errorMessage}
+                      setErrorMessage={setErrorMessage}
+                    />
                   )}
                 </AnimatePresence>
               </div>

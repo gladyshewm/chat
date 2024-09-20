@@ -156,7 +156,7 @@
   margin-right: 1.5rem;
   height: 2.85rem;
   width: 10.7rem;
-  background-color: rgba(25, 25, 25, 0.9);
+  background-color: rgba(25, 25, 25, 1);
   transition: background-color 0.3s ease;
 
   & .logout-button__text {
@@ -181,7 +181,7 @@
 
   &:hover {
     cursor: pointer;
-    background-color: rgba(25, 25, 25, 1);
+    background-color: rgba(153, 153, 153, 0.3);
     transition: background-color 0.3s ease;
   }
 }
