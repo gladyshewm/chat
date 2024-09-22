@@ -36,3 +36,21 @@ export const searchInputVariants = {
   hidden: { width: '70%' },
   visible: { width: '80%', transition: { duration: FAST_ANIMATION_DURATION } },
 };
+
+export const createChatButtonVariants = {
+  hidden: {
+    opacity: 0,
+    y: 50,
+    transition: { duration: FAST_ANIMATION_DURATION },
+  },
+  animate: {
+    opacity: 0.8,
+    y: 0,
+    transition: { duration: FAST_ANIMATION_DURATION },
+  },
+  exit: {
+    opacity: 0,
+    y: 50,
+    transition: { duration: FAST_ANIMATION_DURATION },
+  },
+};

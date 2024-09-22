@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import './ProfileSettings.css';
 import EditProfile from './EditProfile/EditProfile';
 import ProfileInfo from './ProfileInfo/ProfileInfo';
-import { editProfileVariants, profileInfoVariants } from './motion';
-import { TWEEN_TRANSITION } from '@shared/constants/motion';
-
-//TODO: move to sidebar
+import SidebarMotionScale from '../../SidebarMotionScale/SidebarMotionScale';
+import SidebarMotionSlide from '../../SidebarMotionSlide/SidebarMotionSlide';
 
 interface ProfileSettingsProps {
   setIsProfileSettings: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,32 +21,22 @@ const ProfileSettings = ({ setIsProfileSettings }: ProfileSettingsProps) => {
     <>
       <AnimatePresence initial={false} mode="wait">
         {isProfileInfo ? (
-          <motion.div
+          <SidebarMotionScale
             className="profile-settings__container"
             key="profileInfo"
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={profileInfoVariants}
-            transition={TWEEN_TRANSITION}
           >
             <ProfileInfo
               handleBackClick={handleBackClick}
               setIsProfileInfo={setIsProfileInfo}
             />
-          </motion.div>
+          </SidebarMotionScale>
         ) : (
-          <motion.div
+          <SidebarMotionSlide
             className="profile-settings__container"
             key="editProfile"
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            variants={editProfileVariants}
-            transition={TWEEN_TRANSITION}
           >
             <EditProfile setIsProfileInfo={setIsProfileInfo} />
-          </motion.div>
+          </SidebarMotionSlide>
         )}
       </AnimatePresence>
     </>

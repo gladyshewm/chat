@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import './Sidebar.css';
 import { DrawOutline } from '@shared/ui';
-import { messagesListVariants, profileSettingsVariants } from './motion';
-import { TWEEN_TRANSITION } from '@shared/constants/motion';
 import { ProfileSettings } from './ProfileSettings';
 import { MessagesList } from './MessagesList';
+import SidebarMotionSlide from './SidebarMotionSlide/SidebarMotionSlide';
+import SidebarMotionScale from './SidebarMotionScale/SidebarMotionScale';
 
 const Sidebar = () => {
   const [isProfileSettings, setIsProfileSettings] = useState(false);
@@ -15,29 +15,19 @@ const Sidebar = () => {
       <div className="sidebar">
         <AnimatePresence initial={false} mode="wait">
           {isProfileSettings ? (
-            <motion.div
+            <SidebarMotionSlide
               className="sidebar__profile-settings"
               key="profile"
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={profileSettingsVariants}
-              transition={TWEEN_TRANSITION}
             >
               <ProfileSettings setIsProfileSettings={setIsProfileSettings} />
-            </motion.div>
+            </SidebarMotionSlide>
           ) : (
-            <motion.div
+            <SidebarMotionScale
               className="sidebar__messages-list"
               key="messages"
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={messagesListVariants}
-              transition={TWEEN_TRANSITION}
             >
               <MessagesList setIsProfileSettings={setIsProfileSettings} />
-            </motion.div>
+            </SidebarMotionScale>
           )}
         </AnimatePresence>
       </div>

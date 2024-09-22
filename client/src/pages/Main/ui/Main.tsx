@@ -7,7 +7,7 @@ const Main = () => {
     <AnimatePresence mode="wait">
       <motion.div
         key="main-page"
-        className="main-page"
+        id="main-page"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}

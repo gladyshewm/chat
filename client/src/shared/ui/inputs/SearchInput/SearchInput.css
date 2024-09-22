@@ -1,6 +1,6 @@
 .search-input-container {
   position: relative;
-  height: 45px;
+  height: 3.2rem;
 
   & .search-input {
     width: 100%;
@@ -8,16 +8,15 @@
     border: none;
     background-color: transparent;
     color: #fff;
-    border-radius: 20px;
+    border-radius: 1.4rem;
     outline: none;
-    padding: 0 15px 0 45px;
-    font-size: 14px;
+    padding: 0 1rem 0 3.2rem;
   }
 
   & svg {
     position: absolute;
     top: 50%;
-    left: 15px;
+    left: 1rem;
     transform: translateY(-50%);
     pointer-events: none;
     stroke: var(--outline-main-color);

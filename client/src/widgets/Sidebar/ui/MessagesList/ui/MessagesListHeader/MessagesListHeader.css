@@ -1,0 +1,84 @@
+.message-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 5.7rem;
+  width: 100%;
+
+  & .avatar,
+  .back-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 3.55rem;
+    width: 3.55rem;
+    border-radius: 50%;
+
+    & svg {
+      stroke: var(--outline-main-color);
+      transition: stroke 0.3s ease;
+    }
+
+    & ~ .draw-outline-rect-svg > .draw-outline-rect-rect {
+      transition: stroke 0.3s ease;
+    }
+
+    &:hover {
+      cursor: pointer;
+
+      & ~ .draw-outline-rect-svg > .draw-outline-rect-rect {
+        stroke: #fff;
+        transition: stroke 0.3s ease;
+      }
+
+      & svg {
+        stroke: #fff;
+        transition: stroke 0.3s ease;
+      }
+    }
+  }
+
+  & .avatar {
+    & img {
+      height: 100%;
+      width: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+}
+
+.search-input-block {
+  height: 45px;
+}
+
+.search-input-wrapper {
+  height: 100%;
+
+  & .draw-outline-rect-rect {
+    transition: stroke 0.3s ease;
+  }
+
+  & .search-input-container {
+    height: 100%;
+  }
+
+  &:hover {
+    .draw-outline-rect-rect,
+    .search-input-container svg {
+      stroke: #fff;
+      transition: stroke 0.3s ease;
+    }
+  }
+
+  &:focus-within {
+    .draw-outline-rect-rect,
+    .search-input-container svg {
+      stroke: #fff;
+    }
+  }
+
+  & .search-input:not(:placeholder-shown) ~ svg {
+    stroke: #fff;
+  }
+}

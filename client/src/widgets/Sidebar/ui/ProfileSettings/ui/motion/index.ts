@@ -4,8 +4,8 @@ export const profileInfoVariants = {
 };
 
 export const editProfileVariants = {
-  hidden: { x: '10%' },
-  visible: { x: 0 },
+  hidden: { x: '10%', opacity: 0 },
+  visible: { x: 0, opacity: 1 },
 };
 
 export const logoutButtonTransition = {
