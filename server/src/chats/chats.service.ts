@@ -30,6 +30,7 @@ export class ChatsService {
     userUuid: string,
     participantsIds: string[],
     name: string,
+    avatar?: FileUpload,
   ): Promise<ChatWithoutMessages> {
     participantsIds.push(userUuid);
 
@@ -64,6 +65,11 @@ export class ChatsService {
       }
 
       await this.chatRepository.createParty(chat.id, participantsIds);
+
+      if (avatar) {
+        const avatarUrl = await this.uploadChatAvatar(avatar, chat.id);
+        chat.groupAvatarUrl = avatarUrl;
+      }
 
       return chat;
     } catch (error) {

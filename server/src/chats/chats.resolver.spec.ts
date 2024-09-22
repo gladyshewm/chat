@@ -44,6 +44,11 @@ describe('ChatsResolver', () => {
     const participantsIds = ['id', 'id2', 'id3'];
     const participants = participantsIds.map((id) => userWithAvatarStub(id));
     const chatName = 'mockChatName';
+    const chatAvatar = {
+      filename: 'mockFilename',
+      mimetype: 'mockMimetype',
+      createReadStream: jest.fn(),
+    } as unknown as FileUpload;
 
     beforeEach(async () => {
       chatsService.createChat.mockResolvedValue(
@@ -52,6 +57,7 @@ describe('ChatsResolver', () => {
       createdChat = await chatsResolver.createChat(
         participantsIds,
         chatName,
+        chatAvatar,
         userUuid,
       );
     });
@@ -61,6 +67,7 @@ describe('ChatsResolver', () => {
         userUuid,
         participantsIds,
         chatName,
+        chatAvatar,
       );
     });
 

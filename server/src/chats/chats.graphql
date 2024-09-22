@@ -39,7 +39,11 @@ type Mutation {
   Создание чата.
   Возвращаемый список участников содержит ID текущего пользователя (создателя).
   """
-  createChat(participantsIds: [ID!]!, name: String): ChatWithoutMessages!
+  createChat(
+    participantsIds: [ID!]!
+    name: String
+    avatar: Upload
+  ): ChatWithoutMessages!
   """
   Групповой чат удаляет создатель для всех.
 

@@ -86,7 +86,7 @@ export abstract class IMutation {
 
     abstract logOutUser(): boolean | Promise<boolean>;
 
-    abstract createChat(participantsIds: string[], name?: Nullable<string>): ChatWithoutMessages | Promise<ChatWithoutMessages>;
+    abstract createChat(participantsIds: string[], name?: Nullable<string>, avatar?: Nullable<Upload>): ChatWithoutMessages | Promise<ChatWithoutMessages>;
 
     abstract deleteChat(chatId: string): boolean | Promise<boolean>;
 

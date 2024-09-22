@@ -17,9 +17,15 @@ export class ChatsResolver {
   async createChat(
     @Args('participantsIds') participantsIds: string[],
     @Args('name') name: string,
+    @Args('avatar', { type: () => GraphQLUpload }) avatar: FileUpload,
     @Context('user_uuid') userUuid: string,
   ): Promise<ChatWithoutMessages> {
-    return this.chatsService.createChat(userUuid, participantsIds, name);
+    return this.chatsService.createChat(
+      userUuid,
+      participantsIds,
+      name,
+      avatar,
+    );
   }
 
   @UseGuards(JwtHttpAuthGuard)
