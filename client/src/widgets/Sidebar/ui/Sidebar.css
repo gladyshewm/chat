@@ -3,6 +3,7 @@
   width: 28rem;
   height: 100vh;
   z-index: 1;
+  overflow: hidden;
 
   & .sidebar__profile-settings,
   .sidebar__messages-list {

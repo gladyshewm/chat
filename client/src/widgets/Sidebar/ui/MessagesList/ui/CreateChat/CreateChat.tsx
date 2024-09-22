@@ -1,40 +1,40 @@
-import { useRef } from 'react';
+import { useState } from 'react';
 import './CreateChat.css';
-import { DrawOutline, OptionButton, SearchInput } from '@shared/ui';
-import { ArrowLeftIcon } from '@shared/assets';
+import { AnimatePresence } from 'framer-motion';
+import { AddChatParticipants } from './AddChatParticipants/AddChatParticipants';
+import { AddChatDescription } from './AddChatDescription/AddChatDescription';
+import SidebarMotionSlide from '../../../SidebarMotionSlide/SidebarMotionSlide';
+import SidebarMotionScale from '../../../SidebarMotionScale/SidebarMotionScale';
+import { UserWithAvatar } from '@shared/types';
 
 interface CreateChatProps {
   setIsCreateChat: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CreateChat = ({ setIsCreateChat }: CreateChatProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleBackClick = () => {
-    setIsCreateChat(false);
-  };
+  const [isChatDescription, setIsChatDescription] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState<UserWithAvatar[]>([]);
 
   return (
-    <div id="create-chat">
-      <DrawOutline orientation="horizontal" position="bottom">
-        <header>
-          <div className="title">
-            <OptionButton className="back" onClick={handleBackClick}>
-              <abbr title="Назад">
-                <ArrowLeftIcon />
-              </abbr>
-            </OptionButton>
-            <h2>Добавить участников</h2>
-          </div>
-          <SearchInput
-            ref={inputRef}
-            className="search-input"
-            placeholder="Кого бы Вы хотели добавить?"
+    <AnimatePresence mode="wait">
+      {isChatDescription && selectedUsers.length ? (
+        <SidebarMotionSlide key="chatDescription" style={{ height: '100%' }}>
+          <AddChatDescription
+            setIsChatDescription={setIsChatDescription}
+            selectedUsers={selectedUsers}
           />
-        </header>
-      </DrawOutline>
-      <main>asdasd</main>
-    </div>
+        </SidebarMotionSlide>
+      ) : (
+        <SidebarMotionScale key="chatParticipants" style={{ height: '100%' }}>
+          <AddChatParticipants
+            setIsCreateChat={setIsCreateChat}
+            setIsChatDescription={setIsChatDescription}
+            selectedUsers={selectedUsers}
+            setSelectedUsers={setSelectedUsers}
+          />
+        </SidebarMotionScale>
+      )}
+    </AnimatePresence>
   );
 };
 

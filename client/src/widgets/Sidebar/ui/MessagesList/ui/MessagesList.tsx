@@ -117,7 +117,7 @@ const MessagesList = ({ setIsProfileSettings }: MessagesListProps) => {
                         transition: { duration: 0.3 },
                       }}
                     >
-                      <abbr title="Создать чат">
+                      <abbr title="Создать групповой чат">
                         <PlusIcon />
                       </abbr>
                     </motion.button>
