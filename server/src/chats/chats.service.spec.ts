@@ -20,6 +20,7 @@ import { AvatarInfo, ChatWithoutMessages } from '../generated_graphql';
 import { ChatWithParticipantsData } from './models/chats.model';
 import { fileStub } from '../auth/stubs/users.stub';
 import { fileUploadStub } from './stubs/files.stub';
+import { PUB_SUB } from '../common/pubsub/pubsub.provider';
 
 jest.mock('./chats.repository');
 jest.mock('../users/users.service');
@@ -31,6 +32,11 @@ describe('ChatsService', () => {
   let filesService: jest.Mocked<FilesService>;
   let chatRepository: jest.Mocked<ChatRepository>;
 
+  const mockPubSub = {
+    publish: jest.fn(),
+    asyncIterator: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -38,6 +44,7 @@ describe('ChatsService', () => {
         UsersService,
         FilesService,
         { provide: CHAT_REPOSITORY, useClass: SupabaseChatRepository },
+        { provide: PUB_SUB, useValue: mockPubSub },
       ],
     }).compile();
 
@@ -645,11 +652,26 @@ describe('ChatsService', () => {
     const file = fileUploadStub();
     const buffer = Buffer.from('test');
     const uniqueFilename = 'testFilename';
+    const mockChat = chatDataStub(chatId, 'chatName', 'currentUserUuid', false);
 
     beforeEach(async () => {
       filesService.readFile.mockResolvedValue(buffer);
       filesService.generateUniqueFilename.mockReturnValue(uniqueFilename);
       chatRepository.getAvatarPublicUrl.mockResolvedValue('publicUrl');
+      // this.getChatInfoById
+      chatRepository.getChatById.mockResolvedValue(mockChat);
+      chatRepository.getPartyByChatId.mockResolvedValueOnce([
+        partyItemStub(),
+        partyItemStub(),
+      ]);
+      chatRepository.getGroupChatAvatar.mockResolvedValue(
+        groupAvatarDataStub(),
+      );
+      chatRepository.getPartyByChatId.mockResolvedValueOnce([
+        partyItemStub(mockChat),
+        partyItemStub(mockChat),
+        partyItemStub(mockChat),
+      ]);
     });
 
     it('should call filesService.readFile', async () => {
@@ -728,6 +750,7 @@ describe('ChatsService', () => {
     const currentChatAvatar =
       'https://wppewaapojghqafjsuvm.supabase.co/storage/v1/object/public/avatars/chats/1/current.png';
     const chatAvatars = [fileStub('first'), fileStub('second')];
+    const mockChat = chatDataStub(chatId, 'chatName', 'currentUserUuid', false);
 
     beforeEach(async () => {
       chatRepository.getCurrentChatAvatar.mockResolvedValue({
@@ -736,6 +759,20 @@ describe('ChatsService', () => {
       chatRepository.checkDeleteAccess.mockResolvedValue(true);
       chatRepository.getChatAvatars.mockResolvedValue(chatAvatars);
       chatRepository.getAvatarPublicUrl.mockResolvedValue(avatarUrlToDelete);
+      // this.getChatInfoById
+      chatRepository.getChatById.mockResolvedValue(mockChat);
+      chatRepository.getPartyByChatId.mockResolvedValueOnce([
+        partyItemStub(),
+        partyItemStub(),
+      ]);
+      chatRepository.getGroupChatAvatar.mockResolvedValue(
+        groupAvatarDataStub(),
+      );
+      chatRepository.getPartyByChatId.mockResolvedValueOnce([
+        partyItemStub(mockChat),
+        partyItemStub(mockChat),
+        partyItemStub(mockChat),
+      ]);
     });
 
     it('should call chatRepository.getCurrentChatAvatar', async () => {

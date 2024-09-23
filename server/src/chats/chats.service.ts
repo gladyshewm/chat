@@ -11,6 +11,8 @@ import { ChatWithParticipantsData } from './models/chats.model';
 import { AvatarInfo, ChatWithoutMessages } from '../generated_graphql';
 import { FilesService } from '../files/files.service';
 import { UsersService } from '../users/users.service';
+import { PubSub } from 'graphql-subscriptions';
+import { PUB_SUB } from '../common/pubsub/pubsub.provider';
 
 @Injectable()
 export class ChatsService {
@@ -20,6 +22,7 @@ export class ChatsService {
     private usersService: UsersService,
     private readonly filesService: FilesService,
     @Inject(CHAT_REPOSITORY) private chatRepository: ChatRepository,
+    @Inject(PUB_SUB) private pubSub: PubSub,
   ) {}
 
   async isParticipant(chatId: string, userUuid: string): Promise<boolean> {
@@ -70,6 +73,10 @@ export class ChatsService {
         const avatarUrl = await this.uploadChatAvatar(avatar, chat.id);
         chat.groupAvatarUrl = avatarUrl;
       }
+
+      this.pubSub.publish('newChatCreated', {
+        newChatCreated: chat,
+      });
 
       return chat;
     } catch (error) {
@@ -247,6 +254,12 @@ export class ChatsService {
 
       await this.chatRepository.updateGroupChatAvatar(chatId, publicURL);
 
+      const updatedChat = await this.getChatInfoById(chatId);
+
+      this.pubSub.publish('chatById', {
+        chatById: updatedChat,
+      });
+
       return publicURL;
     } catch (error) {
       this.logger.error(`Ошибка загрузки аватара: ${error.message}`);
@@ -294,6 +307,12 @@ export class ChatsService {
 
       await this.chatRepository.updateGroupChatAvatar(chatId, newAvatarUrl);
 
+      const updatedChat = await this.getChatInfoById(chatId);
+
+      this.pubSub.publish('chatById', {
+        chatById: updatedChat,
+      });
+
       return newAvatarUrl;
     } catch (error) {
       this.logger.error(`Ошибка удаления аватара: ${error.message}`);
@@ -322,17 +341,19 @@ export class ChatsService {
       );
 
       if (isParticipant) {
-        /* throw new HttpException(
-          'User is already a participant in this chat',
-          HttpStatus.BAD_REQUEST,
-        ); */
         this.logger.warn('Пользователь уже является участником чата');
         return this.getChatInfoById(chatId);
       }
 
       await this.chatRepository.addUserToChat(chatId, userUuid);
 
-      return this.getChatInfoById(chatId);
+      const updatedChat = await this.getChatInfoById(chatId);
+
+      this.pubSub.publish('chatById', {
+        chatById: updatedChat,
+      });
+
+      return updatedChat;
     } catch (error) {
       this.logger.error(
         `Ошибка при добавлении пользователя в чат: ${error.message}`,
@@ -375,7 +396,13 @@ export class ChatsService {
 
       await this.chatRepository.removeUserFromChat(chatId, userUuid);
 
-      return this.getChatInfoById(chatId);
+      const updatedChat = await this.getChatInfoById(chatId);
+
+      this.pubSub.publish('chatById', {
+        chatById: updatedChat,
+      });
+
+      return updatedChat;
     } catch (error) {
       this.logger.error(
         `Ошибка при удалении пользователя из чата: ${error.message}`,

@@ -1,15 +1,25 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
+import { Inject, UseGuards } from '@nestjs/common';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { ChatsService } from './chats.service';
 import { JwtHttpAuthGuard } from '../auth/guards/jwt-http-auth.guard';
 import { AvatarInfo, ChatWithoutMessages } from '../generated_graphql';
+import { JwtWsAuthGuard } from '../auth/guards/jwt-ws-auth.guard';
+import { PUB_SUB } from '../common/pubsub/pubsub.provider';
+import { PubSub } from 'graphql-subscriptions';
 
 @Resolver('Chats')
 export class ChatsResolver {
   constructor(
     private chatsService: ChatsService,
-    // @Inject(PUB_SUB) private pubSub: PubSub,
+    @Inject(PUB_SUB) private pubSub: PubSub,
   ) {}
 
   @UseGuards(JwtHttpAuthGuard)
@@ -26,6 +36,12 @@ export class ChatsResolver {
       name,
       avatar,
     );
+  }
+
+  @UseGuards(JwtWsAuthGuard)
+  @Subscription('newChatCreated')
+  getNewChatSub() {
+    return this.pubSub.asyncIterator('newChatCreated');
   }
 
   @UseGuards(JwtHttpAuthGuard)
@@ -60,6 +76,14 @@ export class ChatsResolver {
     @Args('chatId') chatId: string,
   ): Promise<AvatarInfo[]> {
     return this.chatsService.getChatAllAvatars(chatId);
+  }
+
+  @UseGuards(JwtWsAuthGuard)
+  @Subscription('chatById', {
+    filter: (payload, variables) => payload.chatById.id == variables.chatId,
+  })
+  getChatInfoByIdSub() {
+    return this.pubSub.asyncIterator('chatById');
   }
 
   @UseGuards(JwtHttpAuthGuard)

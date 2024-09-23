@@ -10,6 +10,8 @@ import {
   userWithAvatarStub,
 } from './stubs/chats.stub';
 import { FileUpload } from 'graphql-upload-ts';
+import { PUB_SUB } from '../common/pubsub/pubsub.provider';
+import { JwtWsAuthGuard } from '../auth/guards/jwt-ws-auth.guard';
 
 jest.mock('./chats.service');
 
@@ -21,12 +23,27 @@ describe('ChatsResolver', () => {
     canActivate: jest.fn().mockReturnValue(true),
   };
 
+  const mockJwtWSAuthGuard = {
+    canActivate: jest.fn().mockReturnValue(true),
+  };
+
+  const mockPubSub = {
+    publish: jest.fn(),
+    asyncIterator: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChatsResolver, ChatsService],
+      providers: [
+        ChatsResolver,
+        ChatsService,
+        { provide: PUB_SUB, useValue: mockPubSub },
+      ],
     })
       .overrideGuard(JwtHttpAuthGuard)
       .useValue(mockJwtHttpAuthGuard)
+      .overrideGuard(JwtWsAuthGuard)
+      .useValue(mockJwtWSAuthGuard)
       .compile();
 
     chatsResolver = module.get<ChatsResolver>(ChatsResolver);

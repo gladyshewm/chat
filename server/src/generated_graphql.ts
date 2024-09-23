@@ -132,6 +132,16 @@ export class UserWithAvatar {
     avatarUrl?: Nullable<string>;
 }
 
+export abstract class ISubscription {
+    abstract chatById(chatId: string): Nullable<ChatWithoutMessages> | Promise<Nullable<ChatWithoutMessages>>;
+
+    abstract newChatCreated(): Nullable<ChatWithoutMessages> | Promise<Nullable<ChatWithoutMessages>>;
+
+    abstract messageSent(chatId: string): Message | Promise<Message>;
+
+    abstract userTyping(chatId: string): TypingFeedback | Promise<TypingFeedback>;
+}
+
 export class Message {
     id: string;
     chatId: string;
@@ -155,12 +165,6 @@ export class TypingFeedback {
     chatId: string;
     userName: string;
     isTyping: boolean;
-}
-
-export abstract class ISubscription {
-    abstract messageSent(chatId: string): Message | Promise<Message>;
-
-    abstract userTyping(chatId: string): TypingFeedback | Promise<TypingFeedback>;
 }
 
 export class Info {

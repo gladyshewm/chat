@@ -68,3 +68,10 @@ type Mutation {
   """
   removeUserFromChat(chatId: ID!, userUuid: ID!): ChatWithoutMessages!
 }
+
+type Subscription {
+  "Подписка на изменения существующего чата"
+  chatById(chatId: ID!): ChatWithoutMessages
+  "Подписка на создание нового чата"
+  newChatCreated: ChatWithoutMessages
+}
