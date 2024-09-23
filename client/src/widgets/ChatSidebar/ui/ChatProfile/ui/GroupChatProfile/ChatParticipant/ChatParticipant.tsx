@@ -12,7 +12,6 @@ import {
   useRemoveUserFromChatMutation,
 } from './chat-participant.generated';
 import { actionButtonVariants } from './motion';
-import { useChat } from '@pages/Chat/ctx/ChatContext';
 
 interface ChatParticipantProps {
   chat: ChatWithoutMessages;
@@ -28,7 +27,6 @@ export const ChatParticipant = ({
   const [isActionClicked, setIsActionClicked] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { updateChat } = useChat();
 
   const { data, loading, error } = useChatWithUserQuery({
     variables: {
@@ -87,7 +85,6 @@ export const ChatParticipant = ({
       throw new Error('Не удалось удалить пользователя из чата');
     }
 
-    updateChat(data.removeUserFromChat as ChatWithoutMessages);
     setSuccessMessage((prev) => [
       ...prev,
       `Пользователь ${participant.name} исключён из чата`,

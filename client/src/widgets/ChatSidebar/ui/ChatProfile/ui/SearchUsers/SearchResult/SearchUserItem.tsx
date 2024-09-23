@@ -15,21 +15,20 @@ export const SearchUserItem = ({
   addUserToChat,
   setSuccessMessage,
 }: SearchResultChatUserProps) => {
-  const { chat, updateChat } = useChat();
+  const { chat } = useChat();
 
   if (!chat) return;
 
   const handleClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     try {
-      const result = await addUserToChat({
+      await addUserToChat({
         variables: {
           chatId: chat.id,
           userUuid: resultUser.id,
         },
       });
 
-      updateChat(result.data.addUserToChat as ChatWithoutMessages);
       setSuccessMessage((prev) => [
         ...prev,
         `Пользователь ${resultUser.name} добавлен в чат`,

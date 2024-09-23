@@ -35,5 +35,85 @@
 
   & main {
     height: calc(100% - 5.7rem);
+    padding: 0.7rem;
+
+    & #participants {
+      & #participants-title {
+        color: var(--outline-main-color);
+        padding: 0.7rem;
+        margin-top: 0.7rem;
+      }
+
+      & .participant {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0.7rem;
+        height: 4.65rem;
+
+        & .avatar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-color: var(--col3);
+          height: 3.55rem;
+          width: 3.55rem;
+          border-radius: 50%;
+
+          & img {
+            height: 100%;
+            width: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+
+          & svg {
+            stroke: #fff;
+            width: 60%;
+            height: 60%;
+          }
+        }
+
+        & .name {
+          color: #fff;
+          padding-left: 0.7rem;
+        }
+      }
+    }
+
+    & form {
+      margin-top: 4rem;
+
+      & .profile__input-wrapper {
+        width: 100%;
+    
+        & .draw-outline-rect-rect {
+          transition: stroke 0.3s ease;
+        }
+    
+        &:hover .draw-outline-rect-rect {
+          stroke: var(--input-placeholder-color);
+          transition: stroke 0.3s ease;
+        }
+      }
+    
+      & .input__field {
+        border-radius: 15px;
+        padding: 1rem;
+        min-width: 21.4rem;
+        min-height: 1.4rem;
+        height: 3.57rem;
+        width: 100%;
+        color: #fff;
+    
+        &:focus,
+        &:not(:placeholder-shown) {
+          & + .input__label {
+            transform: translate(0, -120%) scale(0.8);
+            color: #fff;
+          }
+        }
+      }
+    }
   }
 }

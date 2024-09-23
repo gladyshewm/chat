@@ -12,25 +12,19 @@ import {
   Loader,
   OptionButton,
 } from '@shared/ui';
-import {
-  ArrowLeftIcon,
-  CameraIcon,
-  CheckIcon,
-  XmarkIcon,
-} from '@shared/assets';
+import { ArrowLeftIcon } from '@shared/assets';
 import DeleteModal from './DeleteModal/DeleteModal';
 import {
   ChangeCredentialsSchema,
   validationChangeCredentialsSchema,
 } from '@widgets/Auth';
-import { ErrorMessage, SuccessMessage } from '@features';
+import { AvatarUploader, ErrorMessage, SuccessMessage } from '@features';
 
 interface EditProfileProps {
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
-  const [avatar, setAvatar] = useState<File | null>(null);
   const [successMessage, setSuccessMessage] = useState<string[]>([]);
   const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,37 +45,6 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
 
   const handleBackClick = () => {
     setIsProfileInfo(true);
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      if (file.type.startsWith('image/')) {
-        setAvatar(file);
-      } else {
-        alert('Недопустимый тип файла. Пожалуйста, выберите изображение.');
-        event.target.value = '';
-      }
-    }
-  };
-
-  const handleCancel = () => {
-    setAvatar(null);
-  };
-
-  const handleSave = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    await handleUploadAvatar(avatar as File);
-    setAvatar(null);
-  };
-
-  const handleDivClick = () => {
-    const fileInput = document.getElementById(
-      'avatarInput',
-    ) as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
-    }
   };
 
   const handleSubmitCredentials = async (values: ChangeCredentialsSchema) => {
@@ -126,7 +89,7 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
   return (
     <div className="edit-profile">
       <DrawOutline orientation="horizontal" position="bottom">
-        <div className="edit-profile__header">
+        <header className="edit-profile__header">
           <OptionButton className="back" onClick={handleBackClick}>
             <abbr title="Назад">
               <ArrowLeftIcon />
@@ -135,60 +98,15 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
           <div className="edit-profile__title">
             <p>Редактирование профиля</p>
           </div>
-        </div>
+        </header>
       </DrawOutline>
-      <div className="edit-profile__main">
-        <div className="avatar">
-          <input
-            type="file"
-            accept="image/*"
-            id="avatarInput"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-          />
-          {avatar ? (
-            <div className="preview-avatar">
-              <div className="preview-avatar__avatar">
-                {profileLoadingStates.uploadAvatar && <Loader />}
-                <img src={URL.createObjectURL(avatar)} alt="new avatar" />
-              </div>
-              <div className="avatar-buttons">
-                <OptionButton className="cancel" onClick={handleCancel}>
-                  <XmarkIcon />
-                </OptionButton>
-                <OptionButton
-                  className="save"
-                  onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-                    handleSave(e)
-                  }
-                >
-                  <CheckIcon />
-                </OptionButton>
-              </div>
-            </div>
-          ) : errorQueryAvatar || !avatarUrl ? (
-            <DrawOutlineRect
-              strokeWidth={1}
-              className="avatar-wrapper"
-              rx="50%"
-            >
-              <div className="empty-avatar" onClick={handleDivClick}>
-                <CameraIcon />
-              </div>
-            </DrawOutlineRect>
-          ) : (
-            <DrawOutlineRect
-              strokeWidth={1}
-              className="avatar-wrapper"
-              rx="50%"
-            >
-              <div className="update-avatar" onClick={handleDivClick}>
-                <CameraIcon />
-                <img src={avatarUrl as string} alt="avatar" />
-              </div>
-            </DrawOutlineRect>
-          )}
-        </div>
+      <main className="edit-profile__main">
+        <AvatarUploader
+          initialAvatarUrl={avatarUrl as string}
+          onSave={handleUploadAvatar}
+          isLoading={profileLoadingStates.uploadAvatar}
+          error={errorQueryAvatar}
+        />
         {profileLoadingStates.changeCredentials && <Loader />}
         <Formik
           initialValues={initialValues}
@@ -284,7 +202,7 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
             </Form>
           )}
         </Formik>
-      </div>
+      </main>
       <DeleteModal
         isOpen={isModalOpen}
         setIsOpen={setIsModalOpen}

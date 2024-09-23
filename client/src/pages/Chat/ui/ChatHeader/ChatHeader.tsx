@@ -16,9 +16,9 @@ import {
   UserIcon,
   XmarkIcon,
 } from '@shared/assets';
-import { formatParticipants } from '../../utils';
 import { useUserTypingSubscription } from '../chat.generated';
 import { useNavigate } from 'react-router-dom';
+import { formatParticipants } from '@shared/utils';
 
 interface ChatHeaderProps {
   chat: ChatWithoutMessages;

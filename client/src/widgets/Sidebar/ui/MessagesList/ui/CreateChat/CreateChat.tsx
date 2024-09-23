@@ -20,6 +20,7 @@ const CreateChat = ({ setIsCreateChat }: CreateChatProps) => {
       {isChatDescription && selectedUsers.length ? (
         <SidebarMotionSlide key="chatDescription" style={{ height: '100%' }}>
           <AddChatDescription
+            setIsCreateChat={setIsCreateChat}
             setIsChatDescription={setIsChatDescription}
             selectedUsers={selectedUsers}
           />

@@ -1,0 +1,15 @@
+subscription newChatCreated {
+  newChatCreated {
+    id
+    name
+    userUuid
+    isGroupChat
+    groupAvatarUrl
+    participants {
+      id
+      name
+      avatarUrl
+    }
+    createdAt
+  }
+}

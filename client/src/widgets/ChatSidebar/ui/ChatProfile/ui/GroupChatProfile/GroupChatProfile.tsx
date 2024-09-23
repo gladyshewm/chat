@@ -28,7 +28,7 @@ const GroupChatProfile = ({
   const [successMessage, setSuccessMessage] = useState<string[]>([]);
   const { copyMessage, handleCopy } = useCopyMessage();
   const { user } = useAuth();
-  const { chat, updateChat } = useChat();
+  const { chat } = useChat();
   const {
     openSlider,
     isOpen,
@@ -70,7 +70,7 @@ const GroupChatProfile = ({
 
   const handleDeleteAvatar = async (url: string) => {
     try {
-      const { data } = await deleteAvatar({
+      await deleteAvatar({
         variables: {
           chatId: chat.id,
           avatarUrl: url,
@@ -79,12 +79,6 @@ const GroupChatProfile = ({
 
       removeImage(url);
       setAvatars(avatars.filter((avatar) => avatar.url !== url));
-
-      const updatedChat = {
-        ...chat,
-        groupAvatarUrl: data?.deleteChatAvatar,
-      };
-      updateChat(updatedChat);
     } catch (error) {
       console.error(error);
       throw new Error(error);

@@ -10,13 +10,14 @@ export type ChatWithUserQueryVariables = Types.Exact<{
 
 export type ChatWithUserQuery = { __typename?: 'Query', chatWithUser?: { __typename?: 'ChatWithoutMessages', id: string, name?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string }> } | null };
 
-export type CreateChatMutationVariables = Types.Exact<{
+export type CreateChatSidebarMutationVariables = Types.Exact<{
   participantsIds: Array<Types.Scalars['ID']['input']> | Types.Scalars['ID']['input'];
   name?: Types.InputMaybe<Types.Scalars['String']['input']>;
+  avatar?: Types.InputMaybe<Types.Scalars['Upload']['input']>;
 }>;
 
 
-export type CreateChatMutation = { __typename?: 'Mutation', createChat: { __typename?: 'ChatWithoutMessages', id: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> } };
+export type CreateChatSidebarMutation = { __typename?: 'Mutation', createChat: { __typename?: 'ChatWithoutMessages', id: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> } };
 
 
 export const ChatWithUserDocument = gql`
@@ -65,9 +66,9 @@ export type ChatWithUserQueryHookResult = ReturnType<typeof useChatWithUserQuery
 export type ChatWithUserLazyQueryHookResult = ReturnType<typeof useChatWithUserLazyQuery>;
 export type ChatWithUserSuspenseQueryHookResult = ReturnType<typeof useChatWithUserSuspenseQuery>;
 export type ChatWithUserQueryResult = Apollo.QueryResult<ChatWithUserQuery, ChatWithUserQueryVariables>;
-export const CreateChatDocument = gql`
-    mutation createChat($participantsIds: [ID!]!, $name: String) {
-  createChat(participantsIds: $participantsIds, name: $name) {
+export const CreateChatSidebarDocument = gql`
+    mutation createChatSidebar($participantsIds: [ID!]!, $name: String, $avatar: Upload) {
+  createChat(participantsIds: $participantsIds, name: $name, avatar: $avatar) {
     id
     name
     isGroupChat
@@ -81,30 +82,31 @@ export const CreateChatDocument = gql`
   }
 }
     `;
-export type CreateChatMutationFn = Apollo.MutationFunction<CreateChatMutation, CreateChatMutationVariables>;
+export type CreateChatSidebarMutationFn = Apollo.MutationFunction<CreateChatSidebarMutation, CreateChatSidebarMutationVariables>;
 
 /**
- * __useCreateChatMutation__
+ * __useCreateChatSidebarMutation__
  *
- * To run a mutation, you first call `useCreateChatMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateChatMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateChatSidebarMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateChatSidebarMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createChatMutation, { data, loading, error }] = useCreateChatMutation({
+ * const [createChatSidebarMutation, { data, loading, error }] = useCreateChatSidebarMutation({
  *   variables: {
  *      participantsIds: // value for 'participantsIds'
  *      name: // value for 'name'
+ *      avatar: // value for 'avatar'
  *   },
  * });
  */
-export function useCreateChatMutation(baseOptions?: Apollo.MutationHookOptions<CreateChatMutation, CreateChatMutationVariables>) {
+export function useCreateChatSidebarMutation(baseOptions?: Apollo.MutationHookOptions<CreateChatSidebarMutation, CreateChatSidebarMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateChatMutation, CreateChatMutationVariables>(CreateChatDocument, options);
+        return Apollo.useMutation<CreateChatSidebarMutation, CreateChatSidebarMutationVariables>(CreateChatSidebarDocument, options);
       }
-export type CreateChatMutationHookResult = ReturnType<typeof useCreateChatMutation>;
-export type CreateChatMutationResult = Apollo.MutationResult<CreateChatMutation>;
-export type CreateChatMutationOptions = Apollo.BaseMutationOptions<CreateChatMutation, CreateChatMutationVariables>;
+export type CreateChatSidebarMutationHookResult = ReturnType<typeof useCreateChatSidebarMutation>;
+export type CreateChatSidebarMutationResult = Apollo.MutationResult<CreateChatSidebarMutation>;
+export type CreateChatSidebarMutationOptions = Apollo.BaseMutationOptions<CreateChatSidebarMutation, CreateChatSidebarMutationVariables>;

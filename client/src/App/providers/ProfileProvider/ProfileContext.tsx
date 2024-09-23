@@ -13,7 +13,7 @@ interface ProfileContextType {
   setAllAvatars: React.Dispatch<React.SetStateAction<AvatarInfo[] | []>>;
   avatarUrls: string[] | [];
   handleDeleteAvatar: (url: string) => void;
-  handleUploadAvatar: (avatar: File) => void;
+  handleUploadAvatar: (avatar: File) => Promise<void>;
   handleChangeCredentials: (
     values: ChangeCredentialsSchema,
   ) => Promise<string[] | null>;

@@ -10,8 +10,12 @@ query chatWithUser($userUuid: String!) {
   }
 }
 
-mutation createChat($participantsIds: [ID!]!, $name: String) {
-  createChat(participantsIds: $participantsIds, name: $name) {
+mutation createChatSidebar(
+  $participantsIds: [ID!]!
+  $name: String
+  $avatar: Upload
+) {
+  createChat(participantsIds: $participantsIds, name: $name, avatar: $avatar) {
     id
     name
     isGroupChat

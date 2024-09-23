@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import './Chat.css';
 import {
   useChatByIdLazyQuery,
+  useChatByIdSubSubscription,
   useSendTypingStatusMutation,
 } from './chat.generated';
 import { ChatWithoutMessages, UserInfo } from '@shared/types';
@@ -17,6 +18,7 @@ import {
 import ChatHeader from './ChatHeader/ChatHeader';
 import { ChatSidebar, MessageForm, Messages } from '@widgets';
 import { ChatProvider, useChat } from '../ctx/ChatContext';
+import { useNewChatCreatedSubscription } from '@widgets/Sidebar/ui/MessagesList/ui/CreateChat/AddChatDescription/add-chat-description.generated';
 
 const Chat = () => {
   const { user } = useAuth();
@@ -25,6 +27,25 @@ const Chat = () => {
   const [isChatInfo, setIsChatInfo] = useState(false);
   const [chat, setChat] = useState<ChatWithoutMessages | null>(null);
   const [chatQuery, { loading, error }] = useChatByIdLazyQuery();
+
+  const { data: newChatData } = useNewChatCreatedSubscription();
+
+  useEffect(() => {
+    if (newChatData) {
+      const newChat = newChatData.newChatCreated;
+      setChat(newChat as ChatWithoutMessages);
+    }
+  }, [newChatData]);
+
+  useChatByIdSubSubscription({
+    variables: {
+      chatId: chat?.id as string,
+    },
+    onData: (chatData) => {
+      const chat = chatData.data.data?.chatById as ChatWithoutMessages;
+      setChat(chat);
+    },
+  });
 
   useEffect(() => {
     setChat(null);

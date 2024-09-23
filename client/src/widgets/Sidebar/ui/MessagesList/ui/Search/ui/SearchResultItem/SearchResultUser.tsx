@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import './SearchResultUser.css';
 import {
   useChatWithUserQuery,
-  useCreateChatMutation,
+  useCreateChatSidebarMutation,
 } from './search-result-item.generated';
 import { DrawOutlineRect, Loader } from '@shared/ui';
 import { UserWithAvatar } from '@shared/types';
@@ -22,7 +22,7 @@ export const SearchResultUser = ({ resultUser }: SearchResultUserProps) => {
       userUuid: resultUser.id,
     },
   });
-  const [createChat] = useCreateChatMutation();
+  const [createChat] = useCreateChatSidebarMutation();
 
   const handleClick = async () => {
     if (user?.uuid === resultUser.id) return;

@@ -148,6 +148,7 @@ export type MutationChangeCredentialsArgs = {
 
 
 export type MutationCreateChatArgs = {
+  avatar?: InputMaybe<Scalars['Upload']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   participantsIds: Array<Scalars['ID']['input']>;
 };
@@ -281,8 +282,15 @@ export type QueryUserAvatarArgs = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  chatById?: Maybe<ChatWithoutMessages>;
   messageSent: Message;
+  newChatCreated?: Maybe<ChatWithoutMessages>;
   userTyping: TypingFeedback;
+};
+
+
+export type SubscriptionChatByIdArgs = {
+  chatId: Scalars['ID']['input'];
 };
 
 
