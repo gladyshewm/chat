@@ -1,10 +1,15 @@
-#message-list {
+.message-list {
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 0.7rem;
   height: calc(100% - 5.7rem);
-  overflow: hidden auto;
+  overflow: hidden;
+}
+
+.chats-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0.7rem;
 }
 
 .avatar-wrapper {
@@ -13,12 +18,12 @@
 
 .create-chat-button {
   z-index: 2;
-  /* position: sticky; */
   position: absolute;
-  right:  2rem;
+  right: 2rem;
   bottom: 2rem;
-  width: 3.55rem;
-  height: 3.55rem;
+  min-width: 3.55rem;
+  min-height: 3.55rem;
+  align-self: flex-end;
   background-color: var(--message-bg-color);
   border-radius: 50%;
   border: none;

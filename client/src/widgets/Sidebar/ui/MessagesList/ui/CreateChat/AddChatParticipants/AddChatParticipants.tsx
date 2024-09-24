@@ -75,7 +75,7 @@ export const AddChatParticipants = ({
   };
 
   return (
-    <div id="create-chat">
+    <div className="create-chat">
       <DrawOutline orientation="horizontal" position="bottom">
         <header>
           <div className="title">

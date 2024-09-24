@@ -83,6 +83,23 @@ const splitLink: ApolloLink = split(
 
 export const apolloClient: ApolloClient<any> = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      ChatWithoutMessages: {
+        fields: {
+          participants: {
+            merge(existing = [], incoming) {
+              const mergedParticipants = [...existing, ...incoming].filter(
+                (participant, index, self) =>
+                  index ===
+                  self.findIndex((p) => p.__ref === participant.__ref),
+              );
+              return mergedParticipants;
+            },
+          },
+        },
+      },
+    },
+  }),
   credentials: 'include',
 });

@@ -88,7 +88,7 @@ const SingleChatProfile = () => {
   };
 
   return (
-    <>
+    <div className='chat-profile'>
       <FullScreenSlider
         isOpen={isOpen}
         currentImage={currentImage}
@@ -140,7 +140,7 @@ const SingleChatProfile = () => {
           </div>
         )}
       </main>
-    </>
+    </div>
   );
 };
 

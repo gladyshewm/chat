@@ -282,8 +282,10 @@ export type QueryUserAvatarArgs = {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  /** Подписка на изменения существующего чата */
   chatById?: Maybe<ChatWithoutMessages>;
   messageSent: Message;
+  /** Подписка на создание нового чата */
   newChatCreated?: Maybe<ChatWithoutMessages>;
   userTyping: TypingFeedback;
 };

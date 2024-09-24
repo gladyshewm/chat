@@ -91,38 +91,40 @@ const MessagesList = ({ setIsProfileSettings }: MessagesListProps) => {
             ) : (
               <SidebarMotionScale
                 key="messages"
-                id="message-list"
+                className="message-list"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
               >
-                <Chats
-                  user={user}
-                  chats={chats}
-                  chatsLoading={chatsLoading}
-                  chatsError={chatsError}
-                  activeChatId={id}
-                />
-                <AnimatePresence mode="wait">
-                  {isHovered && (
-                    <motion.button
-                      className="create-chat-button"
-                      key="create-chat-button"
-                      onClick={handleCreateChatClick}
-                      variants={createChatButtonVariants}
-                      initial="hidden"
-                      animate="animate"
-                      exit="exit"
-                      whileHover={{
-                        opacity: 1,
-                        transition: { duration: 0.3 },
-                      }}
-                    >
-                      <abbr title="Создать групповой чат">
-                        <PlusIcon />
-                      </abbr>
-                    </motion.button>
-                  )}
-                </AnimatePresence>
+                <div className="chats-container">
+                  <Chats
+                    user={user}
+                    chats={chats}
+                    chatsLoading={chatsLoading}
+                    chatsError={chatsError}
+                    activeChatId={id}
+                  />
+                  <AnimatePresence mode="wait">
+                    {isHovered && (
+                      <motion.button
+                        className="create-chat-button"
+                        key="create-chat-button"
+                        onClick={handleCreateChatClick}
+                        variants={createChatButtonVariants}
+                        initial="hidden"
+                        animate="animate"
+                        exit="exit"
+                        whileHover={{
+                          opacity: 1,
+                          transition: { duration: 0.3 },
+                        }}
+                      >
+                        <abbr title="Создать групповой чат">
+                          <PlusIcon />
+                        </abbr>
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
+                </div>
               </SidebarMotionScale>
             )}
           </AnimatePresence>

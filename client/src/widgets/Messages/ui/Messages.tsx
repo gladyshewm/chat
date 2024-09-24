@@ -14,7 +14,7 @@ import {
   useMessageSentSubscription,
 } from './messages.generated';
 import { groupMessagesByDate } from '../utils';
-import { containerVariants } from './motion';
+import { containerVariants, wrapperVariants } from './motion';
 import { UserIcon } from '@shared/assets';
 import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
 
@@ -67,7 +67,7 @@ const Messages = ({
     onError: (error) => {
       console.error(error);
     },
-    // fetchPolicy: 'cache-and-network',
+    fetchPolicy: 'cache-and-network',
   });
 
   useMessageSentSubscription({
@@ -79,15 +79,12 @@ const Messages = ({
     },
     onData: (data) => {
       if (!data || !data.data.data?.messageSent) return;
+      const newMessage = data.data.data.messageSent;
+
       setMessages((prevMessages) => {
-        const newMessage = data.data.data?.messageSent;
-        if (!newMessage) return prevMessages;
-
-        const existingMessage = prevMessages.find(
-          (msg) => msg.id === newMessage.id,
-        );
-
-        if (existingMessage) return prevMessages;
+        if (prevMessages.some((msg) => msg.id === newMessage.id)) {
+          return prevMessages;
+        }
 
         return [newMessage, ...prevMessages];
       });
@@ -251,7 +248,15 @@ const Messages = ({
         {Object.keys(groupedMessages)
           .reverse()
           .map((date) => (
-            <motion.div className="wrapper" key={date}>
+            <motion.div
+              className="wrapper"
+              key={date}
+              variants={wrapperVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              transition={{ duration: 0.3 }}
+            >
               <motion.div className="date-divider">
                 <time>{date}</time>
               </motion.div>

@@ -1,5 +1,5 @@
 export const sidebarMotionScaleVariants = {
-  hidden: { scale: 0.95, opacity: 0.8 },
+  hidden: { scale: 0.95, opacity: 0 },
   visible: { scale: 1, opacity: 1 },
 };
 

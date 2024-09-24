@@ -28,7 +28,7 @@ export const ImageLoader = ({
       setTimeout(() => {
         setImageLoaded(true);
         setDimensions({ width: img.width, height: img.height });
-      }, 0);
+      }, 3330);
     }; */
     img.src = src;
   }, [src]);

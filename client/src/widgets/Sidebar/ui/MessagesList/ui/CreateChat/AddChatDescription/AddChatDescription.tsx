@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import './AddChatDescription.css';
 import { motion } from 'framer-motion';
@@ -15,7 +16,6 @@ import { createChatButtonVariants } from '../../motion';
 import { AvatarUploader } from '@features';
 import { formatParticipants } from '@shared/utils';
 import { useCreateChatSidebarMutation } from '../../Search/ui/SearchResultItem/search-result-item.generated';
-import { useNavigate } from 'react-router-dom';
 import { useNewChatCreatedSubscription } from './add-chat-description.generated';
 
 interface AddChatDescriptionProps {
@@ -68,7 +68,7 @@ export const AddChatDescription = ({
   };
 
   return (
-    <div id="add-chat-description">
+    <div className="add-chat-description">
       {loading && <Loader />}
       <DrawOutline orientation="horizontal" position="bottom">
         <header>
