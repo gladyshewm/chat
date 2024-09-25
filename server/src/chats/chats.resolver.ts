@@ -38,12 +38,6 @@ export class ChatsResolver {
     );
   }
 
-  @UseGuards(JwtWsAuthGuard)
-  @Subscription('newChatCreated')
-  getNewChatSub() {
-    return this.pubSub.asyncIterator('newChatCreated');
-  }
-
   @UseGuards(JwtHttpAuthGuard)
   @Mutation('deleteChat')
   async deleteChat(
@@ -59,6 +53,12 @@ export class ChatsResolver {
     @Context('user_uuid') userUuid: string,
   ): Promise<ChatWithoutMessages[]> {
     return this.chatsService.getUserChats(userUuid);
+  }
+
+  @UseGuards(JwtWsAuthGuard)
+  @Subscription('userChats')
+  getUserChatsSub() {
+    return this.pubSub.asyncIterator('userChats');
   }
 
   @UseGuards(JwtHttpAuthGuard)

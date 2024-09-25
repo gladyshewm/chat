@@ -74,8 +74,14 @@ export class ChatsService {
         chat.groupAvatarUrl = avatarUrl;
       }
 
-      this.pubSub.publish('newChatCreated', {
-        newChatCreated: chat,
+      const updatedChats = await this.getUserChats(userUuid);
+
+      if (!updatedChats.some((updChat) => updChat.id === chat.id)) {
+        updatedChats.push(chat);
+      }
+
+      await this.pubSub.publish('userChats', {
+        userChats: updatedChats,
       });
 
       return chat;
@@ -85,14 +91,52 @@ export class ChatsService {
     }
   }
 
+  // TODO: тут в идеале транзакция
   async deleteChat(chatId: string, userUuid: string): Promise<boolean> {
     try {
       const chat = await this.chatRepository.getChatById(chatId);
 
       if (chat.is_group_chat) {
-        return this.chatRepository.deleteGroupChat(chat.chat_id, userUuid);
+        const avatars = await this.getChatAllAvatars(chatId);
+
+        if (avatars && avatars.length > 0) {
+          await Promise.all(
+            avatars.map(async (file) => {
+              const isRemoved =
+                await this.chatRepository.removeAvatarFromStorage(
+                  `chats/${chatId}/${file.name}`,
+                );
+
+              if (!isRemoved) {
+                throw new Error(
+                  `Не удалось удалить аватар из хранилища: ${file.name}`,
+                );
+              }
+            }),
+          );
+        }
+
+        const isDeleted = this.chatRepository.deleteGroupChat(
+          chat.chat_id,
+          userUuid,
+        );
+
+        const updatedChats = await this.getUserChats(userUuid);
+        updatedChats.filter((updChat) => updChat.id !== chatId);
+        await this.pubSub.publish('userChats', { userChats: updatedChats });
+
+        return isDeleted;
       } else {
-        return this.chatRepository.deleteOneOnOneChat(chat.chat_id, userUuid);
+        const isDeleted = await this.chatRepository.deleteOneOnOneChat(
+          chat.chat_id,
+          userUuid,
+        );
+
+        const updatedChats = await this.getUserChats(userUuid);
+        updatedChats.filter((updChat) => updChat.id !== chatId);
+        await this.pubSub.publish('userChats', { userChats: updatedChats });
+
+        return isDeleted;
       }
     } catch (error) {
       this.logger.error(`Ошибка при удалении чата: ${error.message}`);

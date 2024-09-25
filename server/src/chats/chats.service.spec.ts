@@ -119,6 +119,10 @@ describe('ChatsService', () => {
         });
       });
       chatRepository.createParty.mockResolvedValue();
+      chatRepository.getChatsByUserId.mockResolvedValue([
+        chatWithParticipantsDataStub(),
+        chatWithParticipantsDataStub(),
+      ]);
     });
 
     it("should include the creator's uuid in the list of participants", async () => {
@@ -199,6 +203,7 @@ describe('ChatsService', () => {
     const chatId = 'testChatId';
     const name = 'testChatName';
     const isGroupChat = false;
+    const avatars = [fileStub(), fileStub()];
 
     beforeEach(async () => {
       chatRepository.getChatById.mockResolvedValue(
@@ -206,6 +211,13 @@ describe('ChatsService', () => {
       );
       chatRepository.deleteOneOnOneChat.mockResolvedValue(true);
       chatRepository.deleteGroupChat.mockResolvedValue(true);
+      chatRepository.getChatAvatars.mockResolvedValue(avatars);
+      chatRepository.getAvatarPublicUrl.mockResolvedValue('publicUrl');
+      chatRepository.removeAvatarFromStorage.mockResolvedValue(true);
+      chatRepository.getChatsByUserId.mockResolvedValue([
+        chatWithParticipantsDataStub(),
+        chatWithParticipantsDataStub(),
+      ]);
     });
 
     it('should call chatRepository.getChatById', async () => {

@@ -137,6 +137,8 @@ export abstract class ISubscription {
 
     abstract newChatCreated(): Nullable<ChatWithoutMessages> | Promise<Nullable<ChatWithoutMessages>>;
 
+    abstract userChats(): ChatWithoutMessages[] | Promise<ChatWithoutMessages[]>;
+
     abstract messageSent(chatId: string): Message | Promise<Message>;
 
     abstract userTyping(chatId: string): TypingFeedback | Promise<TypingFeedback>;

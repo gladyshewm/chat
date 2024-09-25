@@ -72,6 +72,6 @@ type Mutation {
 type Subscription {
   "Подписка на изменения существующего чата"
   chatById(chatId: ID!): ChatWithoutMessages
-  "Подписка на создание нового чата"
-  newChatCreated: ChatWithoutMessages
+  "Подписка на изменения списка чатов"
+  userChats: [ChatWithoutMessages!]!
 }

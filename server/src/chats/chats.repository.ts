@@ -10,7 +10,6 @@ import {
   GroupAvatarData,
   PartyItem,
 } from './models/chats.model';
-
 export const CHAT_REPOSITORY = 'CHAT_REPOSITORY';
 
 export interface ChatRepository {
@@ -44,7 +43,7 @@ export interface ChatRepository {
   ): Promise<void>;
   getCurrentChatAvatar(chatId: string): Promise<{ avatar_url: string }>;
   checkDeleteAccess(file_path: string): Promise<boolean>;
-  removeAvatarFromStorage(avatarPath: string): Promise<void>;
+  removeAvatarFromStorage(avatarPath: string): Promise<boolean>;
   getChatAvatars(chatId: string): Promise<FileObject[]>;
 }
 
@@ -53,6 +52,51 @@ export class SupabaseChatRepository implements ChatRepository {
   private readonly logger = new Logger(SupabaseChatRepository.name);
 
   constructor(private readonly supabaseService: SupabaseService) {}
+
+  /* 
+  private chatChannel: RealtimeChannel;
+
+  async onModuleInit() {
+    this.chatChannel = this.supabaseService
+      .getClient()
+      .channel('chats')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'chat' },
+        (payload) => this.handleChatChanges(payload),
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          this.logger.log('Подписка на изменения чатов активирована');
+        }
+      });
+  }
+
+  async onModuleDestroy() {
+    if (this.chatChannel) {
+      await this.supabaseService.getClient().removeChannel(this.chatChannel);
+      this.logger.log('Подписка на изменения чатов деактивирована');
+    }
+  }
+
+  private handleChatChanges(payload: any) {
+    this.logger.log(`Изменение в таблице chat: ${JSON.stringify(payload)}`);
+    console.log([payload.new]);
+
+    switch (payload.eventType) {
+      case 'INSERT':
+        this.pubSub.publish('userChats', { userChats: [payload.new] });
+        break;
+      case 'UPDATE':
+        this.pubSub.publish('userChats', { userChats: [payload.new] });
+        break;
+      case 'DELETE':
+        this.pubSub.publish('userChats', { userChats: [payload.old] });
+        break;
+      default:
+        break;
+    }
+  } */
 
   async isParticipant(chatId: string, userUuid: string): Promise<boolean> {
     const response = (await this.supabaseService
@@ -469,8 +513,8 @@ export class SupabaseChatRepository implements ChatRepository {
     return hasAccess;
   }
 
-  async removeAvatarFromStorage(avatarPath: string): Promise<void> {
-    const { error: deleteError } = await this.supabaseService
+  async removeAvatarFromStorage(avatarPath: string): Promise<boolean> {
+    const { data, error: deleteError } = await this.supabaseService
       .getClient()
       .storage.from('avatars')
       .remove([avatarPath]);
@@ -482,6 +526,8 @@ export class SupabaseChatRepository implements ChatRepository {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+
+    return !!data;
   }
 
   async getChatAvatars(chatId: string): Promise<FileObject[]> {
