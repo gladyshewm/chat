@@ -12,6 +12,25 @@ import {
   useRemoveUserFromChatMutation,
 } from './chat-participant.generated';
 import { actionButtonVariants } from './motion';
+import { gql } from '@apollo/client';
+
+const CHAT_BY_ID_QUERY = gql`
+  query chatById($chatId: ID!) {
+    chatById(chatId: $chatId) {
+      id
+      name
+      userUuid
+      isGroupChat
+      groupAvatarUrl
+      participants {
+        id
+        name
+        avatarUrl
+      }
+      createdAt
+    }
+  }
+`;
 
 interface ChatParticipantProps {
   chat: ChatWithoutMessages;
@@ -35,7 +54,19 @@ export const ChatParticipant = ({
   });
   const [createChat] = useCreateChatMutation();
   const [removeUserFromChat, { loading: removeUserLoading }] =
-    useRemoveUserFromChatMutation();
+    useRemoveUserFromChatMutation({
+      fetchPolicy: 'no-cache',
+      update(cache, { data }) {
+        if (!data?.removeUserFromChat) return;
+        const updatedChat = data.removeUserFromChat;
+        cache.writeQuery({
+          query: CHAT_BY_ID_QUERY, // Тот же запрос, который используется для получения чата в Chat
+          data: { chatById: updatedChat },
+          variables: { chatId: updatedChat.id },
+          overwrite: true,
+        });
+      },
+    });
 
   const handleClick = async () => {
     if (user?.uuid === participant.id) return;

@@ -287,6 +287,8 @@ export type Subscription = {
   messageSent: Message;
   /** Подписка на создание нового чата */
   newChatCreated?: Maybe<ChatWithoutMessages>;
+  /** Подписка на изменения списка чатов */
+  userChats: Array<ChatWithoutMessages>;
   userTyping: TypingFeedback;
 };
 

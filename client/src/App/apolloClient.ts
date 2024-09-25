@@ -83,9 +83,11 @@ const splitLink: ApolloLink = split(
 
 export const apolloClient: ApolloClient<any> = new ApolloClient({
   link: splitLink,
+  // defaultOptions: {}, TODO:
   cache: new InMemoryCache({
     typePolicies: {
       ChatWithoutMessages: {
+        keyFields: ['id'],
         fields: {
           participants: {
             merge(existing = [], incoming) {

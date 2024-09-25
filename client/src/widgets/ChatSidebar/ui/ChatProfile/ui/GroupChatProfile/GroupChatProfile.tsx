@@ -136,9 +136,7 @@ const GroupChatProfile = ({
             {errorAllAvatars || !avatars.length ? (
               <UserGroupIcon />
             ) : avatars.length > 1 ? (
-              <>
-                <Slider images={avatarsUrls} onImageClick={handleImageClick} />
-              </>
+              <Slider images={avatarsUrls} onImageClick={handleImageClick} />
             ) : (
               chat.groupAvatarUrl && (
                 <img

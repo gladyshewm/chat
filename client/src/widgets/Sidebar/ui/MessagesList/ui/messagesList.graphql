@@ -21,3 +21,19 @@ query userChats {
     }
   }
 }
+
+subscription userChatsSub {
+  userChats {
+    id
+    userUuid
+    name
+    isGroupChat
+    groupAvatarUrl
+    createdAt
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+}

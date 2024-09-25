@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import './MessagesList.css';
 import { useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   useFindUsersLazyQuery,
-  useUserChatsLazyQuery,
+  useUserChatsQuery,
+  useUserChatsSubSubscription,
 } from './messagesList.generated';
 import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
 import { createChatButtonVariants } from './motion';
@@ -33,29 +34,25 @@ const MessagesList = ({ setIsProfileSettings }: MessagesListProps) => {
 
   const [findUsers, { loading: searchLoading, error: searchError }] =
     useFindUsersLazyQuery();
-  const [userChatsQuery, { error: chatsError, loading: chatsLoading }] =
-    useUserChatsLazyQuery();
 
-  useEffect(() => {
-    const fetchUserChat = async () => {
-      const { data: chatsData } = await userChatsQuery({});
+  const { loading: chatsLoading, error: chatsError } = useUserChatsQuery({
+    onCompleted: (data) => {
+      if (!data.userChats) return;
+      setChats(data.userChats as ChatWithoutMessages[]);
+    },
+    onError: (error) => {
+      setChats(null);
+      console.error(error);
+    },
+  });
 
-      if (chatsError) {
-        setChats(null);
-        console.error(chatsError);
-        return;
-      }
-
-      if (!chatsData || chatsData.userChats.length === 0) {
-        setChats(null);
-        return;
-      }
-
-      setChats(chatsData.userChats as ChatWithoutMessages[]);
-    };
-
-    fetchUserChat();
-  }, [userChatsQuery, chatsError]);
+  useUserChatsSubSubscription({
+    onData: ({ data }) => {
+      if (!data.data?.userChats) return;
+      setChats(data.data.userChats as ChatWithoutMessages[]);
+    },
+    // fetchPolicy: 'no-cache',
+  });
 
   const handleCreateChatClick = () => {
     setIsCreateChat(true);

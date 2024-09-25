@@ -15,6 +15,11 @@ export type UserChatsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 export type UserChatsQuery = { __typename?: 'Query', userChats: Array<{ __typename?: 'ChatWithoutMessages', id: string, userUuid: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> }> };
 
+export type UserChatsSubSubscriptionVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type UserChatsSubSubscription = { __typename?: 'Subscription', userChats: Array<{ __typename?: 'ChatWithoutMessages', id: string, userUuid: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> }> };
+
 
 export const FindUsersDocument = gql`
     query findUsers($input: String!) {
@@ -107,3 +112,42 @@ export type UserChatsQueryHookResult = ReturnType<typeof useUserChatsQuery>;
 export type UserChatsLazyQueryHookResult = ReturnType<typeof useUserChatsLazyQuery>;
 export type UserChatsSuspenseQueryHookResult = ReturnType<typeof useUserChatsSuspenseQuery>;
 export type UserChatsQueryResult = Apollo.QueryResult<UserChatsQuery, UserChatsQueryVariables>;
+export const UserChatsSubDocument = gql`
+    subscription userChatsSub {
+  userChats {
+    id
+    userUuid
+    name
+    isGroupChat
+    groupAvatarUrl
+    createdAt
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+}
+    `;
+
+/**
+ * __useUserChatsSubSubscription__
+ *
+ * To run a query within a React component, call `useUserChatsSubSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useUserChatsSubSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useUserChatsSubSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useUserChatsSubSubscription(baseOptions?: Apollo.SubscriptionHookOptions<UserChatsSubSubscription, UserChatsSubSubscriptionVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useSubscription<UserChatsSubSubscription, UserChatsSubSubscriptionVariables>(UserChatsSubDocument, options);
+      }
+export type UserChatsSubSubscriptionHookResult = ReturnType<typeof useUserChatsSubSubscription>;
+export type UserChatsSubSubscriptionResult = Apollo.SubscriptionResult<UserChatsSubSubscription>;

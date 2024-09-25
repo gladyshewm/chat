@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ApolloError } from '@apollo/client';
+import { ApolloError, gql } from '@apollo/client';
 import { motion } from 'framer-motion';
 import { Cross, DrawOutlineRect, Loader, SearchIllustration } from '@shared/ui';
 import { ExclamationTriangleIcon } from '@shared/assets';
@@ -7,6 +7,24 @@ import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
 import { SearchUserItem } from './SearchUserItem';
 import { useAddUserToChatMutation } from './search-result.generated';
 import { SuccessMessage } from '@features';
+
+const CHAT_BY_ID_QUERY = gql`
+  query chatById($chatId: ID!) {
+    chatById(chatId: $chatId) {
+      id
+      name
+      userUuid
+      isGroupChat
+      groupAvatarUrl
+      participants {
+        id
+        name
+        avatarUrl
+      }
+      createdAt
+    }
+  }
+`;
 
 interface SearchResultProps {
   searchValue: string;
@@ -26,7 +44,18 @@ export const SearchResult = ({
   chat,
 }: SearchResultProps) => {
   const [successMessage, setSuccessMessage] = useState<string[]>([]);
-  const [addUserToChat, { loading }] = useAddUserToChatMutation();
+  const [addUserToChat, { loading }] = useAddUserToChatMutation({
+    update(cache, { data }) {
+      if (!data?.addUserToChat) return;
+      const updatedChat = data.addUserToChat;
+      cache.writeQuery({
+        query: CHAT_BY_ID_QUERY,
+        data: { chatById: updatedChat },
+        variables: { chatId: updatedChat.id },
+        overwrite: true,
+      });
+    },
+  });
 
   if (searchValue !== '' && searchLoading) {
     return (

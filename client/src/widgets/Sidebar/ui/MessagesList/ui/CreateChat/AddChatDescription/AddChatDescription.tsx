@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Formik } from 'formik';
 import './AddChatDescription.css';
@@ -16,7 +16,6 @@ import { createChatButtonVariants } from '../../motion';
 import { AvatarUploader } from '@features';
 import { formatParticipants } from '@shared/utils';
 import { useCreateChatSidebarMutation } from '../../Search/ui/SearchResultItem/search-result-item.generated';
-import { useNewChatCreatedSubscription } from './add-chat-description.generated';
 
 interface AddChatDescriptionProps {
   setIsCreateChat: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,16 +31,6 @@ export const AddChatDescription = ({
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null);
   const navigate = useNavigate();
   const [createChat, { loading, error }] = useCreateChatSidebarMutation();
-  const { data: newChatData } = useNewChatCreatedSubscription();
-
-  useEffect(() => {
-    if (newChatData && newChatData.newChatCreated) {
-      const newChat = newChatData.newChatCreated;
-      setIsChatDescription(false);
-      setIsCreateChat(false);
-      navigate(`/chat/${newChat.id}`);
-    }
-  }, [newChatData, navigate, setIsChatDescription, setIsCreateChat]);
 
   const handleBackClick = () => {
     setIsChatDescription(false);
