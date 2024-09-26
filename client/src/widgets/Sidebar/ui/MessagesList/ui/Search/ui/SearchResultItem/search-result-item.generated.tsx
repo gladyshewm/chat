@@ -1,6 +1,7 @@
 import * as Types from '@shared/types';
 
 import { gql } from '@apollo/client';
+import { CoreUserChatsFieldsFragmentDoc } from '../../../messagesList.generated';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type ChatWithUserQueryVariables = Types.Exact<{
@@ -17,7 +18,7 @@ export type CreateChatSidebarMutationVariables = Types.Exact<{
 }>;
 
 
-export type CreateChatSidebarMutation = { __typename?: 'Mutation', createChat: { __typename?: 'ChatWithoutMessages', id: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> } };
+export type CreateChatSidebarMutation = { __typename?: 'Mutation', createChat: { __typename?: 'ChatWithoutMessages', id: string, userUuid: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> } };
 
 
 export const ChatWithUserDocument = gql`
@@ -69,19 +70,10 @@ export type ChatWithUserQueryResult = Apollo.QueryResult<ChatWithUserQuery, Chat
 export const CreateChatSidebarDocument = gql`
     mutation createChatSidebar($participantsIds: [ID!]!, $name: String, $avatar: Upload) {
   createChat(participantsIds: $participantsIds, name: $name, avatar: $avatar) {
-    id
-    name
-    isGroupChat
-    groupAvatarUrl
-    isGroupChat
-    participants {
-      id
-      name
-      avatarUrl
-    }
+    ...coreUserChatsFields
   }
 }
-    `;
+    ${CoreUserChatsFieldsFragmentDoc}`;
 export type CreateChatSidebarMutationFn = Apollo.MutationFunction<CreateChatSidebarMutation, CreateChatSidebarMutationVariables>;
 
 /**

@@ -86,6 +86,34 @@ export const apolloClient: ApolloClient<any> = new ApolloClient({
   // defaultOptions: {}, TODO:
   cache: new InMemoryCache({
     typePolicies: {
+      Query: {
+        fields: {
+          userChats: {
+            merge(existing = [], incoming) {
+              const mergedChats = [...existing, ...incoming].filter(
+                (chat, index, self) =>
+                  index ===
+                  self.findIndex((c) => c.__ref === chat.__ref),
+              );
+              return mergedChats;
+            },
+          },
+        },
+      },
+      Subscription: {
+        fields: {
+          userChats: {
+            merge(existing = [], incoming) {
+              const mergedChats = [...existing, ...incoming].filter(
+                (chat, index, self) =>
+                  index ===
+                  self.findIndex((c) => c.__ref === chat.__ref),
+              );
+              return mergedChats;
+            },
+          },
+        },
+      },
       ChatWithoutMessages: {
         keyFields: ['id'],
         fields: {
@@ -100,6 +128,9 @@ export const apolloClient: ApolloClient<any> = new ApolloClient({
             },
           },
         },
+      },
+      UserWithAvatar: {
+        keyFields: ['id'],
       },
     },
   }),

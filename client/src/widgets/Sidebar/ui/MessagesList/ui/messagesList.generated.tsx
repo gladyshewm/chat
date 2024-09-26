@@ -10,6 +10,8 @@ export type FindUsersQueryVariables = Types.Exact<{
 
 export type FindUsersQuery = { __typename?: 'Query', findUsers: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null } | null> };
 
+export type CoreUserChatsFieldsFragment = { __typename?: 'ChatWithoutMessages', id: string, userUuid: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> };
+
 export type UserChatsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
@@ -20,7 +22,21 @@ export type UserChatsSubSubscriptionVariables = Types.Exact<{ [key: string]: nev
 
 export type UserChatsSubSubscription = { __typename?: 'Subscription', userChats: Array<{ __typename?: 'ChatWithoutMessages', id: string, userUuid: string, name?: string | null, isGroupChat: boolean, groupAvatarUrl?: string | null, createdAt: any, participants: Array<{ __typename?: 'UserWithAvatar', id: string, name: string, avatarUrl?: string | null }> }> };
 
-
+export const CoreUserChatsFieldsFragmentDoc = gql`
+    fragment coreUserChatsFields on ChatWithoutMessages {
+  id
+  userUuid
+  name
+  isGroupChat
+  groupAvatarUrl
+  createdAt
+  participants {
+    id
+    name
+    avatarUrl
+  }
+}
+    `;
 export const FindUsersDocument = gql`
     query findUsers($input: String!) {
   findUsers(input: $input) {
@@ -66,20 +82,10 @@ export type FindUsersQueryResult = Apollo.QueryResult<FindUsersQuery, FindUsersQ
 export const UserChatsDocument = gql`
     query userChats {
   userChats {
-    id
-    userUuid
-    name
-    isGroupChat
-    groupAvatarUrl
-    createdAt
-    participants {
-      id
-      name
-      avatarUrl
-    }
+    ...coreUserChatsFields
   }
 }
-    `;
+    ${CoreUserChatsFieldsFragmentDoc}`;
 
 /**
  * __useUserChatsQuery__
@@ -115,20 +121,10 @@ export type UserChatsQueryResult = Apollo.QueryResult<UserChatsQuery, UserChatsQ
 export const UserChatsSubDocument = gql`
     subscription userChatsSub {
   userChats {
-    id
-    userUuid
-    name
-    isGroupChat
-    groupAvatarUrl
-    createdAt
-    participants {
-      id
-      name
-      avatarUrl
-    }
+    ...coreUserChatsFields
   }
 }
-    `;
+    ${CoreUserChatsFieldsFragmentDoc}`;
 
 /**
  * __useUserChatsSubSubscription__

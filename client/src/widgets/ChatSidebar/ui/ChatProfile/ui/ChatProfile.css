@@ -1,11 +1,16 @@
-#chat-profile__header {
+.chat-profile__header {
   display: flex;
   align-items: center;
   height: 5.7rem;
   width: 100%;
+  padding: 0 1.5rem;
 
   & .close-button {
-    margin-left: 1.5rem;
+    margin-right: 0.8rem;
+
+    &.action {
+      margin-right: 0;
+    }
 
     & abbr {
       display: flex;
@@ -17,7 +22,6 @@
 
       & svg {
         stroke: #fff;
-        transition: stroke 0.3s ease;
       }
     }
   }
@@ -27,12 +31,52 @@
     display: flex;
     align-items: center;
     height: 2.8rem;
-    padding-left: 0.7rem;
 
     & p {
       font-size: 1.3rem;
       font-weight: bold;
       color: #fff;
+    }
+  }
+
+  & .action-button {
+    z-index: 99;
+    position: absolute;
+    right: 1.5rem;
+    bottom: -3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 1rem;
+    padding: 0 0.7rem;
+    height: 3rem;
+    width: 12rem;
+    background-color: rgba(25, 25, 25, 0.8);
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(153, 153, 153, 0.3);
+      transition: background-color 0.3s ease;
+    }
+
+    & .action-button__text {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 0 0.7rem;
+
+      & p {
+        font-size: 0.9rem;
+        color: #fff;
+      }
+
+      & svg {
+        stroke: #fff;
+        margin-right: 1.5rem;
+      }
     }
   }
 }

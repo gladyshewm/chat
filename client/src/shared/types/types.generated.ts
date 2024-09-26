@@ -285,8 +285,6 @@ export type Subscription = {
   /** Подписка на изменения существующего чата */
   chatById?: Maybe<ChatWithoutMessages>;
   messageSent: Message;
-  /** Подписка на создание нового чата */
-  newChatCreated?: Maybe<ChatWithoutMessages>;
   /** Подписка на изменения списка чатов */
   userChats: Array<ChatWithoutMessages>;
   userTyping: TypingFeedback;

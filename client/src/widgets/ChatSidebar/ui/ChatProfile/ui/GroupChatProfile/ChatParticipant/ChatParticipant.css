@@ -28,7 +28,7 @@
 
       &:hover {
         cursor: pointer;
-        background-color: rgba(25, 25, 25, 1);
+        background-color: var(--outline-hover-color);
         transition: background-color 0.3s ease;
       }
 

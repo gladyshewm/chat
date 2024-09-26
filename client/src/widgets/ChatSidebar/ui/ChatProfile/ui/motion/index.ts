@@ -9,3 +9,28 @@ export const chatProfileVariants = {
     },
   },
 };
+
+export const deleteChatButtonTransition = {
+  type: 'spring',
+  duration: 0.3,
+  ease: 'linear',
+};
+
+
+export const deleteChatButtonVariants = {
+  initial: {
+    opacity: 0,
+    y: -10,
+    transition: deleteChatButtonTransition,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: deleteChatButtonTransition,
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    transition: deleteChatButtonTransition,
+  },
+};

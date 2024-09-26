@@ -16,6 +16,23 @@ import { createChatButtonVariants } from '../../motion';
 import { AvatarUploader } from '@features';
 import { formatParticipants } from '@shared/utils';
 import { useCreateChatSidebarMutation } from '../../Search/ui/SearchResultItem/search-result-item.generated';
+import { gql } from '@apollo/client';
+
+const NEW_CHAT_FRAGMENT = gql`
+  fragment NewChat on ChatWithoutMessages {
+    id
+    userUuid
+    name
+    isGroupChat
+    groupAvatarUrl
+    createdAt
+    participants {
+      id
+      name
+      avatarUrl
+    }
+  }
+`;
 
 interface AddChatDescriptionProps {
   setIsCreateChat: React.Dispatch<React.SetStateAction<boolean>>;
@@ -46,6 +63,31 @@ export const AddChatDescription = ({
         name: values.chatName || '',
         participantsIds: selectedUsers.map((user) => user.id),
         avatar: selectedAvatar,
+      },
+      update: (cache, { data }) => {
+        if (!data || !data.createChat) return;
+        const createChat = data.createChat;
+        const chatId = cache.identify(createChat);
+
+        cache.modify({
+          fields: {
+            userChats(existingChats = [], { readField }) {
+              const isChatExists = existingChats.some(
+                (chatRef: any) => readField('id', chatRef) === chatId,
+              );
+              if (isChatExists) return existingChats;
+
+              const newChatRef = cache.writeFragment({
+                data: createChat,
+                fragment: NEW_CHAT_FRAGMENT,
+              });
+              return [...existingChats, newChatRef];
+            },
+          },
+        });
+      },
+      onError: (error) => {
+        console.log(`Ошибка при создании чата: ${error}`);
       },
     });
 

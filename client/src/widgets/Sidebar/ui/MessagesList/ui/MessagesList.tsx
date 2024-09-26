@@ -48,10 +48,13 @@ const MessagesList = ({ setIsProfileSettings }: MessagesListProps) => {
 
   useUserChatsSubSubscription({
     onData: ({ data }) => {
+      console.log(data);
       if (!data.data?.userChats) return;
       setChats(data.data.userChats as ChatWithoutMessages[]);
     },
-    // fetchPolicy: 'no-cache',
+    onError: (error) => {
+      console.error(error);
+    },
   });
 
   const handleCreateChatClick = () => {

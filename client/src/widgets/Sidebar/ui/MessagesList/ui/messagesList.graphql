@@ -6,34 +6,28 @@ query findUsers($input: String!) {
   }
 }
 
+fragment coreUserChatsFields on ChatWithoutMessages {
+  id
+  userUuid
+  name
+  isGroupChat
+  groupAvatarUrl
+  createdAt
+  participants {
+    id
+    name
+    avatarUrl
+  }
+}
+
 query userChats {
   userChats {
-    id
-    userUuid
-    name
-    isGroupChat
-    groupAvatarUrl
-    createdAt
-    participants {
-      id
-      name
-      avatarUrl
-    }
+    ...coreUserChatsFields
   }
 }
 
 subscription userChatsSub {
   userChats {
-    id
-    userUuid
-    name
-    isGroupChat
-    groupAvatarUrl
-    createdAt
-    participants {
-      id
-      name
-      avatarUrl
-    }
+    ...coreUserChatsFields
   }
 }

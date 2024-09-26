@@ -16,15 +16,6 @@ mutation createChatSidebar(
   $avatar: Upload
 ) {
   createChat(participantsIds: $participantsIds, name: $name, avatar: $avatar) {
-    id
-    name
-    isGroupChat
-    groupAvatarUrl
-    isGroupChat
-    participants {
-      id
-      name
-      avatarUrl
-    }
+    ...coreUserChatsFields
   }
 }
