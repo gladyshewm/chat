@@ -1,73 +1,110 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Messenger App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This is a full-stack web application designed to enable seamless communication between users in a real-time chat interface. The project consists of a `client` (frontend) and `server` (backend), both of which are developed using modern web technologies such as React, NestJS, GraphQL, and Supabase for database management and authentication. The application supports both HTTP and WebSocket connections for a robust real-time experience.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Project Structure
 
-## Description
+- **Client:** A React-based frontend application built using TypeScript. It handles user interactions, real-time messaging, and communicates with the backend using Apollo Client for GraphQL queries, mutations and subscriptions.
+- **Server:** A NestJS-based backend that manages authentication (JWT), chat and user management, file uploads, and real-time message handling. Supabase is integrated for database management and user authentication.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Key Features
 
-## Installation
+- **JWT Authentication**: Secure authentication using JSON Web Tokens for both HTTP and WebSocket connections.
+- **Real-time Communication**: Chats and messages are updated in real-time using WebSockets.
+- **User and Chat Management**: Create, update, and delete users and chats seamlessly.
+- **File Uploads**: Handle file uploads via GraphQL using `graphql-upload`.
+- **Database Management**: Supabase is used for managing user data and chat storage.
+- **Custom Scalars in GraphQL**: Implemented custom GraphQL scalars for handling dates and file uploads efficiently.
+- **Test-Driven Development (TDD)**: The server code is thoroughly tested using Jest and Testing Library.
 
+## Technologies
+
+### Backend
+- **NestJS**
+- **TypeScript**
+- **GraphQL**
+- **Supabase**
+- **PostgreSQL**
+- **JWT**
+- **Docker**
+-  **Testing Library & Jest** for unit testing
+
+### Frontend
+- **React**
+- **TypeScript**
+- **Apollo Client**
+- **Formik & Yup** for form validation
+- **Framer Motion** for animations
+
+## Getting Started
+
+### Prerequisites
+
+- Docker installed on your machine.
+- Node.js and npm installed.
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/gladyshewm/chat.git
+   cd chat
+   ```
+2. Install dependencies for both client and server:
+   ```bash
+   cd client
+   npm install
+   cd ../server
+   npm install
+   ```
+
+### Running the App in Development Mode
+
+To run the app in development mode using Docker:
 ```bash
-$ npm install
+  docker compose --profile dev up --build
 ```
 
-## Running the app
+This will start both the client (on port 3000) and the server (on port 5000) in development mode.
 
+### Manual Run (Without Docker)
+
+Alternatively, you can run the client and server locally without Docker:
+
+1. Start the client:
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+  cd client
+  npm run start:dev
+```
+2. Start the server:
+```bash
+  cd server
+  npm run start:dev
 ```
 
-## Test
+### Running the App in Production Mode
+
+To run the app in production mode using Docker:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+  docker compose --profile prod up --build
 ```
 
-## Support
+This will build and start the client (on port 3000) and server (on port 5000) with production optimizations.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Testing
 
-## Stay in touch
+Uses Jest to test services, resolvers, and other backend components.
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Running Tests
 
-## License
+To run unit tests for the server:
+```bash
+  cd server
+  npm test
+```
 
-Nest is [MIT licensed](LICENSE).
+For end-to-end tests on the server:
+```bash
+  npm run test:e2e
+```
