@@ -8,7 +8,7 @@ import {
   Message,
   UserInfo,
 } from '@shared/types';
-import { ImageLoader, Loader, ScrollButton } from '@shared/ui';
+import { ImageLoader, ScrollButton } from '@shared/ui';
 import {
   useChatMessagesQuery,
   useMessageSentSubscription,
@@ -228,7 +228,7 @@ const Messages = ({
 
   return (
     <>
-      {loading && offset === 0 && <Loader />}
+      {/* {loading && offset === 0 && <Loader />} */}
       {error && <div>Ошибка: {error.message}</div>}
       <FullScreenSlider
         isOpen={isOpen}

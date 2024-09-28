@@ -5,6 +5,24 @@ import { DrawOutlineRect, Emoji } from '@shared/ui';
 import { SendIcon } from '@shared/assets';
 import FilePicker from './FilePicker/FilePicker';
 import { useSendMessageMutation } from './message-form.generated';
+import { gql } from '@apollo/client';
+import { useAuth } from '@app/providers/hooks/useAuth';
+
+const NEW_MESSAGE_FRAGMENT = gql`
+  fragment NewMessage on chatMessages {
+    id
+    userId
+    userName
+    content
+    avatarUrl
+    createdAt
+    attachedFiles {
+      fileId
+      fileUrl
+      fileName
+    }
+  }
+`;
 
 interface MessageFormProps {
   chat_id: string;
@@ -20,12 +38,13 @@ export const MessageForm = ({
   chat_id,
 }: MessageFormProps) => {
   const [postMessage, { loading, error }] = useSendMessageMutation();
+  const { user } = useAuth();
 
   const sendMessage = async (
     message: string | null,
     attachedFiles: File[] = [],
   ) => {
-    // const tempId = `temp_${Date.now()}`;
+    const tempId = `temp_${Date.now()}`;
     if (chat_id) {
       await postMessage({
         variables: {
@@ -33,51 +52,51 @@ export const MessageForm = ({
           content: message,
           attachedFiles: attachedFiles,
         },
-        /* optimisticResponse: {
+        update: (cache, { data }) => {
+          if (!data || !data.sendMessage) return;
+          const newMessage = data.sendMessage;
+          const messageId = cache.identify(newMessage);
+
+          cache.modify({
+            fields: {
+              chatMessages(
+                existingMessages = [],
+                { readField, storeFieldName },
+              ) {
+                const isMessageExists = existingMessages.some(
+                  (messageRef: any) =>
+                    readField('id', messageRef) === messageId,
+                );
+                if (isMessageExists) return existingMessages;
+
+                const match = storeFieldName.match(/chatMessages\((\{.*\})\)/);
+                if (!match) return existingMessages;
+                const args = JSON.parse(match[1]);
+
+                if (args.chatId !== chat_id) return existingMessages;
+
+                const newMessageRef = cache.writeFragment({
+                  data: newMessage,
+                  fragment: NEW_MESSAGE_FRAGMENT,
+                });
+
+                return [...existingMessages, newMessageRef];
+              },
+            },
+          });
+        },
+        optimisticResponse: {
           sendMessage: {
             __typename: 'Message',
-            id: tempId, //uuidv4()
-            chatId: chat_id,
-            userId: user.uuid as string,
-            userName: user.name as string,
+            id: tempId, //uuidv4()???
+            userName: user?.name as string,
+            userId: user?.uuid as string,
             content: message,
             avatarUrl: '',
             createdAt: new Date().toISOString(),
+            attachedFiles: [],
           },
         },
-        update: (cache, { data }) => {
-          if (data && data.sendMessage) {
-            const newMessage = data.sendMessage;
-            cache.modify({
-              fields: {
-                chatMessages(existingMessages = [], { readField }) {
-                  const newMessageRef = cache.writeFragment({
-                    data: newMessage,
-                    fragment: gql`
-                      fragment NewMessage on Message {
-                        id
-                        chatId
-                        userId
-                        userName
-                        content
-                        avatarUrl
-                        createdAt
-                      }
-                    `,
-                  });
-                  if (
-                    existingMessages.some(
-                      (ref: any) => readField('id', ref) === newMessage.id,
-                    )
-                  ) {
-                    return existingMessages;
-                  }
-                  return [...existingMessages, newMessageRef];
-                },
-              },
-            });
-          }
-        }, */
       });
     }
   };

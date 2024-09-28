@@ -92,8 +92,7 @@ export const apolloClient: ApolloClient<any> = new ApolloClient({
             merge(existing = [], incoming) {
               const mergedChats = [...existing, ...incoming].filter(
                 (chat, index, self) =>
-                  index ===
-                  self.findIndex((c) => c.__ref === chat.__ref),
+                  index === self.findIndex((c) => c.__ref === chat.__ref),
               );
               return mergedChats;
             },
@@ -106,8 +105,7 @@ export const apolloClient: ApolloClient<any> = new ApolloClient({
             merge(existing = [], incoming) {
               const mergedChats = [...existing, ...incoming].filter(
                 (chat, index, self) =>
-                  index ===
-                  self.findIndex((c) => c.__ref === chat.__ref),
+                  index === self.findIndex((c) => c.__ref === chat.__ref),
               );
               return mergedChats;
             },
@@ -131,6 +129,9 @@ export const apolloClient: ApolloClient<any> = new ApolloClient({
       },
       UserWithAvatar: {
         keyFields: ['id'],
+      },
+      chatMessages: {
+        keyFields: ['chatId'],
       },
     },
   }),

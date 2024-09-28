@@ -8,7 +8,9 @@ mutation sendMessage(
     content: $content
     attachedFiles: $attachedFiles
   ) {
+    id
     userName
+    userId
     content
     avatarUrl
     createdAt

@@ -10,13 +10,15 @@ export type SendMessageMutationVariables = Types.Exact<{
 }>;
 
 
-export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: { __typename?: 'Message', userName: string, content?: string | null, avatarUrl?: string | null, createdAt: any, attachedFiles: Array<{ __typename?: 'AttachedFile', fileId: string, fileUrl: string, fileName: string } | null> } };
+export type SendMessageMutation = { __typename?: 'Mutation', sendMessage: { __typename?: 'Message', id: string, userName: string, userId: string, content?: string | null, avatarUrl?: string | null, createdAt: any, attachedFiles: Array<{ __typename?: 'AttachedFile', fileId: string, fileUrl: string, fileName: string } | null> } };
 
 
 export const SendMessageDocument = gql`
     mutation sendMessage($chatId: ID!, $content: String, $attachedFiles: [Upload!]) {
   sendMessage(chatId: $chatId, content: $content, attachedFiles: $attachedFiles) {
+    id
     userName
+    userId
     content
     avatarUrl
     createdAt
