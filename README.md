@@ -108,3 +108,20 @@ For end-to-end tests on the server:
 ```bash
   npm run test:e2e
 ```
+
+### Environment Variables
+
+The project uses environment variables to configure settings such as the database URL, API keys, etc. To run the project, you'll need to set the following environment variables in .env files for both client and server:
+
+Client: `.env`
+```bash
+   REACT_APP_API_HTTP_URL=http://localhost:5000/graphql
+   REACT_APP_API_WS_URL=ws://localhost:5000/graphql
+```
+Server: `.env`
+```bash
+   SUPABASE_URL=your-supabase-url
+   SUPABASE_KEY=your-supabase-key
+   SUPABASE_JWT_SECRET=your-jwt-secret
+   SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+```
