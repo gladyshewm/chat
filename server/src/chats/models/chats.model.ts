@@ -27,3 +27,7 @@ export type GroupAvatarData = {
   chat_id: string;
   avatar_url?: string;
 };
+
+export type ChatWithParty = Omit<ChatWithParticipantsData, 'profiles'> & {
+  profiles: ProfileData[];
+};

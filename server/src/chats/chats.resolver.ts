@@ -135,4 +135,14 @@ export class ChatsResolver {
       currentUserUuid,
     );
   }
+
+  @UseGuards(JwtHttpAuthGuard)
+  @Mutation('changeChatName')
+  async changeChatName(
+    @Args('chatId') chatId: string,
+    @Args('newName') newName: string,
+    @Context('user_uuid') userUuid: string,
+  ): Promise<ChatWithoutMessages> {
+    return this.chatsService.changeChatName(chatId, newName, userUuid);
+  }
 }

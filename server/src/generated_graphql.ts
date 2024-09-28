@@ -98,6 +98,8 @@ export abstract class IMutation {
 
     abstract removeUserFromChat(chatId: string, userUuid: string): ChatWithoutMessages | Promise<ChatWithoutMessages>;
 
+    abstract changeChatName(chatId: string, newName: string): ChatWithoutMessages | Promise<ChatWithoutMessages>;
+
     abstract sendMessage(chatId: string, content?: Nullable<string>, attachedFiles?: Nullable<Upload[]>): Message | Promise<Message>;
 
     abstract sendTypingStatus(chatId: string, userName: string, isTyping: boolean): TypingFeedback | Promise<TypingFeedback>;
@@ -134,8 +136,6 @@ export class UserWithAvatar {
 
 export abstract class ISubscription {
     abstract chatById(chatId: string): Nullable<ChatWithoutMessages> | Promise<Nullable<ChatWithoutMessages>>;
-
-    abstract newChatCreated(): Nullable<ChatWithoutMessages> | Promise<Nullable<ChatWithoutMessages>>;
 
     abstract userChats(): ChatWithoutMessages[] | Promise<ChatWithoutMessages[]>;
 

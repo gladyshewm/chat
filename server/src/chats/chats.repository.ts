@@ -7,8 +7,10 @@ import {
 import {
   ChatData,
   ChatWithParticipantsData,
+  ChatWithParty,
   GroupAvatarData,
   PartyItem,
+  ProfileData,
 } from './models/chats.model';
 export const CHAT_REPOSITORY = 'CHAT_REPOSITORY';
 
@@ -45,6 +47,7 @@ export interface ChatRepository {
   checkDeleteAccess(file_path: string): Promise<boolean>;
   removeAvatarFromStorage(avatarPath: string): Promise<boolean>;
   getChatAvatars(chatId: string): Promise<FileObject[]>;
+  updateChatName(chatId: string, name: string): Promise<ChatWithParty>;
 }
 
 @Injectable()
@@ -551,5 +554,76 @@ export class SupabaseChatRepository implements ChatRepository {
     }
 
     return files;
+  }
+
+  async updateChatName(chatId: string, name: string): Promise<ChatWithParty> {
+    const response = (await this.supabaseService
+      .getClient()
+      .from('chat')
+      .update({ name })
+      .eq('chat_id', chatId)
+      .select(
+        `
+        chat_id,
+        user_uuid,
+        name,
+        is_group_chat,
+        created_at,
+        group_chat (
+          avatar_url
+        )
+        `,
+      )
+      .single()) as SupabaseResponse<
+      ChatData & { group_chat: { avatar_url?: string } }
+    >;
+
+    const chat = this.supabaseService.handleSupabaseResponse<
+      ChatData & { group_chat: { avatar_url?: string } }
+    >(response);
+
+    if (!chat) {
+      this.logger.warn(
+        `Чат с id ${chatId} не найден или обновление не выполнено`,
+      );
+      throw new HttpException('Chat not found', HttpStatus.NOT_FOUND);
+    }
+
+    const participantsResponse = (await this.supabaseService
+      .getClient()
+      .from('party')
+      .select(
+        `
+        profiles (
+          uuid,
+          name,
+          avatar_url
+        )
+      `,
+      )
+      .eq('chat_id', chatId)) as SupabaseResponse<{ profiles: ProfileData }[]>;
+
+    const participants =
+      this.supabaseService.handleSupabaseResponse<{ profiles: ProfileData }[]>(
+        participantsResponse,
+      );
+
+    if (!participants) {
+      this.logger.warn(`Участники чата с id ${chatId} не найдены`);
+      throw new HttpException('Participants not found', HttpStatus.NOT_FOUND);
+    }
+
+    const updatedChat: ChatWithParty = {
+      chat: {
+        ...chat,
+      },
+      profiles: participants.map((participant) => ({
+        uuid: participant.profiles.uuid,
+        name: participant.profiles.name,
+        avatar_url: participant.profiles.avatar_url,
+      })),
+    };
+
+    return updatedChat;
   }
 }

@@ -67,6 +67,7 @@ type Mutation {
   Только создатель чата может удалять участников.
   """
   removeUserFromChat(chatId: ID!, userUuid: ID!): ChatWithoutMessages!
+  changeChatName(chatId: ID!, newName: String!): ChatWithoutMessages!
 }
 
 type Subscription {

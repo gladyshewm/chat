@@ -121,8 +121,10 @@ export class ChatsService {
           userUuid,
         );
 
-        const updatedChats = await this.getUserChats(userUuid);
-        updatedChats.filter((updChat) => updChat.id !== chatId);
+        let updatedChats = await this.getUserChats(userUuid);
+        updatedChats = updatedChats.filter(
+          (updChat) => String(updChat.id) !== chatId,
+        );
         await this.pubSub.publish('userChats', { userChats: updatedChats });
 
         return isDeleted;
@@ -132,8 +134,10 @@ export class ChatsService {
           userUuid,
         );
 
-        const updatedChats = await this.getUserChats(userUuid);
-        updatedChats.filter((updChat) => updChat.id !== chatId);
+        let updatedChats = await this.getUserChats(userUuid);
+        updatedChats = updatedChats.filter(
+          (updChat) => String(updChat.id) !== chatId,
+        );
         await this.pubSub.publish('userChats', { userChats: updatedChats });
 
         return isDeleted;
@@ -451,6 +455,61 @@ export class ChatsService {
       this.logger.error(
         `Ошибка при удалении пользователя из чата: ${error.message}`,
       );
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async changeChatName(
+    chatId: string,
+    newName: string,
+    userUuid: string,
+  ): Promise<ChatWithoutMessages> {
+    try {
+      const chat = await this.chatRepository.getChatById(chatId);
+
+      if (chat.user_uuid !== userUuid) {
+        throw new HttpException(
+          'Only the chat creator can change the chat name',
+          HttpStatus.FORBIDDEN,
+        );
+      }
+
+      const updatedChat = await this.chatRepository.updateChatName(
+        chatId,
+        newName,
+      );
+
+      const newChat: ChatWithoutMessages = {
+        id: updatedChat.chat.chat_id,
+        name: updatedChat.chat.name,
+        userUuid: updatedChat.chat.user_uuid,
+        isGroupChat: updatedChat.chat.is_group_chat,
+        groupAvatarUrl: updatedChat.chat.group_chat.avatar_url,
+        participants: updatedChat.profiles.map((profile) => ({
+          id: profile.uuid,
+          name: profile.name,
+          avatarUrl: profile.avatar_url,
+        })),
+        createdAt: updatedChat.chat.created_at,
+      };
+
+      await this.pubSub.publish('chatById', {
+        chatById: newChat,
+      });
+
+      const updatedChats = await this.getUserChats(userUuid);
+
+      if (!updatedChats.some((updChat) => updChat.id === newChat.id)) {
+        updatedChats.push(newChat);
+      }
+
+      await this.pubSub.publish('userChats', {
+        userChats: updatedChats,
+      });
+
+      return newChat;
+    } catch (error) {
+      this.logger.error(`Ошибка при изменении имени чата: ${error.message}`);
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
