@@ -43,4 +43,8 @@
       }
     }
   }
+
+  & .notification-message {
+    z-index: 99;
+  }
 }

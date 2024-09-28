@@ -1,3 +1,19 @@
 mutation uploadChatAvatar($image: Upload!, $chatId: ID!) {
   uploadChatAvatar(image: $image, chatId: $chatId)
 }
+
+mutation changeChatName($chatId: ID!, $newName: String!) {
+  changeChatName(chatId: $chatId, newName: $newName) {
+    id
+    name
+    userUuid
+    isGroupChat
+    groupAvatarUrl
+    participants {
+      id
+      name
+      avatarUrl
+    }
+    createdAt
+  }
+}

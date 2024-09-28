@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Formik, Form } from 'formik';
 import { motion } from 'framer-motion';
 import './EditChatProfile.css';
-import { AvatarUploader } from '@features';
+import { AvatarUploader, SuccessMessage } from '@features';
 import {
   CustomInput,
   DrawOutline,
@@ -13,16 +14,22 @@ import { ArrowLeftIcon, CheckIcon } from '@shared/assets';
 import { chatProfileVariants } from '../motion';
 import { useChat } from '@pages/Chat/providers/ChatProvider';
 import { createChatButtonVariants } from '../../../../../Sidebar/ui/MessagesList/ui/motion';
-import { useUploadChatAvatarMutation } from './edit-chat-profile.generated';
+import {
+  useChangeChatNameMutation,
+  useUploadChatAvatarMutation,
+} from './edit-chat-profile.generated';
 
 interface EditChatProfileProps {
   setIsEditChat: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const EditChatProfile = ({ setIsEditChat }: EditChatProfileProps) => {
+  const [successMessage, setSuccessMessage] = useState<string[]>([]);
   const { chat } = useChat();
   const [uploadChatAvatar, { loading: uploadLoading }] =
     useUploadChatAvatarMutation();
+  const [changeChatName, { loading: changeLoading }] =
+    useChangeChatNameMutation();
 
   const handleAvatarSave = async (avatar: File) => {
     await uploadChatAvatar({
@@ -33,7 +40,15 @@ const EditChatProfile = ({ setIsEditChat }: EditChatProfileProps) => {
     });
   };
 
-  const handleSubmit = (values: { chatName: string }) => {};
+  const handleSubmit = async (values: { chatName: string }) => {
+    await changeChatName({
+      variables: {
+        chatId: chat?.id as string,
+        newName: values.chatName,
+      },
+    });
+    setSuccessMessage(['Название чата успешно изменено']);
+  };
 
   const handleBackClick = () => {
     setIsEditChat(false);
@@ -41,7 +56,13 @@ const EditChatProfile = ({ setIsEditChat }: EditChatProfileProps) => {
 
   return (
     <div className="edit-chat-profile">
-      {uploadLoading && <Loader />}
+      {(uploadLoading || changeLoading) && <Loader />}
+      {successMessage.length > 0 && (
+        <SuccessMessage
+          successMessage={successMessage}
+          setSuccessMessage={setSuccessMessage}
+        />
+      )}
       <DrawOutline orientation="horizontal" position="bottom">
         <motion.header
           className="chat-profile__header"

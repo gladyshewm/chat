@@ -100,6 +100,7 @@ export type Mutation = {
    * Только создатель чата может добавлять новых участников.
    */
   addUserToChat: ChatWithoutMessages;
+  changeChatName: ChatWithoutMessages;
   changeCredentials: UserInfo;
   /**
    * Создание чата.
@@ -139,6 +140,12 @@ export type Mutation = {
 export type MutationAddUserToChatArgs = {
   chatId: Scalars['ID']['input'];
   userUuid: Scalars['ID']['input'];
+};
+
+
+export type MutationChangeChatNameArgs = {
+  chatId: Scalars['ID']['input'];
+  newName: Scalars['String']['input'];
 };
 
 
