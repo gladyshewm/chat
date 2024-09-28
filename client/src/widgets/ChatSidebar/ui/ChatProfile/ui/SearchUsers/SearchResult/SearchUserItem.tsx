@@ -1,7 +1,7 @@
 import { DrawOutlineRect } from '@shared/ui';
 import { ChatWithoutMessages, UserWithAvatar } from '@shared/types';
 import { UserIcon } from '@shared/assets';
-import { useChat } from '@pages/Chat/ctx/ChatContext';
+import { useChat } from '@pages/Chat/providers/ChatProvider';
 
 interface SearchResultChatUserProps {
   resultUser: UserWithAvatar;

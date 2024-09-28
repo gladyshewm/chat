@@ -37,8 +37,8 @@
     height: calc(100% - 5.7rem);
     padding: 0.7rem;
 
-    & #participants {
-      & #participants-title {
+    & .participants {
+      & .participants-title {
         color: var(--outline-main-color);
         padding: 0.7rem;
         margin-top: 0.7rem;

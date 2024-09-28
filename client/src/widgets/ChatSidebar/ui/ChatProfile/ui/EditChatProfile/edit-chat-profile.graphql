@@ -1,0 +1,3 @@
+mutation uploadChatAvatar($image: Upload!, $chatId: ID!) {
+  uploadChatAvatar(image: $image, chatId: $chatId)
+}

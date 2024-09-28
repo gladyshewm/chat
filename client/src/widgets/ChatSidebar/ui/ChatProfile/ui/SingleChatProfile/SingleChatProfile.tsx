@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
+import "./SingleChatProfile.css";
 import { motion } from 'framer-motion';
 import { useAuth } from '@app/providers/hooks/useAuth';
 import { useUserAllAvatarsLazyQuery } from '@app/providers/ProfileProvider/profile.generated';
-import { IdentificationIcon, UserIcon } from '@shared/assets';
+import { IdentificationIcon, UserIcon, XmarkIcon } from '@shared/assets';
 import { AvatarInfo, UserWithAvatar } from '@shared/types';
-import { DrawOutline, Loader, Slider } from '@shared/ui';
+import { DrawOutline, Loader, OptionButton, Slider } from '@shared/ui';
 import { CopyMessage, useCopyMessage } from '@features';
 import { FullScreenSlider, useFullScreenSlider } from '@shared/ui/Slider';
-import { useChat } from '@pages/Chat/ctx/ChatContext';
+import { useChat } from '@pages/Chat/providers/ChatProvider';
+import { chatProfileVariants } from '../motion';
 
-/* interface SingleChatProfileProps {
-  chat: ChatWithoutMessages;
-} */
+interface SingleChatProfileProps {
+  setIsChatInfo: (isChatInfo: boolean) => void;
+}
 
-const SingleChatProfile = () => {
+const SingleChatProfile = ({ setIsChatInfo }: SingleChatProfileProps) => {
   const { user } = useAuth();
   const [avatars, setAvatars] = useState<AvatarInfo[]>([]);
   const [avatarsUrls, setAvatarsUrls] = useState<string[]>([]);
@@ -88,7 +90,7 @@ const SingleChatProfile = () => {
   };
 
   return (
-    <div className='chat-profile'>
+    <div className="single-chat-profile">
       <FullScreenSlider
         isOpen={isOpen}
         currentImage={currentImage}
@@ -98,6 +100,26 @@ const SingleChatProfile = () => {
         onNavigate={navigateSlider}
       />
       <CopyMessage copyMessage={copyMessage} />
+      <DrawOutline orientation="horizontal" position="bottom">
+        <motion.header
+          className="chat-profile__header"
+          variants={chatProfileVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <OptionButton
+            className="close-button"
+            onClick={() => setIsChatInfo(false)}
+          >
+            <abbr title="Закрыть">
+              <XmarkIcon />
+            </abbr>
+          </OptionButton>
+          <div className="chat-profile__title">
+            <p>Информация</p>
+          </div>
+        </motion.header>
+      </DrawOutline>
       <main className="profile-settings__main">
         <DrawOutline
           className="all-avatars-wrapper"

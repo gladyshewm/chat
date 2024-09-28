@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { searchVariants } from './motion';
 import { SearchMessages } from './SearchMessages';
 import { ChatProfile } from './ChatProfile';
+import SidebarMotionScale from '../../Sidebar/ui/SidebarMotionScale/SidebarMotionScale';
 
 interface ChatSidebarProps {
   isSearchMessages: boolean;
@@ -20,7 +21,7 @@ const ChatSidebar = ({
   setIsChatInfo,
 }: ChatSidebarProps) => {
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" initial={false}>
       {(isSearchMessages || isChatInfo) && (
         <motion.div
           className="search-messages"
@@ -31,10 +32,15 @@ const ChatSidebar = ({
           transition={{ duration: 0.3 }}
         >
           {isSearchMessages ? (
-            <SearchMessages
-              onMessageSelect={handleMessageSelect}
-              setIsSearch={setIsSearchMessages}
-            />
+            <SidebarMotionScale
+              className="chat-sidebar__search-messages"
+              key="search-messages"
+            >
+              <SearchMessages
+                onMessageSelect={handleMessageSelect}
+                setIsSearch={setIsSearchMessages}
+              />
+            </SidebarMotionScale>
           ) : (
             <ChatProfile setIsChatInfo={setIsChatInfo} />
           )}

@@ -166,8 +166,8 @@ export const AddChatDescription = ({
             </Form>
           )}
         </Formik>
-        <div id="participants">
-          <p id="participants-title">
+        <div className="participants">
+          <p className="participants-title">
             {formatParticipants(selectedUsers.length)}
           </p>
           {selectedUsers.map((user) => (

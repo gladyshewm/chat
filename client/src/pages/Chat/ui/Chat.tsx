@@ -17,7 +17,7 @@ import {
 } from './motion';
 import ChatHeader from './ChatHeader/ChatHeader';
 import { ChatSidebar, MessageForm, Messages } from '@widgets';
-import { ChatProvider, useChat } from '../ctx/ChatContext';
+import { ChatProvider, useChat } from '../providers/ChatProvider';
 
 const Chat = () => {
   const { user } = useAuth();
@@ -48,7 +48,7 @@ const Chat = () => {
     onError: (error) => {
       console.log(error);
     },
-    fetchPolicy: 'cache-and-network',
+    // fetchPolicy: 'cache-and-network',
   });
 
   useEffect(() => {

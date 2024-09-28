@@ -5,6 +5,10 @@
   height: 5.7rem;
   width: 100%;
 
+  & .avatar-wrapper {
+    margin-right: 0.7rem;
+  }
+
   & .avatar,
   .back-button {
     display: flex;

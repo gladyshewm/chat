@@ -7,6 +7,10 @@
   width: 100%;
   background-color: var(--base-color);
 
+  & .avatar-wrapper {
+    margin-right: 0.7rem;
+  }
+
   & .main {
     display: flex;
     align-items: center;

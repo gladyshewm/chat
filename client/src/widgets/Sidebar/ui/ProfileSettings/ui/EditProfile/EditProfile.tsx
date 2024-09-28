@@ -14,11 +14,14 @@ import {
 } from '@shared/ui';
 import { ArrowLeftIcon } from '@shared/assets';
 import DeleteModal from './DeleteModal/DeleteModal';
+
 import {
+  AvatarUploader,
   ChangeCredentialsSchema,
+  ErrorMessage,
+  SuccessMessage,
   validationChangeCredentialsSchema,
-} from '@widgets/Auth';
-import { AvatarUploader, ErrorMessage, SuccessMessage } from '@features';
+} from '@features';
 
 interface EditProfileProps {
   setIsProfileInfo: React.Dispatch<React.SetStateAction<boolean>>;

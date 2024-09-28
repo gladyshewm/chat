@@ -1,0 +1,46 @@
+.edit-chat-profile {
+  height: 100%;
+
+  & header {
+    height: 5.7rem;
+  }
+
+  & main {
+    padding: 0.7rem;
+
+    & form {
+      margin-top: 4rem;
+
+      & .profile__input-wrapper {
+        width: 100%;
+
+        & .draw-outline-rect-rect {
+          transition: stroke 0.3s ease;
+        }
+
+        &:hover .draw-outline-rect-rect {
+          stroke: var(--input-placeholder-color);
+          transition: stroke 0.3s ease;
+        }
+      }
+
+      & .input__field {
+        border-radius: 15px;
+        padding: 1rem;
+        min-width: 21.4rem;
+        min-height: 1.4rem;
+        height: 3.57rem;
+        width: 100%;
+        color: #fff;
+
+        &:focus,
+        &:not(:placeholder-shown) {
+          & + .input__label {
+            transform: translate(0, -120%) scale(0.8);
+            color: #fff;
+          }
+        }
+      }
+    }
+  }
+}

@@ -51,8 +51,8 @@
 
 .edit-profile .credentials {
   position: relative;
-  margin: 3.5rem 1rem 1rem;
-  padding: 0.5rem;
+  margin: 3.5rem 0 1rem;
+  padding: 0 0.7rem;
   display: flex;
   align-items: center;
   flex-direction: column;

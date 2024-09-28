@@ -1,0 +1,54 @@
+query user {
+  user {
+    user {
+      uuid
+      name
+      email
+    }
+    token
+  }
+}
+
+mutation createUser($createInput: CreateUserInput!) {
+  createUser(createInput: $createInput) {
+    user {
+      uuid
+      name
+      email
+    }
+    accessToken
+    refreshToken
+  }
+}
+
+mutation logInUser($loginInput: LoginUserInput!) {
+  logInUser(loginInput: $loginInput) {
+    user {
+      uuid
+      name
+      email
+    }
+    accessToken
+    refreshToken
+  }
+}
+
+mutation logOutUser {
+  logOutUser
+}
+
+mutation refreshToken {
+  refreshToken {
+    user {
+      uuid
+      name
+      email
+    }
+    accessToken
+    refreshToken
+  }
+}
+
+mutation deleteUser {
+  deleteUser
+}

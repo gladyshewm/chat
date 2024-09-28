@@ -1,11 +1,18 @@
-.chat-profile {
-  height: calc(100vh - 5.7rem);
-  overflow: hidden auto;
+.group-chat-profile {
+  height: 100%;
 
   & .profile-settings__main {
+    overflow: hidden auto;
+    height: calc(100% - 5.7rem);
+    margin: 0;
+
     & .participants {
       padding: 0 0.7rem;
       margin: 0.7rem 0;
+
+      & .avatar-wrapper {
+        margin-right: 0.7rem;
+      }
 
       & .subtitle {
         display: flex;
@@ -29,6 +36,89 @@
             }
           }
         }
+      }
+    }
+  }
+}
+
+.chat-profile__header {
+  display: flex;
+  align-items: center;
+  height: 5.7rem;
+  width: 100%;
+  padding: 0 1.5rem;
+
+  & .close-button {
+    margin-right: 0.8rem;
+
+    &.action {
+      margin-right: 0;
+    }
+
+    & abbr {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      width: 100%;
+      height: 100%;
+
+      & svg {
+        stroke: #fff;
+      }
+    }
+  }
+
+  & .chat-profile__title {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    height: 2.8rem;
+
+    & p {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #fff;
+    }
+  }
+
+  & .action-button {
+    z-index: 99;
+    position: absolute;
+    right: 1.5rem;
+    bottom: -3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 1rem;
+    padding: 0 0.7rem;
+    height: 3rem;
+    width: 12rem;
+    background-color: rgba(25, 25, 25, 0.8);
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(153, 153, 153, 0.3);
+      transition: background-color 0.3s ease;
+    }
+
+    & .action-button__text {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      padding: 0 0.7rem;
+
+      & p {
+        font-size: 0.9rem;
+        color: #fff;
+      }
+
+      & svg {
+        stroke: #fff;
+        margin-right: 1.5rem;
       }
     }
   }

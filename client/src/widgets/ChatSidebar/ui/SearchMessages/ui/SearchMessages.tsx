@@ -24,7 +24,7 @@ import { formatMessages } from '../utils';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import { ExclamationTriangleIcon, UserIcon, XmarkIcon } from '@shared/assets';
-import { useChat } from '@pages/Chat/ctx/ChatContext';
+import { useChat } from '@pages/Chat/providers/ChatProvider';
 
 const SearchResultItem = ({ message }: { message: Message }) => {
   return (

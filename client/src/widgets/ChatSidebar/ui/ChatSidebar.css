@@ -16,3 +16,8 @@
     }
   }
 }
+
+.chat-sidebar__search-messages {
+  width: 100%;
+  height: 100%;
+}
