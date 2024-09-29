@@ -1,6 +1,5 @@
 .login-form {
   height: 100%;
-  margin: 40px 0;
 
   & form {
     display: flex;
@@ -20,13 +19,13 @@
 
   & .buttons {
     & .button-wrapper:first-child {
-      margin-bottom: 20px;
+      margin-bottom: 1.4rem;
     }
   }
 }
 
 .input-wrapper {
-  margin-bottom: 20px;
+  margin-bottom: 1.4rem;
 
   & .draw-outline-rect-rect {
     transition: stroke 0.3s ease;
@@ -36,4 +35,8 @@
     stroke: var(--input-placeholder-color);
     transition: stroke 0.3s ease;
   }
+}
+
+.button-wrapper {
+  padding: 1px;
 }

@@ -148,6 +148,7 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
                     placeholder=" "
                     label="Пароль"
                     type="password"
+                    autoComplete="new-password"
                   />
                 </DrawOutlineRect>
                 <DrawOutlineRect
@@ -160,6 +161,7 @@ const EditProfile = ({ setIsProfileInfo }: EditProfileProps) => {
                     placeholder=" "
                     label="Подтверждение пароля"
                     type="password"
+                    autoComplete="new-password"
                   />
                 </DrawOutlineRect>
                 <DrawOutlineRect

@@ -1,0 +1,43 @@
+.no-messages-illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 16rem;
+  position: relative;
+  width: 100%;
+}
+
+.speech-bubble {
+  width: 8.5rem;
+  height: 5.7rem;
+  background-color: var(--outline-main-color);
+  border-radius: 1.4rem;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 1.4rem 1.4rem 0;
+  border-style: solid;
+  border-color: var(--outline-main-color) transparent transparent transparent;
+}
+
+.dots {
+  display: flex;
+  justify-content: space-around;
+  width: 2.85rem;
+}
+
+.dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  background-color: #d4d4d4;
+  border-radius: 50%;
+}

@@ -64,5 +64,6 @@
   & .user-name {
     color: var(--outline-main-color);
     transition: color 0.3s ease;
+    margin-left: 0.7rem;
   }
 }

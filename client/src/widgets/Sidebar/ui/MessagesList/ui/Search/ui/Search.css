@@ -16,13 +16,16 @@
   align-items: center;
   justify-content: flex-start;
 
+  & .no-users-illustration {
+    margin-top: 30%;
+  }
+
   & .search-illustration {
     margin-top: 30%;
   }
 
   & p {
     text-align: center;
-    margin-top: 20px;
     color: var(--outline-main-color);
   }
 

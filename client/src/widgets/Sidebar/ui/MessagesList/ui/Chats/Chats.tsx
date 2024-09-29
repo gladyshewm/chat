@@ -3,7 +3,7 @@ import { ApolloError } from '@apollo/client';
 import './Chats.css';
 import { motion } from 'framer-motion';
 import { ChatWithoutMessages, UserInfo } from '@shared/types';
-import { DrawOutlineRect, Loader } from '@shared/ui';
+import { DrawOutlineRect, Loader, NoChatsIllustration } from '@shared/ui';
 import { UserGroupIcon, UserIcon } from '@shared/assets';
 
 interface GroupChatProps {
@@ -102,7 +102,13 @@ const Chats = ({
 }: ChatsProps) => {
   if (chatsLoading) return <Loader />;
   if (chatsError) return <p>Error</p>;
-  if (!chats) return <p>No messages</p>;
+  if (!chats || chats.length === 0)
+    return (
+      <div className="no-chats-block">
+        <NoChatsIllustration />
+        <p>Не найдено ни одного чата</p>
+      </div>
+    );
 
   return chats.map((chat) => (
     <motion.div key={chat.id} whileTap={{ scale: 0.95 }}>

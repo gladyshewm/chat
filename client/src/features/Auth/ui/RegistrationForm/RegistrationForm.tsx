@@ -43,10 +43,20 @@ const RegistrationForm = () => {
         >
           <Form>
             <DrawOutlineRect className="input-wrapper" rx="15px">
-              <CustomInput name="email" placeholder=" " label="E-mail" />
+              <CustomInput
+                name="email"
+                placeholder=" "
+                label="E-mail"
+                spellCheck={false}
+              />
             </DrawOutlineRect>
             <DrawOutlineRect className="input-wrapper" rx="15px">
-              <CustomInput name="username" placeholder=" " label="Имя" />
+              <CustomInput
+                name="username"
+                placeholder=" "
+                label="Имя"
+                spellCheck={false}
+              />
             </DrawOutlineRect>
             <DrawOutlineRect className="input-wrapper" rx="15px">
               <CustomInput

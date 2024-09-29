@@ -5,7 +5,6 @@ export { Loader } from './Loader/Loader';
 export { ImageLoader } from './ImageLoader/ImageLoader';
 export { default as Modal } from './Modal/Modal';
 export { default as Cross } from './Cross/Cross';
-export { default as SearchIllustration } from './SearchIllustration/SearchIllustration';
-export { default as SpaceBackground } from './SpaceBackground/SpaceBackground';
+export * from './illustrations';
 export { Slider } from './Slider';
 export { default as Emoji } from './Emoji/Emoji';

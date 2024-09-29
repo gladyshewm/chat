@@ -1,4 +1,4 @@
-#search-messages__header {
+.search-messages__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -33,10 +33,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: calc(100% - 80px);
+  height: calc(100% - 5.7rem);
 
-  & .search-results {
+  & .search-results,
+  & .search-block {
     height: 100%;
+
+    & .no-messages-illustration {
+      margin-top: 30%;
+    }
   }
 
   & .count {
@@ -49,7 +54,6 @@
 
     & span {
       margin-left: 1rem;
-      font-size: 1.1rem;
       font-weight: bold;
       color: var(--outline-main-color);
     }
@@ -87,6 +91,7 @@
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+        margin-left: 0.7rem;
       }
     }
   }

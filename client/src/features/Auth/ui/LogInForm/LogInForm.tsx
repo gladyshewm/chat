@@ -38,7 +38,12 @@ const LogInForm = ({ handleCreateAccountClick }: LogInFormProps) => {
         >
           <Form>
             <DrawOutlineRect className="input-wrapper" rx="15px">
-              <CustomInput name="email" placeholder=" " label="E-mail" />
+              <CustomInput
+                name="email"
+                placeholder=" "
+                label="E-mail"
+                spellCheck={false}
+              />
             </DrawOutlineRect>
             <DrawOutlineRect className="input-wrapper" rx="15px">
               <CustomInput

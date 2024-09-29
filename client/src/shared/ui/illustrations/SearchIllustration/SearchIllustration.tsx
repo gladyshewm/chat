@@ -4,7 +4,13 @@ import { AnimatePresence, motion } from 'framer-motion';
 const SearchIllustration = () => {
   return (
     <AnimatePresence>
-      <div className="search-illustration">
+      <motion.div
+        className="search-illustration"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3 }}
+      >
         <motion.div
           className="magnifier"
           animate={{
@@ -37,7 +43,7 @@ const SearchIllustration = () => {
             }}
           />
         ))}
-      </div>
+      </motion.div>
     </AnimatePresence>
   );
 };

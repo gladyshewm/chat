@@ -2,7 +2,11 @@ import { ApolloError } from '@apollo/client';
 import { motion } from 'framer-motion';
 import './Search.css';
 import { UserWithAvatar } from '@shared/types';
-import { Cross, DrawOutlineRect, SearchIllustration } from '@shared/ui';
+import {
+  DrawOutlineRect,
+  NoUsersIllustration,
+  SearchIllustration,
+} from '@shared/ui';
 import { ExclamationTriangleIcon } from '@shared/assets';
 import { SearchResultUser } from './SearchResultItem/SearchResultUser';
 
@@ -40,8 +44,8 @@ export const Search = ({
   if (searchValue !== '' && (!searchData || !searchData.length)) {
     return (
       <div className="search-block">
-        <Cross className="search-cross" strokeWidth={18} />
-        <p>Пользователь не найден</p>
+        <NoUsersIllustration />
+        <p>Пользователи не найдены</p>
       </div>
     );
   }

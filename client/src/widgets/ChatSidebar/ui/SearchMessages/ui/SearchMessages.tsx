@@ -10,9 +10,9 @@ import {
   map,
 } from 'rxjs';
 import {
-  Cross,
   DrawOutline,
   DrawOutlineRect,
+  NoMessagesIllustration,
   OptionButton,
   SearchIllustration,
   SearchInput,
@@ -101,8 +101,8 @@ const renderSearchResults = ({
   if (searchValue !== '' && (!searchData || !searchData.length)) {
     return (
       <div className="search-block">
-        <Cross className="search-cross" strokeWidth={18} />
-        <p>Сообщение не найдено</p>
+        <NoMessagesIllustration />
+        <p>Сообщения не найдены</p>
       </div>
     );
   }
@@ -211,7 +211,7 @@ const SearchMessages = ({
       >
         <DrawOutline orientation="horizontal" position="bottom">
           <motion.header
-            id="search-messages__header"
+            className="search-messages__header"
             variants={contentVariants}
             initial="hidden"
             animate="visible"
