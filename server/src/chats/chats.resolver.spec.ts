@@ -447,4 +447,40 @@ describe('ChatsResolver', () => {
       ).rejects.toThrow('Service Error');
     });
   });
+
+  describe('changeChatName', () => {
+    const chatId = '12312213213';
+    const newChatName = 'mockNewChatName';
+    const userUuid = 'mockUserUuid';
+
+    it('should call chatsService.changeChatName with correct data', async () => {
+      await chatsResolver.changeChatName(chatId, newChatName, userUuid);
+      expect(chatsService.changeChatName).toHaveBeenCalledWith(
+        chatId,
+        newChatName,
+        userUuid,
+      );
+    });
+
+    it('should return updated chat if chat name is changed', async () => {
+      const newChat = chatWithoutMessagesStub(chatId, newChatName, userUuid);
+      chatsService.changeChatName.mockResolvedValue(newChat);
+
+      const result = await chatsResolver.changeChatName(
+        chatId,
+        newChatName,
+        userUuid,
+      );
+
+      expect(result).toBe(newChat);
+    });
+
+    it('should propagate error if chatsService.changeChatName throws an error', async () => {
+      chatsService.changeChatName.mockRejectedValue(new Error('Service Error'));
+
+      await expect(
+        chatsResolver.changeChatName(chatId, newChatName, userUuid),
+      ).rejects.toThrow('Service Error');
+    });
+  });
 });
